@@ -113,14 +113,14 @@ module shallwemove::cardgame {
       public_key : public_key
       });
   }
-  
+
   entry fun create_card_game(root_game : &RootGame, ctx: &mut TxContext) {
     assert!(root_game.admin == tx_context::sender(ctx), 403);
 
     transfer::share_object(CardGame{
       id : object::new(ctx),
       root_game_id : object::id(root_game),
-      game_tables : vector[option::none()]
+      game_tables : vector[]
     });
   }
 
@@ -137,11 +137,12 @@ module shallwemove::cardgame {
       game_status : game_status,
       money_box : money_box,
       card_deck : option::some(empty_card_deck),
-      used_card_decks : vector[option::none()],
-      player_hands : vector[option::none()]
+      used_card_decks : vector[],
+      player_hands : vector[]
     };
 
     let object_field_key = card_game.game_tables.length() + 1;
+    card_game.game_tables.push_back(option::some(object::id(&game_table)));
 
     dynamic_object_field::add(&mut card_game.id, object_field_key, game_table);
 
@@ -174,22 +175,22 @@ module shallwemove::cardgame {
       game_info : game_info,
       money_box_info : money_box_info,
       card_info : card_info,
-      player_infos : vector[option::none()]
+      player_infos : vector[]
     }
   }
 
   fun create_money_box(ctx : &mut TxContext) : MoneyBox {
     MoneyBox {
       id : object::new(ctx),
-      money : vector[option::none()]
+      money : vector[]
     }
   }
 
   fun create_card_deck(ctx : &mut TxContext) : CardDeck {
     CardDeck {
       id : object::new(ctx),
-      avail_cards : vector[option::none()],
-      used_cards : vector[option::none()],
+      avail_cards : vector[],
+      used_cards : vector[],
     }
 
   }
