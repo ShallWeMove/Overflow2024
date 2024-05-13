@@ -1,6 +1,6 @@
 
 /// Module: shallwemove
-module shallwemove::shallwemove {
+module shallwemove::cardgame {
   use sui::object::{Self, ID, UID};
   use std::string::{Self, String};
   use sui::tx_context::{Self, TxContext};
@@ -11,6 +11,16 @@ module shallwemove::shallwemove {
     id: UID,
     admin: address,
     publicKey: vector<u8>
+  }
+
+  struct CardGame has key {
+    id: UID,
+    rootgame_id : ID,
+    game_tables : vector<GameTable>
+  }
+
+  struct GameTable has key, store {
+    id : UID
   }
 
   fun init(ctx: &mut TxContext) {

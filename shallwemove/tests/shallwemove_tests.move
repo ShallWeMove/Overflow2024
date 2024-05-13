@@ -1,7 +1,7 @@
 #[test_only]
 module shallwemove::shallwemove_tests {
     // uncomment this line to import the module
-    use shallwemove::shallwemove;
+    use shallwemove::cardgame;
 
     const ENotImplemented: u64 = 0;
 
