@@ -173,7 +173,7 @@ module shallwemove::cardgame {
     
     let game_table = GameTable {
       id : object::new(ctx),
-      card_game_id : object::id(card_game),
+      card_game_id : card_game.id(),
       game_status : game_status,
       money_box : money_box,
       card_deck : option::some(card_deck),
@@ -181,15 +181,15 @@ module shallwemove::cardgame {
       player_hands : vector[]
     };
 
-    card_game.game_tables.push_back(object::id(&game_table));
+    card_game.game_tables.push_back(game_table.id());
 
-    dynamic_object_field::add<ID, GameTable>(&mut card_game.id, object::id(&game_table), game_table);
+    dynamic_object_field::add<ID, GameTable>(&mut card_game.id, game_table.id(), game_table);
   }
 
   // --------- For Player ---------
 
   entry fun enter_game(root_game : &RootGame, card_game : &CardGame, player_hand : &PlayerHand, ctx : &mut TxContext) {
-    assert!(object::id(root_game) == card_game.root_game_id, 403);
+    assert!(root_game.id() == card_game.root_game_id(), 403);
   }
 
   // =================== None Entry Functions ====================
