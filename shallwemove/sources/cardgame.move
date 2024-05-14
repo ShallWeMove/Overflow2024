@@ -195,6 +195,8 @@ module shallwemove::cardgame {
   // =================== None Entry Functions ====================
   // =============================================================
 
+  // --------- Create Functions ---------
+
   fun create_game_status(ante_amount : u64, bet_unit : u64, game_seats : u8) : GameStatus {
     assert!(game_seats >= 3 && game_seats <= 6, 403);
 
@@ -239,28 +241,13 @@ module shallwemove::cardgame {
       avail_cards : vector[],
       used_cards : vector[],
     };
-    fill_card_deck(&mut card_deck, root_game.public_key,  ctx);
+
+    card_deck.fill_card(root_game.public_key(), ctx);
+
     card_deck
   }
 
-  fun fill_card_deck(card_deck : &mut CardDeck, public_key : vector<u8>, ctx : &mut TxContext) {
-    let fifty_two_numbers_array = get_fifty_two_numbers_array();
-    let shuffled_fifty_two_numbers_array = shuffle(fifty_two_numbers_array);
-    let mut encrypted_fifty_two_numbers_array = encrypt(shuffled_fifty_two_numbers_array, public_key);
-
-    let mut i = encrypted_fifty_two_numbers_array.length();
-    while (i > 0) {
-      let card = Card {
-        id : object::new(ctx),
-        index : (i as u8),
-        card_number : encrypted_fifty_two_numbers_array.pop_back()
-      };
-
-      card_deck.avail_cards.push_back(card);
-
-      i = i - 1;
-    };
-  }
+  // --------- Utility Functions ---------
 
   fun get_fifty_two_numbers_array() : vector<u8> {
     let mut fifty_two_numbers_array = vector<u8>[];
@@ -282,22 +269,7 @@ module shallwemove::cardgame {
     vector<u8>[34, 9, 15, 3, 43, 10, 19, 36, 20, 22, 40, 28, 50, 26, 47, 42, 17, 48, 37, 33, 51, 24, 8, 23, 21, 5, 4, 1, 12, 6, 31, 14, 35, 41, 11, 32, 7, 29, 46, 30, 13, 16, 18, 27, 49, 39, 44, 38, 2, 25, 45, 52]
   }
 
-  fun get_available_game_table_id(card_game : &CardGame) : Option<ID> {
-    let mut game_tables = card_game.game_tables;
-    debug::print(&string::utf8(b"game tables : "));
-    debug::print(&game_tables);
 
-    while (!game_tables.is_empty()) {
-      let game_table_id = game_tables.pop_back();
-      let game_table = dynamic_object_field::borrow<ID, GameTable> (&card_game.id, game_table_id);
-      if (game_table.game_status.game_info.avail_seats > 0) {
-        debug::print(&string::utf8(b"게임을 찾았다!"));
-        return option::some(game_table_id)
-      };
-    };
-
-    return option::none()
-  }
 
   // ===================== Methods ===============================
   // =============================================================
@@ -323,6 +295,24 @@ module shallwemove::cardgame {
 
   use fun card_game_game_tables as CardGame.game_tables;
   fun card_game_game_tables(card_game : &CardGame) : vector<ID> {card_game.game_tables}
+
+  use fun get_available_game_table_id as CardGame.avail_game_table;
+  fun get_available_game_table_id(card_game : &CardGame) : Option<ID> {
+    let mut game_tables = card_game.game_tables();
+    debug::print(&string::utf8(b"game tables : "));
+    debug::print(&game_tables);
+
+    while (!game_tables.is_empty()) {
+      let game_table_id = game_tables.pop_back();
+      let game_table = dynamic_object_field::borrow<ID, GameTable> (&card_game.id, game_table_id);
+      if (game_table.game_status.avail_seats() > 0) {
+        debug::print(&string::utf8(b"게임을 찾았다!"));
+        return option::some(game_table_id)
+      };
+    };
+
+    return option::none()
+  }
 
   // --------- GameTable ---------
 
@@ -399,6 +389,26 @@ module shallwemove::cardgame {
   use fun card_deck_id as CardDeck.id;
   fun card_deck_id(card_deck : &CardDeck) : ID {object::id(card_deck)}
 
+  use fun fill_card_deck as CardDeck.fill_card;
+  fun fill_card_deck(card_deck : &mut CardDeck, public_key : vector<u8>, ctx : &mut TxContext) {
+    let fifty_two_numbers_array = get_fifty_two_numbers_array();
+    let shuffled_fifty_two_numbers_array = shuffle(fifty_two_numbers_array);
+    let mut encrypted_fifty_two_numbers_array = encrypt(shuffled_fifty_two_numbers_array, public_key);
+
+    let mut i = encrypted_fifty_two_numbers_array.length();
+    while (i > 0) {
+      let card = Card {
+        id : object::new(ctx),
+        index : (i as u8),
+        card_number : encrypted_fifty_two_numbers_array.pop_back()
+      };
+
+      card_deck.avail_cards.push_back(card);
+
+      i = i - 1;
+    };
+  }
+
   // --------- Card ---------
 
   use fun card_id as Card.id;
@@ -472,7 +482,7 @@ module shallwemove::cardgame {
     create_and_add_game_table(&root_game, &mut card_game, 5,5,5, ctx);
     create_and_add_game_table(&root_game, &mut card_game, 5,5,5, ctx);
 
-    let game_table_id = get_available_game_table_id(&card_game); 
+    let game_table_id = card_game.avail_game_table();
     debug::print(&game_table_id);
 
 
