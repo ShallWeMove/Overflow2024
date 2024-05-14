@@ -9,7 +9,7 @@ module shallwemove::cardgame {
   // FUNCTIONS
     // Entry Functions
     // None Entry Functions
-    // Accessors
+    // Methods
   // TEST
   // --------------------------
 
@@ -140,10 +140,10 @@ module shallwemove::cardgame {
   // ====================== Entry Functions ======================
   // =============================================================
 
-  // --------- For Dealer ---------
+  // --------- For Game Owner ---------
 
   // This function will be executed in the Backend
-  // dealer or anyone who wanna be a dealer can create new game
+  // game owner or anyone who wanna be a game owner can create new game
   // RootGame object is essential to play game
   entry fun create_root_game(public_key : vector<u8>, ctx: &mut TxContext) {
     transfer::freeze_object(
@@ -299,7 +299,7 @@ module shallwemove::cardgame {
     return option::none()
   }
 
-  // =================== Accessors ===============================
+  // ===================== Methods ===============================
   // =============================================================
 
   // --------- RootGame ---------
