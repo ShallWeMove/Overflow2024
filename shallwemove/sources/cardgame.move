@@ -1,6 +1,22 @@
-
-/// Module: shallwemove
 module shallwemove::cardgame {
+  // ------ Contents ----------
+  // IMPORTS
+  // CONSTANTS
+    // GAME STATUSES
+    // ERRORS
+  // EVENTS
+  // STRUCTS
+  // FUNCTIONS
+    // Entry Functions
+    // None Entry Functions
+    // Accessors
+  // TEST
+  // --------------------------
+
+  // ============================================
+  // ============= IMPORTS ======================
+  // ============================================
+
   use sui::object::{Self, ID, UID};
   use std::string::{Self, String};
   use sui::tx_context::{Self, TxContext};
@@ -10,6 +26,24 @@ module shallwemove::cardgame {
   use sui::sui::SUI;
   use sui::dynamic_object_field;
   use std::debug;
+
+  // ============================================
+  // ============== CONSTANTS ===================
+  // ============================================
+
+  // ==================== Game Statuses ==========================
+  // =============================================================
+
+  // ======================= Errors ==============================
+  // =============================================================
+
+  // ============================================
+  // ============== EVENTS ======================
+  // ============================================
+
+  // ============================================
+  // ============== STRUCTS =====================
+  // ============================================
 
   // game object which can create game table
   public struct RootGame has key {
@@ -40,7 +74,6 @@ module shallwemove::cardgame {
     money_box_info : MoneyBoxInfo,
     card_info : CardInfo,
     player_infos : vector<PlayerInfo>
-
   }
 
   public struct GameInfo has store {
@@ -56,7 +89,6 @@ module shallwemove::cardgame {
 
   public struct MoneyBoxInfo has store {
     total_bet_amount : u64
-
   }
 
   public struct CardInfo has store {
@@ -98,8 +130,17 @@ module shallwemove::cardgame {
     money : vector<Coin<SUI>>
   }
 
+  // ============================================
+  // ============== FUNCTIONS ===================
+  // ============================================
+
   fun init(ctx: &mut TxContext) {
   }
+
+  // ====================== Entry Functions ======================
+  // =============================================================
+
+  // --------- For Dealer ---------
 
   // This function will be executed in the Backend
   // dealer or anyone who wanna be a dealer can create new game
@@ -143,8 +184,16 @@ module shallwemove::cardgame {
     card_game.game_tables.push_back(object::id(&game_table));
 
     dynamic_object_field::add<ID, GameTable>(&mut card_game.id, object::id(&game_table), game_table);
-
   }
+
+  // --------- For Player ---------
+
+  entry fun enter_game(root_game : &RootGame, card_game : &CardGame, player_hand : &PlayerHand, ctx : &mut TxContext) {
+    assert!(object::id(root_game) == card_game.root_game_id, 403);
+  }
+
+  // =================== None Entry Functions ====================
+  // =============================================================
 
   fun create_game_status(ante_amount : u64, bet_unit : u64, game_seats : u8) : GameStatus {
     assert!(game_seats >= 3 && game_seats <= 6, 403);
@@ -211,7 +260,6 @@ module shallwemove::cardgame {
 
       i = i - 1;
     };
-
   }
 
   fun get_fifty_two_numbers_array() : vector<u8> {
@@ -234,11 +282,6 @@ module shallwemove::cardgame {
     vector<u8>[34, 9, 15, 3, 43, 10, 19, 36, 20, 22, 40, 28, 50, 26, 47, 42, 17, 48, 37, 33, 51, 24, 8, 23, 21, 5, 4, 1, 12, 6, 31, 14, 35, 41, 11, 32, 7, 29, 46, 30, 13, 16, 18, 27, 49, 39, 44, 38, 2, 25, 45, 52]
   }
 
-  entry fun enter_game(root_game : &RootGame, card_game : &CardGame, player_hand : &PlayerHand, ctx : &mut TxContext) {
-    assert!(object::id(root_game) == card_game.root_game_id, 403);
-
-  }
-
   fun get_available_game_table_id(card_game : &CardGame) : Option<ID> {
     let mut game_tables = card_game.game_tables;
     debug::print(&string::utf8(b"game tables : "));
@@ -256,7 +299,13 @@ module shallwemove::cardgame {
     return option::none()
   }
 
-  // ====================== TEST ======================
+  // =================== Accessors ===============================
+  // =============================================================
+
+
+  // ============================================
+  // ================ TEST ======================
+  // ============================================
   #[test_only] 
   use sui::test_scenario;
 
