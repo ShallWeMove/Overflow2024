@@ -5,13 +5,13 @@ module shallwemove::shallwemove_tests {
 
     const ENotImplemented: u64 = 0;
 
-    #[test]
-    fun test_shallwemove() {
-        // pass
-    }
+    // #[test]
+    // fun test_shallwemove() {
+    //     // pass
+    // }
 
-    #[test, expected_failure(abort_code = shallwemove::shallwemove_tests::ENotImplemented)]
-    fun test_shallwemove_fail() {
-        abort ENotImplemented
-    }
+    // #[test, expected_failure(abort_code = shallwemove::shallwemove_tests::ENotImplemented)]
+    // fun test_shallwemove_fail() {
+    //     abort ENotImplemented
+    // }
 }

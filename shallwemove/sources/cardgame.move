@@ -9,6 +9,7 @@ module shallwemove::cardgame {
   use sui::coin::{Self, Coin};
   use sui::sui::SUI;
   use sui::dynamic_object_field;
+  use std::debug;
 
   // game object which can create game table
   public struct RootGame has key {
@@ -20,7 +21,7 @@ module shallwemove::cardgame {
   public struct CardGame has key {
     id: UID,
     root_game_id : ID,
-    game_tables : vector<Option<ID>>
+    game_tables : vector<ID>
   }
 
   public struct GameTable has key, store {
@@ -29,15 +30,15 @@ module shallwemove::cardgame {
     game_status : GameStatus,
     money_box : MoneyBox,
     card_deck : Option<CardDeck>,
-    used_card_decks : vector<Option<ID>>,
-    player_hands : vector<Option<PlayerHand>>
+    used_card_decks : vector<ID>,
+    player_hands : vector<PlayerHand>
   }
 
   public struct GameStatus has store {
     game_info : GameInfo,
     money_box_info : MoneyBoxInfo,
     card_info : CardInfo,
-    player_infos : vector<Option<PlayerInfo>>
+    player_infos : vector<PlayerInfo>
 
   }
 
@@ -73,15 +74,13 @@ module shallwemove::cardgame {
 
   public struct MoneyBox has key, store {
     id : UID,
-    money : vector<Option<Coin<SUI>>>
+    money : vector<Coin<SUI>>
   }
 
   public struct CardDeck has key, store {
     id : UID,
-    avail_cards : vector<Option<Card>>,
-    // avail_cards : vector<Option<ID>>,
-    used_cards : vector<Option<Card>>
-    // used_cards : vector<Option<ID>>
+    avail_cards : vector<Card>,
+    used_cards : vector<Card>
   }
 
   public struct Card has key, store {
@@ -94,9 +93,8 @@ module shallwemove::cardgame {
     id : UID,
     owner : address,
     public_key : vector<u8>,
-    cards : vector<Option<Card>>,
-    // cards : vector<Option<ID>>,
-    money : Option<Coin<SUI>>
+    cards : vector<Card>,
+    money : vector<Coin<SUI>>
   }
 
   fun init(ctx: &mut TxContext) {
@@ -129,7 +127,7 @@ module shallwemove::cardgame {
 
     let game_status = create_game_status(ante_amount, bet_unit, game_seats);
     let money_box = create_money_box(ctx);
-    let empty_card_deck = create_card_deck(ctx);
+    let empty_card_deck = create_card_deck(root_game, ctx);
     
     let game_table = GameTable {
       id : object::new(ctx),
@@ -142,7 +140,7 @@ module shallwemove::cardgame {
     };
 
     let object_field_key = card_game.game_tables.length() + 1;
-    card_game.game_tables.push_back(option::some(object::id(&game_table)));
+    card_game.game_tables.push_back(object::id(&game_table));
 
     dynamic_object_field::add(&mut card_game.id, object_field_key, game_table);
 
@@ -186,18 +184,75 @@ module shallwemove::cardgame {
     }
   }
 
-  fun create_card_deck(ctx : &mut TxContext) : CardDeck {
-    CardDeck {
+  fun create_card_deck(root_game : &RootGame, ctx : &mut TxContext) : CardDeck {
+    let mut card_deck = CardDeck {
       id : object::new(ctx),
       avail_cards : vector[],
       used_cards : vector[],
-    }
+    };
+    fill_card_deck(&mut card_deck, root_game.public_key,  ctx);
+    card_deck
+  }
+
+  fun fill_card_deck(card_deck : &mut CardDeck, public_key : vector<u8>, ctx : &mut TxContext) {
+    let fifty_two_numbers_array = get_fifty_two_numbers_array();
+    let mut shuffled_fifty_two_numbers_array = shuffle(fifty_two_numbers_array);
+    let mut encrypted_fifty_two_numbers_array = encrypt(shuffled_fifty_two_numbers_array, public_key);
+
+    let mut i = encrypted_fifty_two_numbers_array.length();
+    while (i > 0) {
+      let card = Card {
+        id : object::new(ctx),
+        index : (i as u8),
+        card_number : encrypted_fifty_two_numbers_array.pop_back()
+      };
+
+      card_deck.avail_cards.push_back(card);
+
+      i = i - 1;
+    };
 
   }
 
-  fun create_card() {
+  fun get_fifty_two_numbers_array() : vector<u8> {
+    let mut fifty_two_numbers_array = vector<u8>[];
+    let mut i = 52;
+    while (i > 0) {
+      fifty_two_numbers_array.push_back(i);
+      i = i - 1;
+    };
+    fifty_two_numbers_array
+  }
+
+  fun shuffle(number_array : vector<u8>) : vector<u8> {
+    // 임시 하드코딩
+    vector<u8>[34, 9, 15, 3, 43, 10, 19, 36, 20, 22, 40, 28, 50, 26, 47, 42, 17, 48, 37, 33, 51, 24, 8, 23, 21, 5, 4, 1, 12, 6, 31, 14, 35, 41, 11, 32, 7, 29, 46, 30, 13, 16, 18, 27, 49, 39, 44, 38, 2, 25, 45, 52]
+  }
+
+  fun encrypt(number_array : vector<u8>, public_key : vector<u8>) : vector<u8> {
+    // 임시 하드코딩
+    vector<u8>[34, 9, 15, 3, 43, 10, 19, 36, 20, 22, 40, 28, 50, 26, 47, 42, 17, 48, 37, 33, 51, 24, 8, 23, 21, 5, 4, 1, 12, 6, 31, 14, 35, 41, 11, 32, 7, 29, 46, 30, 13, 16, 18, 27, 49, 39, 44, 38, 2, 25, 45, 52]
+  }
+
+  entry fun enter_game(root_game : &RootGame, card_game : &CardGame, player_hand : &PlayerHand, ctx : &mut TxContext) {
 
   }
 
+
+
+  #[test]
+  fun test_cardgame() {
+
+    let fifty_two_numbers_array = get_fifty_two_numbers_array();
+    let mut shuffled_fifty_two_numbers_array = shuffle(fifty_two_numbers_array);
+
+    let mut i = shuffled_fifty_two_numbers_array.length();
+    while (i > 0) {
+      let number = shuffled_fifty_two_numbers_array.pop_back();
+      debug::print(&number);
+    
+      i = i - 1;
+    };
+  }
 
 }
