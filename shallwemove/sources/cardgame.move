@@ -302,6 +302,124 @@ module shallwemove::cardgame {
   // =================== Accessors ===============================
   // =============================================================
 
+  // --------- RootGame ---------
+
+  use fun root_game_id as RootGame.id;
+  fun root_game_id(root_game : &RootGame) : ID {object::id(root_game)}
+
+  use fun root_game_admin as RootGame.admin;
+  fun root_game_admin(root_game : &RootGame) : address {root_game.admin}
+
+  use fun root_game_public_key as RootGame.public_key;
+  fun root_game_public_key(root_game : &RootGame) : vector<u8> {root_game.public_key}
+
+  // --------- CardGame ---------
+
+  use fun card_game_id as CardGame.id;
+  fun card_game_id(card_game : &CardGame) : ID {object::id(card_game)}
+
+  use fun card_game_root_game_id as CardGame.root_game_id;
+  fun card_game_root_game_id(card_game : &CardGame) : ID {card_game.root_game_id}
+
+  use fun card_game_game_tables as CardGame.game_tables;
+  fun card_game_game_tables(card_game : &CardGame) : vector<ID> {card_game.game_tables}
+
+  // --------- GameTable ---------
+
+  use fun game_table_id as GameTable.id;
+  fun game_table_id(game_table : &GameTable) : ID {object::id(game_table)}
+
+  use fun game_table_card_game_id as GameTable.card_game_id;
+  fun game_table_card_game_id(game_table : &GameTable) : ID {game_table.card_game_id}
+
+  use fun game_table_used_card_decks as GameTable.used_card_decks;
+  fun game_table_used_card_decks(game_table : &GameTable) : vector<ID> {game_table.used_card_decks}
+
+  // --------- GameStatus ---------
+
+  use fun game_status_manager_player as GameStatus.manager_player;
+  fun game_status_manager_player(game_status : &GameStatus) : Option<address>{game_status.game_info.manager_player}
+
+  use fun game_status_game_playing_status as GameStatus.game_playing_status;
+  fun game_status_game_playing_status(game_status : &GameStatus) : u8 {game_status.game_info.game_playing_status}
+
+  use fun game_status_current_turn_player as GameStatus.current_turn_player;
+  fun game_status_current_turn_player(game_status : &GameStatus) : Option<address> {game_status.game_info.current_turn_player}
+
+  use fun game_status_winner_player as GameStatus.winner_player;
+  fun game_status_winner_player(game_status : &GameStatus) : Option<address> {game_status.game_info.winner_player}
+
+  use fun game_status_ante_amount as GameStatus.ante_amount;
+  fun game_status_ante_amount(game_status : &GameStatus) : u64 {game_status.game_info.ante_amount}
+
+  use fun game_status_bet_unit as GameStatus.bet_unit;
+  fun game_status_bet_unit(game_status : &GameStatus) : u64 {game_status.game_info.bet_unit}
+
+  use fun game_status_game_seats as GameStatus.game_seats;
+  fun game_status_game_seats(game_status : &GameStatus) : u8 {game_status.game_info.game_seats}
+
+  use fun game_status_avail_seats as GameStatus.avail_seats;
+  fun game_status_avail_seats(game_status : &GameStatus) : u8 {game_status.game_info.avail_seats}
+
+  use fun game_status_total_bet_amount as GameStatus.total_bet_amount;
+  fun game_status_total_bet_amount(game_status : &GameStatus) : u64 {game_status.money_box_info.total_bet_amount}
+
+  use fun game_status_number_of_avail_cards as GameStatus.number_of_avail_cards;
+  fun game_status_number_of_avail_cards(game_status : &GameStatus) : u8 {game_status.card_info.number_of_avail_cards}
+
+  use fun game_status_number_of_used_cards as GameStatus.number_of_used_cards;
+  fun game_status_number_of_used_cards(game_status : &GameStatus) : u8 {game_status.card_info.number_of_used_cards}
+
+  // --------- PlayerInfo ---------
+
+  use fun player_info_player_address as PlayerInfo.player_address;
+  fun player_info_player_address(player_info : &PlayerInfo) : address {player_info.player_address}
+
+  use fun player_info_public_key as PlayerInfo.public_key;
+  fun player_info_public_key(player_info : &PlayerInfo) : vector<u8> {player_info.public_key}
+
+  use fun player_info_playing_status as PlayerInfo.playing_status;
+  fun player_info_playing_status(player_info : &PlayerInfo) : u8 {player_info.playing_status}
+
+  use fun player_info_number_of_holding_cards as PlayerInfo.number_of_holding_cards;
+  fun player_info_number_of_holding_cards(player_info : &PlayerInfo) : u8 {player_info.number_of_holding_cards}
+
+  use fun player_info_previous_bet_amount as PlayerInfo.previous_bet_amount;
+  fun player_info_previous_bet_amount(player_info : &PlayerInfo) : u64 {player_info.previous_bet_amount}
+
+  use fun player_info_total_bet_amount as PlayerInfo.total_bet_amount;
+  fun player_info_total_bet_amount(player_info : &PlayerInfo) : u64 {player_info.total_bet_amount}
+
+  // --------- MoneyBox ---------
+
+  use fun money_box_id as MoneyBox.id;
+  fun money_box_id(money_box : &MoneyBox) : ID {object::id(money_box)}
+
+  // --------- CardDeck ---------
+  use fun card_deck_id as CardDeck.id;
+  fun card_deck_id(card_deck : &CardDeck) : ID {object::id(card_deck)}
+
+  // --------- Card ---------
+
+  use fun card_id as Card.id;
+  fun card_id(card : &Card) : ID {object::id(card)}
+
+  use fun card_index as Card.index;
+  fun card_index(card : &Card) : u8 {card.index}
+
+  use fun card_number as Card.number;
+  fun card_number(card : &Card) : u8 {card.card_number}
+
+  // --------- PlayerHand ---------
+
+  use fun player_hand_id as PlayerHand.id;
+  fun player_hand_id(player_hand : &PlayerHand) : ID {object::id(player_hand)}
+
+  use fun player_hand_owner as PlayerHand.owner;
+  fun player_hand_owner(player_hand : &PlayerHand) : address {player_hand.owner}
+
+  use fun player_hand_public_key as PlayerHand.public_key;
+  fun player_hand_public_key(player_hand : &PlayerHand) : vector<u8> {player_hand.public_key}
 
   // ============================================
   // ================ TEST ======================
@@ -359,6 +477,26 @@ module shallwemove::cardgame {
 
 
     remove_game(root_game, card_game, ctx);
+    test_scenario::end(ts);
+  }
+
+  #[test]
+  fun test_card_number() {
+    let mut ts = test_scenario::begin(@0xA);
+    let ctx = test_scenario::ctx(&mut ts);
+
+    let card = Card {
+      id : object::new(ctx),
+      index : 1,
+      card_number : 10
+    };
+
+    let card_number = card.number();
+    debug::print(&card_number);
+
+    let Card {id, index : _, card_number: _} = card;
+    object::delete(id);
+
     test_scenario::end(ts);
   }
 
