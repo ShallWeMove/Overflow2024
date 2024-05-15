@@ -61,7 +61,7 @@ module shallwemove::cardgame {
 
   public struct GameTable has key, store {
     id : UID,
-    card_game_id : ID,
+    lounge_id : ID,
     game_status : GameStatus,
     money_box : MoneyBox,
     card_deck : Option<CardDeck>,
@@ -97,7 +97,8 @@ module shallwemove::cardgame {
   }
 
   public struct PlayerInfo has store {
-    player_address : address,
+    index : u8,
+    player_address : Option<address>,
     public_key : vector<u8>,
     playing_status : u8,
     number_of_holding_cards : u8,
@@ -124,6 +125,7 @@ module shallwemove::cardgame {
 
   public struct PlayerSeat has store {
     // casino_id : ID,
+    index : u8,
     player : Option<address>,
     public_key : vector<u8>,
     cards : vector<Card>,
@@ -145,7 +147,7 @@ module shallwemove::cardgame {
   // This function will be executed in the Backend
   // game owner or anyone who wanna be a game owner can create new game
   // Casino object is essential to play game
-  entry fun create_root_game(public_key : vector<u8>, ctx: &mut TxContext) {
+  entry fun create_casino(public_key : vector<u8>, ctx: &mut TxContext) {
     transfer::freeze_object(
       Casino {
       id : object::new(ctx),
@@ -154,7 +156,7 @@ module shallwemove::cardgame {
       });
   }
 
-  entry fun create_card_game(casino : &Casino, ctx: &mut TxContext) {
+  entry fun create_lounge(casino : &Casino, ctx: &mut TxContext) {
     assert!(casino.admin == tx_context::sender(ctx), 403);
 
     transfer::share_object(Lounge{
@@ -166,7 +168,7 @@ module shallwemove::cardgame {
 
   entry fun create_and_add_game_table(
     casino : &Casino, 
-    card_game : &mut Lounge, 
+    lounge : &mut Lounge, 
     ante_amount : u64, 
     bet_unit : u64, 
     game_seats : u8, 
@@ -180,7 +182,7 @@ module shallwemove::cardgame {
     
     let mut game_table = GameTable {
       id : object::new(ctx),
-      card_game_id : card_game.id(),
+      lounge_id : lounge.id(),
       game_status : game_status,
       money_box : money_box,
       card_deck : option::some(card_deck),
@@ -188,16 +190,9 @@ module shallwemove::cardgame {
       player_seats : vector[]
     };
 
-    let mut i = 0 as u8;
-    while (i < game_seats) {
-      let player_seat = create_player_seat();
-      game_table.player_seats.push_back(player_seat);
-      i = i + 1;
-    };
+    game_table.add_player_seats();
 
-    card_game.game_tables.push_back(game_table.id());
-
-    dynamic_object_field::add<ID, GameTable>(&mut card_game.id, game_table.id(), game_table);
+    lounge.add_game_table(game_table);
   }
 
   // --------- For Player ---------
@@ -206,24 +201,33 @@ module shallwemove::cardgame {
   // 2. 굳이 player_hand를 보내야 하나? game_table에 이미 player_hand가 있어서 정보만 보내는 거지. 그래도 player가 차있다 이걸 표현 할 수 있음.
   entry fun enter(
     casino : &Casino, 
-    card_game : &mut Lounge, 
-    // player_hand : PlayerSeat, 
+    lounge : &mut Lounge, 
     ctx : &mut TxContext) : ID {
-    assert!(casino.id() == card_game.casino_id(), 403);
+    assert!(casino.id() == lounge.casino_id(), 403);
 
-    let mut avail_game_table_id = card_game.avail_game_table();
-    let avail_game_table = dynamic_object_field::borrow_mut<ID, GameTable> (&mut card_game.id, option::extract(&mut avail_game_table_id));
-    // avail_game_table.add_player_hand(player_hand);
+    let mut avail_game_table_id = lounge.avail_game_table();
+    let avail_game_table = dynamic_object_field::borrow_mut<ID, GameTable> (&mut lounge.id, option::extract(&mut avail_game_table_id));
     return option::extract(&mut avail_game_table_id)
 
   }
 
-  // entry fun get_player_hand(casino : &Casino, public_key : vector<u8>, ctx : &mut TxContext) {
-  //   let sender = tx_context::sender(ctx);
+  fun enter_player(game_table : &mut GameTable, ctx : &mut TxContext) {
+    let mut i = 1;
+    while (i < (game_table.game_status.game_info.avail_seats + 1) as u64) {
+      let player_info = game_table.game_status.player_infos.borrow(i);
+      let player_seat = game_table.player_seats.borrow(i);
 
-  //   let player_hand = create_player_seat(casino, public_key, ctx);
-  //   transfer::public_transfer(player_hand, sender);
-  // }
+      // game_table.game_status.player_infos.push_back(player_info);
+      // game_table.player_seats.push_back(player_seat);
+      
+      i = i + 1;
+    };
+  }
+
+  fun get_available_player_seat() {
+
+  }
+
 
   //   // 게임 입장
   // entry fun enter(
@@ -313,12 +317,14 @@ module shallwemove::cardgame {
       number_of_used_cards : 0
     };
 
-    GameStatus {
+    let mut game_status = GameStatus {
       game_info : game_info,
       money_box_info : money_box_info,
       card_info : card_info,
       player_infos : vector[]
-    }
+    };
+
+    game_status
   }
 
   fun create_money_box(ctx : &mut TxContext) : MoneyBox {
@@ -338,17 +344,6 @@ module shallwemove::cardgame {
     card_deck.fill_card(casino.public_key(), ctx);
 
     card_deck
-  }
-
-  fun create_player_seat() : PlayerSeat {
-    PlayerSeat {
-      // id : object::new(ctx),
-      // casino_id : object::id(casino),
-      player : option::none(),
-      public_key : vector<u8>[],
-      cards : vector<Card>[],
-      money : vector<Coin<SUI>>[]
-    }
   }
 
   // --------- Utility Functions ---------
@@ -383,32 +378,39 @@ module shallwemove::cardgame {
   use fun casino_id as Casino.id;
   fun casino_id(casino : &Casino) : ID {object::id(casino)}
 
-  use fun root_game_admin as Casino.admin;
-  fun root_game_admin(casino : &Casino) : address {casino.admin}
+  use fun casino_admin as Casino.admin;
+  fun casino_admin(casino : &Casino) : address {casino.admin}
 
-  use fun root_game_public_key as Casino.public_key;
-  fun root_game_public_key(casino : &Casino) : vector<u8> {casino.public_key}
+  use fun casino_public_key as Casino.public_key;
+  fun casino_public_key(casino : &Casino) : vector<u8> {casino.public_key}
 
   // --------- Lounge ---------
 
-  use fun card_game_id as Lounge.id;
-  fun card_game_id(card_game : &Lounge) : ID {object::id(card_game)}
+  use fun lounge_id as Lounge.id;
+  fun lounge_id(lounge : &Lounge) : ID {object::id(lounge)}
 
-  use fun card_game_root_game_id as Lounge.casino_id;
-  fun card_game_root_game_id(card_game : &Lounge) : ID {card_game.casino_id}
+  use fun lounge_casino_id as Lounge.casino_id;
+  fun lounge_casino_id(lounge : &Lounge) : ID {lounge.casino_id}
 
-  use fun card_game_game_tables as Lounge.game_tables;
-  fun card_game_game_tables(card_game : &Lounge) : vector<ID> {card_game.game_tables}
+  use fun lounge_game_tables as Lounge.game_tables;
+  fun lounge_game_tables(lounge : &Lounge) : vector<ID> {lounge.game_tables}
+
+  use fun lounge_add_game_table as Lounge.add_game_table;
+  fun lounge_add_game_table(lounge : &mut Lounge, game_table : GameTable) {
+    lounge.game_tables.push_back(game_table.id());
+    dynamic_object_field::add<ID, GameTable>(&mut lounge.id, game_table.id(), game_table);
+
+  }
 
   use fun get_available_game_table_id as Lounge.avail_game_table;
-  fun get_available_game_table_id(card_game : &Lounge) : Option<ID> {
-    let mut game_tables = card_game.game_tables();
+  fun get_available_game_table_id(lounge : &Lounge) : Option<ID> {
+    let mut game_tables = lounge.game_tables();
     debug::print(&string::utf8(b"game tables : "));
     debug::print(&game_tables);
 
     while (!game_tables.is_empty()) {
       let game_table_id = game_tables.pop_back();
-      let game_table = dynamic_object_field::borrow<ID, GameTable> (&card_game.id, game_table_id);
+      let game_table = dynamic_object_field::borrow<ID, GameTable> (&lounge.id, game_table_id);
       if (game_table.game_status.avail_seats() > 0) {
         debug::print(&string::utf8(b"게임을 찾았다!"));
         return option::some(game_table_id)
@@ -423,15 +425,42 @@ module shallwemove::cardgame {
   use fun game_table_id as GameTable.id;
   fun game_table_id(game_table : &GameTable) : ID {object::id(game_table)}
 
-  use fun game_table_card_game_id as GameTable.card_game_id;
-  fun game_table_card_game_id(game_table : &GameTable) : ID {game_table.card_game_id}
+  use fun game_table_lounge_id as GameTable.lounge_id;
+  fun game_table_lounge_id(game_table : &GameTable) : ID {game_table.lounge_id}
 
   use fun game_table_used_card_decks as GameTable.used_card_decks;
   fun game_table_used_card_decks(game_table : &GameTable) : vector<ID> {game_table.used_card_decks}
 
-  use fun game_table_add_player_hand as GameTable.add_player_hand;
-  fun game_table_add_player_hand(game_table : &mut GameTable, player_hand : PlayerSeat) {
-    game_table.player_seats.push_back(player_hand);
+  use fun game_table_add_player_seat as GameTable.add_player_seat;
+  fun game_table_add_player_seat(game_table : &mut GameTable, player_seat : PlayerSeat) {
+    game_table.player_seats.push_back(player_seat);
+  }
+
+  use fun game_table_add_player_seats as GameTable.add_player_seats;
+  fun game_table_add_player_seats(game_table : &mut GameTable) {
+    let mut i = 1 as u8;
+    while (i < game_table.game_status.game_info.avail_seats + 1) {
+      let player_seat = PlayerSeat {
+        index : i,
+        player : option::none(),
+        public_key : vector<u8>[],
+        cards : vector<Card>[],
+        money : vector<Coin<SUI>>[]
+      };
+      let player_info = PlayerInfo {
+        index : i,
+        player_address : option::none(),
+        public_key : vector<u8>[],
+        playing_status : 0,
+        number_of_holding_cards : 0,
+        previous_bet_amount : 0,
+        total_bet_amount : 0
+      };
+      game_table.add_player_seat(player_seat);
+      game_table.game_status.add_player_info(player_info);
+      i = i + 1;
+    };
+
   }
 
   // --------- GameStatus ---------
@@ -469,10 +498,13 @@ module shallwemove::cardgame {
   use fun game_status_number_of_used_cards as GameStatus.number_of_used_cards;
   fun game_status_number_of_used_cards(game_status : &GameStatus) : u8 {game_status.card_info.number_of_used_cards}
 
+  use fun game_status_add_player_info as GameStatus.add_player_info;
+  fun game_status_add_player_info(game_status : &mut GameStatus, player_info : PlayerInfo) {game_status.player_infos.push_back(player_info);}
+
   // --------- PlayerInfo ---------
 
   use fun player_info_player_address as PlayerInfo.player_address;
-  fun player_info_player_address(player_info : &PlayerInfo) : address {player_info.player_address}
+  fun player_info_player_address(player_info : &PlayerInfo) : Option<address> {player_info.player_address}
 
   use fun player_info_public_key as PlayerInfo.public_key;
   fun player_info_public_key(player_info : &PlayerInfo) : vector<u8> {player_info.public_key}
@@ -557,67 +589,108 @@ module shallwemove::cardgame {
       admin: tx_context::sender(ctx),
       public_key : public_key
     };
-    let mut card_game = Lounge {
+    let mut lounge = Lounge {
       id : object::new(ctx),
       casino_id : casino.id(),
       game_tables : vector[]
 
     };
 
-    create_and_add_game_table(&casino, &mut card_game, 5, 5, 5, ctx);
+    create_and_add_game_table(&casino, &mut lounge, 5, 5, 5, ctx);
 
     test_scenario::end(ts);
 
-    (casino, card_game)
+    (casino, lounge)
+  }
+
+  #[test]
+  fun test_game_table() {
+    let mut ts = test_scenario::begin(@0xA);
+    let ctx = test_scenario::ctx(&mut ts);
+
+    let (casino, mut lounge) = create_game();
+
+    create_and_add_game_table(&casino, &mut lounge, 5,5,5, ctx);
+    create_and_add_game_table(&casino, &mut lounge, 5,5,6, ctx);
+
+
+    let mut game_tables = lounge.game_tables();
+    debug::print(&string::utf8(b"game tables : "));
+    debug::print(&game_tables);
+
+    let mut i = 1;
+    while (i < game_tables.length() + 1) {
+      let game_table_id = game_tables.pop_back();
+      let game_table = dynamic_object_field::borrow<ID, GameTable> (&mut lounge.id, game_table_id);
+
+      debug::print(game_table);
+
+      i = i + 1;
+    };
+
+
+
+    remove_game(casino, lounge, ctx);
+    test_scenario::end(ts);
+
+  }
+
+
+  #[test]
+  fun test_vector() {
+    let mut u64_vector = vector<u64> [0, 1, 2, 3];
+    let element = u64_vector.remove(0);
+    debug::print(&element);
+    debug::print(&u64_vector.remove(0));
   }
 
   #[test_only] 
-  fun remove_game(casino : Casino, card_game : Lounge, ctx : &mut TxContext) {
+  fun remove_game(casino : Casino, lounge : Lounge, ctx : &mut TxContext) {
     let Casino {id : casino_id, admin : _, public_key : _} = casino;
     object::delete(casino_id);
 
     let sender = tx_context::sender(ctx);
-    transfer::public_transfer(card_game, sender);
+    transfer::public_transfer(lounge, sender);
 
   }
 
-  #[test]
-  fun test_get_available_game_table() {
-    let mut ts = test_scenario::begin(@0xA);
-    let ctx = test_scenario::ctx(&mut ts);
+  // #[test]
+  // fun test_get_available_game_table() {
+  //   let mut ts = test_scenario::begin(@0xA);
+  //   let ctx = test_scenario::ctx(&mut ts);
 
-    let (casino, mut card_game) = create_game();
+  //   let (casino, mut lounge) = create_game();
 
-    create_and_add_game_table(&casino, &mut card_game, 5,5,5, ctx);
-    create_and_add_game_table(&casino, &mut card_game, 5,5,5, ctx);
+  //   create_and_add_game_table(&casino, &mut lounge, 5,5,5, ctx);
+  //   create_and_add_game_table(&casino, &mut lounge, 5,5,5, ctx);
 
-    let game_table_id = card_game.avail_game_table();
-    debug::print(&game_table_id);
+  //   let game_table_id = lounge.avail_game_table();
+  //   debug::print(&game_table_id);
 
 
-    remove_game(casino, card_game, ctx);
-    test_scenario::end(ts);
-  }
+  //   remove_game(casino, lounge, ctx);
+  //   test_scenario::end(ts);
+  // }
 
-  #[test]
-  fun test_card_number() {
-    let mut ts = test_scenario::begin(@0xA);
-    let ctx = test_scenario::ctx(&mut ts);
+  // #[test]
+  // fun test_card_number() {
+  //   let mut ts = test_scenario::begin(@0xA);
+  //   let ctx = test_scenario::ctx(&mut ts);
 
-    let card = Card {
-      id : object::new(ctx),
-      index : 1,
-      card_number : 10
-    };
+  //   let card = Card {
+  //     id : object::new(ctx),
+  //     index : 1,
+  //     card_number : 10
+  //   };
 
-    let card_number = card.number();
-    debug::print(&card_number);
+  //   let card_number = card.number();
+  //   debug::print(&card_number);
 
-    let Card {id, index : _, card_number: _} = card;
-    object::delete(id);
+  //   let Card {id, index : _, card_number: _} = card;
+  //   object::delete(id);
 
-    test_scenario::end(ts);
-  }
+  //   test_scenario::end(ts);
+  // }
 
   // #[test]
   // fun test_card_deck() {
