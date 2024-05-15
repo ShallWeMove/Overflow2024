@@ -13,10 +13,10 @@ function WalletButton() {
 			console.log("walletbutton wallet status: ", wallet.status);
 			console.log("walletbutton wallet address: ", wallet.account?.address);
 			console.log("walletbutton wallect balance: ", wallet);
-			router.push("/game");
+			// router.push("/game");
 		} else {
 			console.log("walletbutton wallet status2", wallet.status);
-			router.push("/landing");
+			// router.push("/landing");
 		}
 	}, [wallet, router]);
 
