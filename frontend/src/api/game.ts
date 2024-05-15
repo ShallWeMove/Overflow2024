@@ -1,18 +1,14 @@
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import { SuiClient } from "@mysten/sui.js/client";
-import { useWallets } from "@mysten/dapp-kit";
+import { WalletContextState } from "@suiet/wallet-kit";
 
-const TESTNET_ENDPOINT = "https://sui-testnet.nodeinfra.com"
 const PACKAGE_ID= "0x29361f0cd734d9374decb131affea826682f801c37021dfe39c6832db839a513"
 const CASINO_ID = "0x334708a551a301c25e866acd0434dd4b2c95dd491d1a528923146b10bbaadb77"
 const LOUNGE_ID = "0x0bff035610796da88e3820d847a6cfc541a2916b981e0c34e29940bb2f2b5c38"
 const MODULE = "cardgame"
 
-const client = new SuiClient({ url: TESTNET_ENDPOINT });
-
 // enter - called when the player enters the game table
 export const enter = async(
-    signer: any,
+    wallet: WalletContextState,
 ) => {
     const txb = new TransactionBlock();
     txb.moveCall({
@@ -23,16 +19,19 @@ export const enter = async(
         ],
     });
 
-    //TODO: signer setting
-    client.signAndExecuteTransactionBlock({
-        signer,
-        transactionBlock: txb,
-    })
+    try {
+        const res = wallet.signAndExecuteTransactionBlock({
+            transactionBlock: txb,
+        })
+        console.log("enter transaction result: ", res)
+    } catch (e) {
+        console.error("'enter' transaction failed", e)
+    }
 }
 
 // exit - called when the player exits the game table
 export const exit = async(
-    signer: any,
+    wallet: WalletContextState,
     gameTableId: string,
 ) => {
     const txb = new TransactionBlock();
@@ -45,16 +44,19 @@ export const exit = async(
         ],
     });
 
-    //TODO: signer setting
-    client.signAndExecuteTransactionBlock({
-        signer,
-        transactionBlock: txb,
-    })
+    try {
+        const res = wallet.signAndExecuteTransactionBlock({
+            transactionBlock: txb,
+        })
+        console.log("exit transaction result: ", res)
+    } catch (e) {
+        console.error("'exit' transaction failed", e)
+    }
 }
 
 // start - called when the game starts
 export const start = async(
-    signer: any,
+    wallet: WalletContextState,
     gameTableId: string,
 ) => {
     const txb = new TransactionBlock();
@@ -67,17 +69,20 @@ export const start = async(
         ],
     });
 
-    //TODO: signer setting
-    client.signAndExecuteTransactionBlock({
-        signer,
-        transactionBlock: txb,
-    })
+    try {
+        const res = wallet.signAndExecuteTransactionBlock({
+            transactionBlock: txb,
+        })
+        console.log("start transaction result: ", res)
+    } catch (e) {
+        console.error("'start' transaction failed", e)
+    }
 }
 
 // action - called when the player makes an action
 //  one of [ANTE, BET, RAISE, CALL, CHECK]
 export const action = async(
-    signer: any,
+    wallet: WalletContextState,
     gameTableId: string,
     actionType: ActionType,
     withNewCard: boolean,
@@ -95,11 +100,14 @@ export const action = async(
         ],
     });
 
-    //TODO: signer setting
-    client.signAndExecuteTransactionBlock({
-        signer,
-        transactionBlock: txb,
-    })
+    try {
+        const res = wallet.signAndExecuteTransactionBlock({
+            transactionBlock: txb,
+        })
+        console.log("action transaction result: ", res)
+    } catch (e) {
+        console.error("'action' transaction failed", e)
+    }
 
     return "gameTableId";
 }
@@ -131,7 +139,7 @@ const convertActionTypeToInt = (actionType: ActionType): number => {
 
 // fold - called when the player folds
 export const fold = async(
-    signer: any,
+    wallet: WalletContextState,
     gameTableId: string,
 ) => {
     const txb = new TransactionBlock();
@@ -143,30 +151,36 @@ export const fold = async(
         ],
     });
 
-    //TODO: signer setting
-    client.signAndExecuteTransactionBlock({
-        signer,
-        transactionBlock: txb,
-    })
+    try {
+        const res = wallet.signAndExecuteTransactionBlock({
+            transactionBlock: txb,
+        })
+        console.log("fold transaction result: ", res)
+    } catch (e) {
+        console.error("'fold' transaction failed", e)
+    }
 }
 
 // settleUp - called after the game ends to calculate the winnings
 export const settleUp = async(
-    signer: any,
+    wallet: WalletContextState,
     gameTableId: string,
 ) => {
     const txb = new TransactionBlock();
     txb.moveCall({
-        target: `${PACKAGE_ID}::${MODULE}::fold`,
+        target: `${PACKAGE_ID}::${MODULE}::settle_up`,
         arguments: [
             txb.object(CASINO_ID), // casino
             txb.object(gameTableId), // game table
         ],
     });
 
-    //TODO: signer setting
-    client.signAndExecuteTransactionBlock({
-        signer,
-        transactionBlock: txb,
-    })
+    try {
+        const res = wallet.signAndExecuteTransactionBlock({
+            transactionBlock: txb,
+        })
+        console.log("settle_up transaction result: ", res)
+    } catch (e) {
+        console.error("'settle_up' transaction failed", e)
+    }
 }
