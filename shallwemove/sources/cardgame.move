@@ -34,8 +34,33 @@ module shallwemove::cardgame {
   // ==================== Game Statuses ==========================
   // =============================================================
 
+  const PRE_GAME : u8 = 0;
+  const IN_GAME : u8 = 1;
+  const GAME_FINISHED : u8 = 2;
+
+  // ==================== Playing Statuses ==========================
+  // =============================================================
+
+  const EMPTY : u8 = 10;
+  const ENTER : u8 = 11;
+  const READY : u8 = 12;
+  const PLAYING : u8 = 13;
+  const GAME_END : u8 = 14;
+
+  // ==================== Playing Actions ==========================
+  // =============================================================
+
+  const ANTE : u8 = 20;
+  const CHECK : u8 = 21;
+  const BET : u8 = 22;
+  const CALL : u8 = 23;
+  const RAISE : u8 = 24;
+  const FOLD : u8 = 25;
+
   // ======================= Errors ==============================
   // =============================================================
+
+  const ERROR1 : u8 = 100; // example of error code
 
   // ============================================
   // ============== EVENTS ======================
@@ -446,7 +471,7 @@ module shallwemove::cardgame {
         index : i,
         player_address : option::none(),
         public_key : vector<u8>[],
-        playing_status : 0,
+        playing_status : EMPTY,
         number_of_holding_cards : 0,
         previous_bet_amount : 0,
         total_bet_amount : 0
@@ -471,11 +496,12 @@ module shallwemove::cardgame {
         continue
       };
 
-      player_info.set_player(ctx);
       player_seat.set_player(ctx);
+      player_seat.set_public_key(public_key);
 
-      // game_table.game_status.player_infos.push_back(player_info);
-      // game_table.player_seats.push_back(player_seat);
+      player_info.set_player(ctx);
+      player_info.set_public_key(public_key);
+      player_info.set_playing_status(ENTER);
       
       break
     };
@@ -549,10 +575,16 @@ module shallwemove::cardgame {
     player_info.public_key = public_key;
   }
 
+  use fun player_info_set_playing_status as PlayerInfo.set_playing_status;
+  fun player_info_set_playing_status(player_info : &mut PlayerInfo, playing_status : u8) {
+    player_info.playing_status = playing_status;
+  }
+
   use fun player_info_is_already_participate as PlayerInfo.is_already_participate;
   fun player_info_is_already_participate(player_info : &mut PlayerInfo, ctx : &mut TxContext) : bool {
     option::extract(&mut player_info.player_address()) == tx_context::sender(ctx)
   }
+
 
   // --------- MoneyBox ---------
 
@@ -608,7 +640,12 @@ module shallwemove::cardgame {
   use fun player_seat_set_player as PlayerSeat.set_player;
   fun player_seat_set_player(player_seat : &mut PlayerSeat, ctx : &TxContext) {
     player_seat.player = option::some(tx_context::sender(ctx));
-    }
+  }
+
+  use fun player_seat_set_public_key as PlayerSeat.set_public_key;
+  fun player_seat_set_public_key(player_seat : &mut PlayerSeat, public_key : vector<u8>) {
+    player_seat.public_key = public_key;
+  }
 
   // ============================================
   // ================ TEST ======================
