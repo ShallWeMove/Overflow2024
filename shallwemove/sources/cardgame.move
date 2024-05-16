@@ -491,7 +491,7 @@ module shallwemove::cardgame {
       let player_seat = game_table.player_seats.borrow_mut(i);
 
       if (player_info.player_address() != option::none() || player_seat.player() != option::none()) {
-        assert!(!player_info.is_already_participate(ctx) , 403);
+        assert!(!player_info.is_participated(ctx) , 403);
         i = i + 1;
         continue
       };
@@ -580,8 +580,8 @@ module shallwemove::cardgame {
     player_info.playing_status = playing_status;
   }
 
-  use fun player_info_is_already_participate as PlayerInfo.is_already_participate;
-  fun player_info_is_already_participate(player_info : &mut PlayerInfo, ctx : &mut TxContext) : bool {
+  use fun player_info_is_participated as PlayerInfo.is_participated;
+  fun player_info_is_participated(player_info : &mut PlayerInfo, ctx : &mut TxContext) : bool {
     option::extract(&mut player_info.player_address()) == tx_context::sender(ctx)
   }
 
