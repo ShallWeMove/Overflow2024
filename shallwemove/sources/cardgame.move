@@ -148,13 +148,15 @@ module shallwemove::cardgame {
     card_number : u8
   }
 
-  public struct PlayerSeat has store {
+  public struct PlayerSeat has key, store {
     // casino_id : ID,
+    id : UID,
     index : u8,
     player : Option<address>,
     public_key : vector<u8>,
     cards : vector<Card>,
-    money : vector<Coin<SUI>>
+    // money : vector<Coin<SUI>>
+    money : vector<ID>
   }
 
   // ============================================
@@ -215,7 +217,7 @@ module shallwemove::cardgame {
       player_seats : vector[]
     };
 
-    game_table.create_player_seats();
+    game_table.create_player_seats(ctx);
 
     lounge.add_game_table(game_table);
   }
@@ -228,13 +230,14 @@ module shallwemove::cardgame {
     casino : &Casino, 
     lounge : &mut Lounge, 
     public_key : vector<u8>,
+    money : Coin<SUI>,
     ctx : &mut TxContext) : ID {
     assert!(casino.id() == lounge.casino_id(), 403);
 
     let mut avail_game_table_id = lounge.avail_game_table_id();
     let avail_game_table = dynamic_object_field::borrow_mut<ID, GameTable> (&mut lounge.id, option::extract(&mut avail_game_table_id));
 
-    avail_game_table.enter_player(public_key, ctx);
+    avail_game_table.enter_player(public_key, money, ctx);
 
     return avail_game_table.id()
   }
@@ -457,15 +460,17 @@ module shallwemove::cardgame {
   }
 
   use fun game_table_create_player_seats as GameTable.create_player_seats;
-  fun game_table_create_player_seats(game_table : &mut GameTable) {
+  fun game_table_create_player_seats(game_table : &mut GameTable, ctx: &mut TxContext) {
     let mut i = 1 as u8;
     while (i < game_table.game_status.game_info.avail_seats + 1) {
       let player_seat = PlayerSeat {
+        id : object::new(ctx),
         index : i,
         player : option::none(),
         public_key : vector<u8>[],
         cards : vector<Card>[],
-        money : vector<Coin<SUI>>[]
+        // money : vector<Coin<SUI>>[]
+        money : vector<ID>[]
       };
       let player_info = PlayerInfo {
         index : i,
@@ -483,28 +488,42 @@ module shallwemove::cardgame {
   }
 
   use fun game_table_enter_player as GameTable.enter_player;
-  fun game_table_enter_player(game_table : &mut GameTable, public_key : vector<u8>, ctx : &mut TxContext) {
+  fun game_table_enter_player(game_table : &mut GameTable, public_key : vector<u8>, money : Coin<SUI>, ctx : &mut TxContext) {
     // check if player already enter into same game table
     let mut i = 0;
+    let is_full = false;
+    
     while (i < (game_table.game_status.game_info.avail_seats ) as u64) {
       let player_info = game_table.game_status.player_infos.borrow_mut(i);
       let player_seat = game_table.player_seats.borrow_mut(i);
 
-      if (player_info.player_address() != option::none() || player_seat.player() != option::none()) {
-        assert!(!player_info.is_participated(ctx) , 403);
-        i = i + 1;
-        continue
+      assert!(!player_info.is_participated(ctx) , 403);
+
+      if (player_info.player_address() == option::none() && player_seat.player() == option::none()) {
+        break
       };
+
+      i = i + 1;
+    };
+
+    if (i == (game_table.game_status.game_info.avail_seats ) as u64) {
+      is_full == true;
+    };
+
+    if (is_full) {
+      transfer::public_transfer(money, tx_context::sender(ctx));
+    } else {
+      let player_info = game_table.game_status.player_infos.borrow_mut(i);
+      let player_seat = game_table.player_seats.borrow_mut(i);
 
       player_seat.set_player(ctx);
       player_seat.set_public_key(public_key);
+      player_seat.add_money(money);
 
       player_info.set_player(ctx);
       player_info.set_public_key(public_key);
       player_info.set_playing_status(ENTER);
-      
-      break
-    };
+    }
   }
 
   // --------- GameStatus ---------
@@ -582,7 +601,11 @@ module shallwemove::cardgame {
 
   use fun player_info_is_participated as PlayerInfo.is_participated;
   fun player_info_is_participated(player_info : &mut PlayerInfo, ctx : &mut TxContext) : bool {
-    option::extract(&mut player_info.player_address()) == tx_context::sender(ctx)
+    if (player_info.player_address() == option::none()) {
+      false
+    } else {
+      option::extract(&mut player_info.player_address()) == tx_context::sender(ctx)
+    }
   }
 
 
@@ -647,6 +670,12 @@ module shallwemove::cardgame {
     player_seat.public_key = public_key;
   }
 
+  use fun player_seat_add_money as PlayerSeat.add_money;
+  fun player_seat_add_money(player_seat : &mut PlayerSeat, money : Coin<SUI>) {
+    player_seat.money.push_back(object::id(&money));
+    dynamic_object_field::add<ID, Coin<SUI>>(&mut player_seat.id, object::id(&money), money);
+  }
+
   // ============================================
   // ================ TEST ======================
   // ============================================
@@ -682,31 +711,39 @@ module shallwemove::cardgame {
   fun test_game_table() {
     let mut ts = test_scenario::begin(@0xA);
     let ctx = test_scenario::ctx(&mut ts);
+    let coin = coin::mint_for_testing<SUI>(50000, ctx);
 
     let (casino, mut lounge) = create_game();
 
     create_and_add_game_table(&casino, &mut lounge, 5,5,5, ctx);
-    create_and_add_game_table(&casino, &mut lounge, 5,5,6, ctx);
+    // create_and_add_game_table(&casino, &mut lounge, 5,5,6, ctx);
 
 
     let mut game_tables = lounge.game_tables();
     debug::print(&string::utf8(b"game tables : "));
     debug::print(&game_tables);
 
-    let mut i = 1;
-    while (i < game_tables.length() + 1) {
-      let game_table_id = game_tables.pop_back();
-      let game_table = dynamic_object_field::borrow_mut<ID, GameTable> (&mut lounge.id, game_table_id);
+    let game_table_id = game_tables.pop_back();
+    let game_table = dynamic_object_field::borrow_mut<ID, GameTable> (&mut lounge.id, game_table_id);
+
+    game_table.enter_player(vector<u8>[2,3,31,31,42,33], coin, ctx);
+
+    debug::print(&game_table.game_status.player_infos);
+    debug::print(&game_table.player_seats);
+
+    // let mut i = 1;
+    // while (i < game_tables.length() + 1) {
+    //   let game_table_id = game_tables.pop_back();
+    //   let game_table = dynamic_object_field::borrow_mut<ID, GameTable> (&mut lounge.id, game_table_id);
 
 
-      game_table.enter_player(vector<u8>[2,3,31,31,42,33], ctx);
-      // enter_player(game_table, ctx);
+    //   // game_table.enter_player(vector<u8>[2,3,31,31,42,33], coin, ctx);
       
-      debug::print(&game_table.game_status.player_infos);
-      debug::print(&game_table.player_seats);
+    //   debug::print(&game_table.game_status.player_infos);
+    //   debug::print(&game_table.player_seats);
 
-      i = i + 1;
-    };
+    //   i = i + 1;
+    // };
 
 
 
