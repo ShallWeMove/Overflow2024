@@ -121,7 +121,7 @@ module shallwemove::cardgame {
     number_of_used_cards : u8
   }
 
-  public struct PlayerInfo has store {
+  public struct PlayerInfo has copy, store, drop {
     index : u8,
     player_address : Option<address>,
     public_key : vector<u8>,
@@ -224,39 +224,24 @@ module shallwemove::cardgame {
 
   // --------- For Player ---------
 
-  // 1. player가 가지고 있는 hand 중에서 빈 핸드 하나 보내는 거가 가능? 가능하면 player_hand parameter 필요 없음.
-  // 2. 굳이 player_hand를 보내야 하나? game_table에 이미 player_hand가 있어서 정보만 보내는 거지. 그래도 player가 차있다 이걸 표현 할 수 있음.
+  // 게임 입장
   entry fun enter(
     casino : &Casino, 
     lounge : &mut Lounge, 
     public_key : vector<u8>,
-    money : Coin<SUI>,
+    deposit : Coin<SUI>,
     ctx : &mut TxContext) : ID {
     assert!(casino.id() == lounge.casino_id(), 403);
 
-    let mut avail_game_table_id = lounge.avail_game_table_id();
-    let avail_game_table = dynamic_object_field::borrow_mut<ID, GameTable> (&mut lounge.id, option::extract(&mut avail_game_table_id));
+    // deposit은 일정량 이상으로 -> game_table의 bet_unit의 20배..?
 
-    avail_game_table.enter_player(public_key, money, ctx);
+    let mut available_game_table_id = lounge.available_game_table_id();
+    let avail_game_table = dynamic_object_field::borrow_mut<ID, GameTable> (&mut lounge.id, option::extract(&mut available_game_table_id));
+
+    avail_game_table.enter_player(public_key, deposit, ctx);
 
     return avail_game_table.id()
   }
-
-  
-
-  fun get_available_player_seat() {
-
-  }
-
-
-  //   // 게임 입장
-  // entry fun enter(
-  //   casino: &Casino, 
-  //   lounge: &mut Lounge,  
-  //   ctx: &mut TxContext,
-  // ) : ID {
-
-  // }
 
   // 게임 퇴장
   entry fun exit(
@@ -265,6 +250,10 @@ module shallwemove::cardgame {
     game_table: &mut GameTable, 
     ctx: &mut TxContext
   ) {
+    assert!(casino.id() == lounge.casino_id(), 403);
+    assert!(lounge.id() == game_table.lounge_id, 403);
+
+    game_table.exit_player(ctx);
 
   }
 
@@ -422,9 +411,8 @@ module shallwemove::cardgame {
 
   }
 
-  use fun get_available_game_table_id as Lounge.avail_game_table_id;
-  fun get_available_game_table_id(lounge : &Lounge) : Option<ID> {
-  // fun get_available_game_table_id(lounge : &mut Lounge) : &mut Option<GameTable> {
+  use fun lounge_get_available_game_table_id as Lounge.available_game_table_id;
+  fun lounge_get_available_game_table_id(lounge : &Lounge) : Option<ID> {
     let mut game_tables = lounge.game_tables();
     // debug::print(&string::utf8(b"game tables : "));
     // debug::print(&game_tables);
@@ -432,11 +420,33 @@ module shallwemove::cardgame {
     while (!game_tables.is_empty()) {
       let game_table_id = game_tables.pop_back();
       let game_table = dynamic_object_field::borrow<ID, GameTable> (&lounge.id, game_table_id);
-      // let game_table = dynamic_object_field::borrow<ID, GameTable> (&mut lounge.id, game_table_id);
       if (game_table.game_status.avail_seats() > 0) {
         debug::print(&string::utf8(b"게임을 찾았다!"));
         return option::some(game_table_id)
-        // return &mut option::some(game_table)
+      };
+    };
+
+    return option::none()
+  }
+
+  use fun lounge_get_entered_game_table_id as Lounge.entered_game_table_id;
+  fun lounge_get_entered_game_table_id(lounge : &Lounge, ctx : &mut TxContext) : Option<ID> {
+    let mut game_table_ids = lounge.game_tables();
+
+    while (!game_table_ids.is_empty()) {
+      let game_table_id = game_table_ids.pop_back();
+      let game_table = dynamic_object_field::borrow<ID, GameTable> (&lounge.id, game_table_id);
+
+      let mut player_infos = game_table.game_status.player_infos();
+      while (!player_infos.is_empty()) {
+        let player_info = player_infos.pop_back();
+        if (player_info.player_address() == option::none()) {
+          continue
+        };
+
+        if (option::extract(&mut player_info.player_address()) == tx_context::sender(ctx) ) {
+          return option::some(game_table_id)
+        }
       };
     };
 
@@ -461,8 +471,8 @@ module shallwemove::cardgame {
 
   use fun game_table_create_player_seats as GameTable.create_player_seats;
   fun game_table_create_player_seats(game_table : &mut GameTable, ctx: &mut TxContext) {
-    let mut i = 1 as u8;
-    while (i < game_table.game_status.game_info.avail_seats + 1) {
+    let mut i = 0 as u8;
+    while (i < game_table.game_status.game_info.avail_seats) {
       let player_seat = PlayerSeat {
         id : object::new(ctx),
         index : i,
@@ -488,8 +498,7 @@ module shallwemove::cardgame {
   }
 
   use fun game_table_enter_player as GameTable.enter_player;
-  fun game_table_enter_player(game_table : &mut GameTable, public_key : vector<u8>, money : Coin<SUI>, ctx : &mut TxContext) {
-    // check if player already enter into same game table
+  fun game_table_enter_player(game_table : &mut GameTable, public_key : vector<u8>, deposit : Coin<SUI>, ctx : &mut TxContext) {
     let mut i = 0;
     let is_full = false;
     
@@ -511,19 +520,63 @@ module shallwemove::cardgame {
     };
 
     if (is_full) {
-      transfer::public_transfer(money, tx_context::sender(ctx));
+      transfer::public_transfer(deposit, tx_context::sender(ctx));
     } else {
       let player_info = game_table.game_status.player_infos.borrow_mut(i);
       let player_seat = game_table.player_seats.borrow_mut(i);
 
       player_seat.set_player(ctx);
       player_seat.set_public_key(public_key);
-      player_seat.add_money(money);
+      player_seat.add_money(deposit);
+
 
       player_info.set_player(ctx);
       player_info.set_public_key(public_key);
       player_info.set_playing_status(ENTER);
+
+      // manager_player, 등 설정 필요함      
+      game_table.game_status.enter_player(ctx);
     }
+  }
+
+  use fun game_table_exit_player as GameTable.exit_player;
+  fun game_table_exit_player(game_table : &mut GameTable, ctx : &mut TxContext) {
+    let mut i = 0;
+    let mut is_player_found = false;
+    let player_address = tx_context::sender(ctx);
+
+    while (i < game_table.player_seats.length()) {
+      let player_seat = game_table.player_seats.borrow_mut(i);
+      if (player_seat.player() == option::none()) {
+        i = i + 1;
+        continue
+      };
+
+      let player_address_of_seat = option::extract(&mut game_table.player_seats[i].player());
+      if (player_address == player_address_of_seat) {
+        is_player_found = true;
+        break
+      };
+
+      i = i + 1;
+    };
+
+
+    // 일단 game_table에 있는 player_seats 한 바퀴 돈 상황
+      // player_seats에서 찾았을 수도 있고
+    if (is_player_found) {
+      let player_seat = game_table.player_seats.borrow_mut(i);
+      let player_info = game_table.game_status.player_infos.borrow_mut(i);
+
+      player_seat.remove_player(ctx);
+      player_info.remove_player(ctx);
+      game_table.game_status.remove_player(ctx);
+
+    } else {
+      // 못 찾는다면 잘못된 game_table이라는 것. 
+
+    };
+
   }
 
   // --------- GameStatus ---------
@@ -552,6 +605,16 @@ module shallwemove::cardgame {
   use fun game_status_avail_seats as GameStatus.avail_seats;
   fun game_status_avail_seats(game_status : &GameStatus) : u8 {game_status.game_info.avail_seats}
 
+  use fun game_status_increment_avail_seat as GameStatus.increment_avail_seat;
+  fun game_status_increment_avail_seat(game_status : &mut GameStatus) {
+    game_status.game_info.avail_seats = game_status.game_info.avail_seats + 1; 
+  }
+
+  use fun game_status_decrement_avail_seat as GameStatus.decrement_avail_seat;
+  fun game_status_decrement_avail_seat(game_status : &mut GameStatus) {
+    game_status.game_info.avail_seats = game_status.game_info.avail_seats - 1; 
+  }
+
   use fun game_status_total_bet_amount as GameStatus.total_bet_amount;
   fun game_status_total_bet_amount(game_status : &GameStatus) : u64 {game_status.money_box_info.total_bet_amount}
 
@@ -561,8 +624,30 @@ module shallwemove::cardgame {
   use fun game_status_number_of_used_cards as GameStatus.number_of_used_cards;
   fun game_status_number_of_used_cards(game_status : &GameStatus) : u8 {game_status.card_info.number_of_used_cards}
 
+  use fun game_status_player_infos as GameStatus.player_infos;
+  fun game_status_player_infos(game_status : &GameStatus) : vector<PlayerInfo> {game_status.player_infos}
+
   use fun game_status_add_player_info as GameStatus.add_player_info;
   fun game_status_add_player_info(game_status : &mut GameStatus, player_info : PlayerInfo) {game_status.player_infos.push_back(player_info);}
+
+  use fun game_status_enter_player as GameStatus.enter_player;
+  fun game_status_enter_player(game_status : &mut GameStatus, ctx : &mut TxContext) {
+    // player가 해당 게임의 첫 번째 유저면 manager_player로 등록
+
+    // avail_seat 하나 감소
+    game_status.decrement_avail_seat();
+  }
+
+  use fun game_status_remove_player as GameStatus.remove_player;
+  fun game_status_remove_player(game_status : &mut GameStatus, ctx : &mut TxContext) {
+
+    // player가 해당 게임의 manager_player이면 다음으로 넘겨주거나 마지막 유저면 null
+
+    // player가 현재 턴 유저면 넘겨주는 로직
+
+    // avail_seat 하나 추가
+    game_status.increment_avail_seat();
+  }
 
   // --------- PlayerInfo ---------
 
@@ -587,6 +672,12 @@ module shallwemove::cardgame {
   use fun player_info_set_player as PlayerInfo.set_player;
   fun player_info_set_player(player_info : &mut PlayerInfo, ctx : &mut TxContext) {
     player_info.player_address = option::some(tx_context::sender(ctx));
+  }
+
+  use fun player_info_remove_player as PlayerInfo.remove_player;
+  fun player_info_remove_player(player_info : &mut PlayerInfo, ctx : &mut TxContext) {
+    assert!(tx_context::sender(ctx) == option::extract(&mut player_info.player_address()), 403);
+    player_info.player_address = option::none();
   }
 
   use fun player_info_set_public_key as PlayerInfo.set_public_key;
@@ -660,9 +751,21 @@ module shallwemove::cardgame {
   use fun player_seat_public_key as PlayerSeat.public_key;
   fun player_seat_public_key(player_seat : &PlayerSeat) : vector<u8> {player_seat.public_key}
 
+  use fun player_seat_money_ids as PlayerSeat.money_ids;
+  fun player_seat_money_ids(player_seat : &PlayerSeat) : vector<ID> {player_seat.money}
+
   use fun player_seat_set_player as PlayerSeat.set_player;
   fun player_seat_set_player(player_seat : &mut PlayerSeat, ctx : &TxContext) {
     player_seat.player = option::some(tx_context::sender(ctx));
+  }
+
+  use fun player_seat_remove_player as PlayerSeat.remove_player;
+  fun player_seat_remove_player(player_seat : &mut PlayerSeat, ctx : &mut TxContext){
+    // let player_address = tx_context::sender(ctx);
+    player_seat.player = option::none();
+    player_seat.public_key = vector<u8>[];
+
+    player_seat.remove_money(ctx);
   }
 
   use fun player_seat_set_public_key as PlayerSeat.set_public_key;
@@ -674,6 +777,19 @@ module shallwemove::cardgame {
   fun player_seat_add_money(player_seat : &mut PlayerSeat, money : Coin<SUI>) {
     player_seat.money.push_back(object::id(&money));
     dynamic_object_field::add<ID, Coin<SUI>>(&mut player_seat.id, object::id(&money), money);
+  }
+
+  use fun player_seat_remove_money as PlayerSeat.remove_money;
+  fun player_seat_remove_money(player_seat : &mut PlayerSeat, ctx : &mut TxContext) {
+    let player_address = tx_context::sender(ctx);
+     let mut i = 0;
+      while(i < player_seat.money.length()) {
+        let money_id = player_seat.money.pop_back();
+        let money = dynamic_object_field::remove<ID, Coin<SUI>>(&mut player_seat.id, money_id);
+        transfer::public_transfer(money, player_address);
+
+        i = i + 1;
+      }
   }
 
   // ============================================
