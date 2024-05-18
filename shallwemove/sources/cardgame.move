@@ -315,7 +315,7 @@ module shallwemove::cardgame {
   // --------- Create Functions ---------
 
   fun new_game_status(ante_amount : u64, bet_unit : u64, game_seats : u8) : GameStatus {
-    assert!(game_seats >= 3 && game_seats <= 6, 403);
+    assert!(game_seats >= 2 && game_seats <= 6, 403);
 
     let game_info = GameInfo {
       manager_player : option::none(),
