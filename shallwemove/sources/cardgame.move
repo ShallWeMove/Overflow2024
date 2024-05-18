@@ -493,7 +493,7 @@ module shallwemove::cardgame {
     let mut i = 0;
     let is_full = false;
     
-    while (i < (game_table.game_status.game_info.avail_seats ) as u64) {
+    while (i < (game_table.game_status.game_info.game_seats ) as u64) {
       let player_info = game_table.game_status.player_infos.borrow_mut(i);
       let player_seat = game_table.player_seats.borrow_mut(i);
 
