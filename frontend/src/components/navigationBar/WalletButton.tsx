@@ -14,10 +14,10 @@ function WalletButton() {
 	useEffect(() => {
 		if (wallet.status === "connected") {
 			setWallet(wallet);
-			router.push("/lounge");
+			// router.push("/lounge");
 		} else {
 			setWallet(null);
-			router.push("/");
+			// router.push("/");
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [router]);
