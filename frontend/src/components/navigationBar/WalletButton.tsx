@@ -14,7 +14,7 @@ function WalletButton() {
 	useEffect(() => {
 		if (wallet.status === "connected") {
 			setWallet(wallet);
-			router.push("/game");
+			router.push("/lounge");
 		} else {
 			setWallet(null);
 			router.push("/");
