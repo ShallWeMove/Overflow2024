@@ -1,24 +1,26 @@
+import { useEffect } from "react";
 import { useWallet } from "@suiet/wallet-kit";
 import { ConnectButton } from "@suiet/wallet-kit";
-import { useEffect } from "react";
 import "@suiet/wallet-kit/style.css";
 import { useRouter } from "next/router";
+import { walletAtom } from "@/lib/states";
+import { useSetAtom } from "jotai";
 
 function WalletButton() {
 	const router = useRouter();
 	const wallet = useWallet();
+	const setWallet = useSetAtom(walletAtom);
 
 	useEffect(() => {
 		if (wallet.status === "connected") {
-			console.log("walletbutton wallet status: ", wallet.status);
-			console.log("walletbutton wallet address: ", wallet.account?.address);
-			console.log("walletbutton wallect balance: ", wallet);
-			// router.push("/game");
+			setWallet(wallet);
+			router.push("/game");
 		} else {
-			console.log("walletbutton wallet status2", wallet.status);
-			// router.push("/landing");
+			setWallet(null);
+			router.push("/");
 		}
-	}, [wallet, router]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [router]);
 
 	return (
 		<ConnectButton

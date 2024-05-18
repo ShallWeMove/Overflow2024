@@ -1,7 +1,7 @@
-import Game from "@/components/pages/Game/Game";
+import SearchGame from "@/components/pages/Game/SearchGame";
 
-const GamePage = () => {
-	return <Game />;
+const SearchGamePage = () => {
+	return <SearchGame />;
 };
 
-export default GamePage;
+export default SearchGamePage;
