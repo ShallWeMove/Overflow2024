@@ -17,6 +17,7 @@
     "@suiet/wallet-kit": "^0.2.24",
     "jotai": "^2.8.0",
     "next": "14.2.3",
+    "node-rsa": "^1.1.1",
     "react": "^18",
     "react-dom": "^18"
   },

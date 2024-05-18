@@ -13,7 +13,7 @@ export default function App({ Component, pageProps }: AppProps) {
 		<JotaiProvider>
 			<ThemeProvider theme={theme}>
 				<CssBaseline />
-				<Box sx={{ flexGrow: 1 }}>
+				<Box sx={{ flexGrow: 1, height: "100vh", overflowY: "hidden" }}>
 					<WalletProvider
 						chains={[
 							{

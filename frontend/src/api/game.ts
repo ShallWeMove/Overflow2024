@@ -1,5 +1,7 @@
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { WalletContextState } from "@suiet/wallet-kit";
+import { client } from "./object";
+import { GetCoinsParams } from "@mysten/sui.js/client";
 
 const PACKAGE_ID =
 	"0x9aaf5ea1dcda8ec3f23d3e9a583bc770e5d22e59ecf4ffe0889918dd768e50fe";
@@ -11,12 +13,19 @@ const MODULE = "cardgame";
 
 // enter - called when the player enters the game table
 export const enter = async (wallet: WalletContextState) => {
+	const getCoinsParams: GetCoinsParams = {
+		owner: wallet?.address ?? "",
+	};
+	const money = await client.getCoins(getCoinsParams);
+	console.log("money: ", money);
 	const txb = new TransactionBlock();
 	txb.moveCall({
 		target: `${PACKAGE_ID}::${MODULE}::enter`,
 		arguments: [
 			txb.object(CASINO_ID), // casino
 			txb.object(LOUNGE_ID), // lounge
+			// public key
+			// money
 		],
 	});
 
@@ -109,6 +118,7 @@ export const action = async (
 
 	return "gameTableId";
 };
+
 export enum ActionType {
 	Ante = "ANTE",
 	Bet = "BET",
