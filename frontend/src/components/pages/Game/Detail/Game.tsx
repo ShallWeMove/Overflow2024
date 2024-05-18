@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Box } from "@mui/material";
 import background from "../../../../public/background.jpg";
 import { Loading } from "@/components/UI/Loading";
-import { getObjectById } from "@/api/object";
+import { getObject } from "@/api/object";
 
 const Game = () => {
 	const router = useRouter();
@@ -12,7 +12,7 @@ const Game = () => {
 
 	useEffect(() => {
 		const interval = setInterval(async () => {
-			const data = await getObjectById(objectId?.toString() ?? "");
+			const data = await getObject(objectId?.toString() ?? "");
 			console.log("data: ", data);
 		}, 1000);
 		return () => clearInterval(interval);

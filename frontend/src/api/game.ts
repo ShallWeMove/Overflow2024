@@ -2,11 +2,11 @@ import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { WalletContextState } from "@suiet/wallet-kit";
 
 const PACKAGE_ID =
-	"0x29361f0cd734d9374decb131affea826682f801c37021dfe39c6832db839a513";
+	"0x9aaf5ea1dcda8ec3f23d3e9a583bc770e5d22e59ecf4ffe0889918dd768e50fe";
 const CASINO_ID =
-	"0x334708a551a301c25e866acd0434dd4b2c95dd491d1a528923146b10bbaadb77";
+	"0x100ca0103d9d06c76e29e2b114773e2ef23dfadca5b31d211965f432141059b7";
 const LOUNGE_ID =
-	"0x0bff035610796da88e3820d847a6cfc541a2916b981e0c34e29940bb2f2b5c38";
+	"0xaad3c53cb7d9d28ac4ed7d9f5e656111295e0aeaa6d6d2c471a29ab1264426a3";
 const MODULE = "cardgame";
 
 // enter - called when the player enters the game table
