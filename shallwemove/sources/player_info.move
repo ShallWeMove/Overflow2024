@@ -19,12 +19,13 @@ module shallwemove::player_info {
 
   // ==================== Playing Actions ==========================
 
-  const ANTE : u8 = 20;
-  const CHECK : u8 = 21;
-  const BET : u8 = 22;
-  const CALL : u8 = 23;
-  const RAISE : u8 = 24;
-  const FOLD : u8 = 25;
+  const NONE : u8 = 20;
+  const ANTE : u8 = 21;
+  const CHECK : u8 = 22;
+  const BET : u8 = 23;
+  const CALL : u8 = 24;
+  const RAISE : u8 = 25;
+  const FOLD : u8 = 26;
 
   // ============================================
   // ============== STRUCTS =====================
@@ -34,7 +35,7 @@ module shallwemove::player_info {
     player_address : Option<address>,
     public_key : vector<u8>,
     playing_status : u8,
-    // player action 추가해야 함
+    playing_action : u8,
     number_of_holding_cards : u8,
     previous_bet_amount : u64,
     total_bet_amount : u64
@@ -65,6 +66,7 @@ module shallwemove::player_info {
       player_address : option::none(),
       public_key : vector<u8>[],
       playing_status : EMPTY,
+      playing_action : NONE,
       number_of_holding_cards : 0,
       previous_bet_amount : 0,
       total_bet_amount : 0
