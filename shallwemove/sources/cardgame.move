@@ -8,6 +8,7 @@ module shallwemove::cardgame {
   use sui::coin::{Self, Coin};
   use sui::sui::SUI;
   use std::debug;
+  use std::string::{Self};
 
   // ======================= Errors ==============================
 
@@ -81,6 +82,8 @@ module shallwemove::cardgame {
       let avail_game_table = lounge.borrow_mut_game_table(option::extract(&mut available_game_table_id));
       avail_game_table.enter_player(public_key, deposit, ctx);
 
+      debug::print(&string::utf8(b"=========================== ENTER =========================="));
+      debug::print(avail_game_table);
       return avail_game_table.id()
   }
 
@@ -108,6 +111,25 @@ module shallwemove::cardgame {
     
     game_table.exit_player(ctx);
   }
+
+  #[test_only]
+  public fun exit_test(
+    casino: &Casino, 
+    lounge: &mut Lounge, // 필요 없을 수도 => 무조건 필요함... parent에서 접근해야 함
+    game_table_id: ID, 
+    ctx: &mut TxContext
+  ) {
+    assert!(casino.id() == lounge.casino_id(), 403);
+  
+    let lounge_id = lounge.id();
+    let game_table = lounge.borrow_mut_game_table(game_table_id);
+    assert!(lounge_id == game_table.lounge_id(), 403);
+    
+    game_table.exit_player(ctx);
+    debug::print(&string::utf8(b"=========================== EXIT =========================="));
+    debug::print(game_table);
+  }
+
 
   // 최초 게임 시작 시 내는 돈. 게임 준비 상태 전환.
   entry fun ante(

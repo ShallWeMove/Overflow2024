@@ -172,11 +172,39 @@ module shallwemove::game_table {
       i = i + 1;
     };
 
+    debug::print(&i);
+
     // 못 찾는다면 잘못된 game_table이라는 것. 
     assert!(is_player_found, 403);
 
     // 일단 game_table에 있는 player_seats 한 바퀴 돈 상황
       // player_seats에서 찾았음
+    
+    // 해당 유저가 manager player인가?? -> 남은 사람 중 다음 순서로 manager player 넘기기
+      // 다음 순서 사람 찾기
+      // 근데 플레이어 4명 중 3번째 유저가 manager player고 exit을 한대. 
+      // 근데 4번째 순서는 없고 1,2번째에 유저가 있어. 그럼 1번째 유저한테 manager player를 줘야 해.
+      // 단순 while문이면 안 되고 순환해야 해
+    i = i + 1;
+    loop {
+      if (i == game_table.player_seats.length()) {
+        i = 0;
+      };
+
+      let player_seat = game_table.player_seats.borrow_mut(i);
+      if (player_seat.player() == option::none()) {
+        i = i + 1;
+        continue
+      };
+
+      if (player_seat.player() != option::none()) {
+        game_table.game_status.set_manager_player(player_seat.player().extract());
+        break
+      };
+
+      i = i + 1;
+    };
+
 
     // 게임 중인가?? 그리고 지금 exit 하는 유저가 current turn인가?? -> next turn
     if (game_table.game_status().game_playing_status() == game_status::CONST_PRE_GAME() 
@@ -185,6 +213,7 @@ module shallwemove::game_table {
     } else {
 
     };
+
 
     // player 정보 제거, PlayerSeat에서도 제거
     let player_seat = game_table.player_seats.borrow_mut(i);

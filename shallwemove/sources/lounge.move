@@ -76,6 +76,9 @@ module shallwemove::lounge {
 
     return option::none()
   }
+  public fun borrow_game_table(lounge: &Lounge, game_table_id : ID) : &GameTable {
+    dynamic_object_field::borrow<ID, GameTable> (&lounge.id, game_table_id)
+  }
 
   public fun borrow_mut_game_table(lounge: &mut Lounge, game_table_id : ID) : &mut GameTable {
     dynamic_object_field::borrow_mut<ID, GameTable> (&mut lounge.id, game_table_id)

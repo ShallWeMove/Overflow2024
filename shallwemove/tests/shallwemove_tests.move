@@ -46,7 +46,7 @@ module shallwemove::shallwemove_tests {
   }
 
   #[test]
-  fun test_enter() {
+  fun test_enter_exit() {
     let mut ts1 = test_scenario::begin(@0xA);
     let mut ts2 = test_scenario::begin(@0xB);
     let ctx1 = test_scenario::ctx(&mut ts1);
@@ -58,8 +58,10 @@ module shallwemove::shallwemove_tests {
     
     let user_public_key = vector<u8>[23,124,1,23,53,63,22];
 
-    let id = cardgame::enter_test(&casino, &mut lounge, user_public_key, deposit1, ctx1);
-    let id = cardgame::enter_test(&casino, &mut lounge, user_public_key, deposit2, ctx2);
+    let game_table_id = cardgame::enter_test(&casino, &mut lounge, user_public_key, deposit1, ctx1);
+    let game_table_id = cardgame::enter_test(&casino, &mut lounge, user_public_key, deposit2, ctx2);
+
+    cardgame::exit_test(&casino, &mut lounge, game_table_id, ctx1);
 
     remove_game(casino, lounge);
     test_scenario::end(ts1);

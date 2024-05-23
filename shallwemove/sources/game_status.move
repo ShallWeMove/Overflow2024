@@ -7,6 +7,8 @@ module shallwemove::game_status {
   use std::vector::{Self};
   use sui::coin::{Self, Coin};
   use sui::sui::SUI;
+  use std::string::{Self, String};
+  use std::debug;
 
   // ============================================
   // ============== CONSTANTS ===================
@@ -105,10 +107,14 @@ module shallwemove::game_status {
     &game_status.game_info
   }
 
+  public fun game_info_mut(game_status : &mut GameStatus) : &mut GameInfo {
+    &mut game_status.game_info
+  }
+
   public fun manager_player(game_status : &GameStatus) : Option<address>{game_status.game_info.manager_player}
 
   public fun set_manager_player(game_status: &mut GameStatus, player : address) {
-    game_status.game_info.manager_player = option::some(player);
+    game_status.game_info_mut().manager_player = option::some(player);
   }
 
   public fun is_manager_player(game_status: &GameStatus, ctx : &mut TxContext) : bool {
