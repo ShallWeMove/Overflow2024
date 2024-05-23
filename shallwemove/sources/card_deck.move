@@ -29,7 +29,8 @@ module shallwemove::card_deck {
       used_cards : vector[],
     };
 
-    card_deck.fill_cards(public_key, ctx);
+    // test 용으로 임시 주석 처리
+    // card_deck.fill_cards(public_key, ctx);
 
     card_deck
   }

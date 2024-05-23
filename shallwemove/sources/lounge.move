@@ -34,7 +34,19 @@ module shallwemove::lounge {
     });
   }
 
+  public fun new(casino : &Casino, ctx : &mut TxContext) : Lounge {
+    Lounge{
+      id : object::new(ctx),
+      casino_id : casino.id(),
+      game_tables : vector[]
+    }
+  }
+
   // ===================== Methods ===============================
+  public fun delete(lounge : Lounge) {
+    let Lounge {id : lounge_id, casino_id : _, game_tables : _} = lounge;
+    object::delete(lounge_id);
+  }
   
   public fun id(lounge : &Lounge) : ID {object::id(lounge)}
 
@@ -68,14 +80,15 @@ module shallwemove::lounge {
   public fun borrow_mut_game_table(lounge: &mut Lounge, game_table_id : ID) : &mut GameTable {
     dynamic_object_field::borrow_mut<ID, GameTable> (&mut lounge.id, game_table_id)
   }
-  fun get_entered_game_table_id(lounge : &Lounge, ctx : &mut TxContext) : Option<ID> {
+
+  fun get_entered_game_table_id(lounge : &mut Lounge, ctx : &mut TxContext) : Option<ID> {
     let mut game_table_ids = lounge.game_tables();
 
     while (!game_table_ids.is_empty()) {
       let game_table_id = game_table_ids.pop_back();
-      let game_table = dynamic_object_field::borrow<ID, GameTable> (&lounge.id, game_table_id);
+      let game_table = lounge.borrow_mut_game_table(game_table_id);
 
-      let mut player_infos = game_table.game_status().player_infos();
+      let mut player_infos = game_table.game_status_mut().player_infos_mut();
       while (!player_infos.is_empty()) {
         let player_info = player_infos.pop_back();
         if (player_info.player_address() == option::none()) {

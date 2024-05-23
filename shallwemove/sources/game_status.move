@@ -120,7 +120,7 @@ module shallwemove::game_status {
   fun current_turn(game_status : &GameStatus) : u8 {game_status.game_info.current_turn}
 
   fun current_turn_player(game_status : &GameStatus) : Option<address> {
-    let current_turn_player_info = vector::borrow(&game_status.player_infos(), game_status.current_turn() as u64);
+    let current_turn_player_info = vector::borrow(&game_status.player_infos, game_status.current_turn() as u64);
     return current_turn_player_info.player_address()
   }
 
@@ -158,7 +158,8 @@ module shallwemove::game_status {
 
   fun number_of_used_cards(game_status : &GameStatus) : u8 {game_status.card_info.number_of_used_cards}
 
-  public fun player_infos(game_status : &GameStatus) : vector<PlayerInfo> {game_status.player_infos}
+  public fun player_infos(game_status : &GameStatus) : &vector<PlayerInfo> {&game_status.player_infos}
+  public fun player_infos_mut(game_status : &mut GameStatus) : &mut vector<PlayerInfo> {&mut game_status.player_infos}
 
   // public fun player_info(game_status : &GameStatus, ctx : &mut TxContext) : &PlayerInfo {
   //   let mut i = 0;
@@ -177,6 +178,9 @@ module shallwemove::game_status {
 
   public fun enter_player(game_status : &mut GameStatus, ctx : &mut TxContext) {
     // player가 해당 게임의 첫 번째 유저면 manager_player로 등록
+    if (game_status.manager_player() == option::none<address>()) {
+      game_status.set_manager_player(tx_context::sender(ctx));
+    };
 
     // avail_seat 하나 감소
     game_status.decrement_avail_seat();
@@ -194,7 +198,7 @@ module shallwemove::game_status {
 
   public fun next_turn(game_status : &mut GameStatus) {
     // current turn을 다음 턴으로
-    if ( (game_status.current_turn() + 1) as u64 == game_status.player_infos().length()) {
+    if ( (game_status.current_turn() + 1) as u64 == game_status.player_infos.length()) {
       game_status.game_info.current_turn = 0;
     } else {
       game_status.game_info.current_turn = game_status.game_info.current_turn + 1;

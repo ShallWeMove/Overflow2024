@@ -104,15 +104,12 @@ module shallwemove::game_table {
     let is_game_table_full = false;
     
     while (i < (game_table.game_status.game_seats() ) as u64) {
-      let player_info = game_table.game_status.player_infos().borrow_mut(i);
+      let player_info = game_table.game_status.player_infos_mut().borrow_mut(i);
       let player_seat = game_table.player_seats.borrow_mut(i);
 
-      // assert!(!player_info.is_participated(ctx) , 403);
-
-      if (player_info.player_address() == option::none() && player_seat.player() == option::none()) {
+      if (player_info.player_address() == option::none<address>() && player_seat.player() == option::none<address>()) {
         break
       };
-
       i = i + 1;
     };
 
@@ -123,37 +120,32 @@ module shallwemove::game_table {
     if (is_game_table_full) {
       transfer::public_transfer(deposit, tx_context::sender(ctx));
     } else {
-      if (game_table.game_status.manager_player() == option::none()) {
-        game_table.game_status.set_manager_player(tx_context::sender(ctx));
-      };
-      let player_info = game_table.game_status.player_infos().borrow_mut(i);
+      
+      let player_info = game_table.game_status.player_infos_mut().borrow_mut(i);
       let player_seat = game_table.player_seats.borrow_mut(i);
 
       player_seat.set_player(ctx);
       player_seat.set_public_key(public_key);
       player_seat.add_money(deposit);
 
-
       player_info.set_player(ctx);
       player_info.set_public_key(public_key);
       player_info.set_playing_status(player_info::CONST_EMTER());
 
-      // manager_player 등록 등 설정 필요함      
       game_table.game_status.enter_player(ctx);
-    }
+    };
   }
 
   public fun is_player_entered(game_table : &GameTable, ctx : &mut TxContext) : bool {
     let mut i = 0;
     while (i < game_table.game_status.player_infos().length()) {
-      let player_info = vector::borrow(&game_table.game_status.player_infos(), i);
-      if (player_info.player_address() == option::some(tx_context::sender(ctx))){
+      let player_info = game_table.game_status.player_infos().borrow(i);
+      if (option::is_some(&player_info.player_address()) 
+      && option::extract(&mut player_info.player_address()) == tx_context::sender(ctx) ) {
         return true
       };
-
       i = i + 1;
     };
-
 
     return false
   }
@@ -196,7 +188,7 @@ module shallwemove::game_table {
 
     // player 정보 제거, PlayerSeat에서도 제거
     let player_seat = game_table.player_seats.borrow_mut(i);
-    let player_info = game_table.game_status.player_infos().borrow_mut(i);
+    let player_info = game_table.game_status.player_infos_mut().borrow_mut(i);
 
     player_seat.remove_player(ctx);
     player_info.remove_player(ctx);
@@ -209,7 +201,7 @@ module shallwemove::game_table {
     assert!(game_table.game_status.game_playing_status() == game_status::CONST_PRE_GAME());
     let mut i = 0;
     while (i < game_table.game_status.player_infos().length()) {
-      let player_info = vector::borrow(&game_table.game_status.player_infos(), i);
+      let player_info = game_table.game_status.player_infos().borrow(i);
       if (player_info.player_address() == option::some(tx_context::sender(ctx))){
         assert!(player_info.playing_status() == player_info::CONST_EMTER());
         break
@@ -234,5 +226,12 @@ module shallwemove::game_table {
 
   // ============================================
   // ================ TEST ======================
+
+
+
+  #[test]
+  fun test_enter() {
+
+  }
 
 }

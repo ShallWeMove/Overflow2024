@@ -48,6 +48,17 @@ module shallwemove::cardgame {
     lounge.add_game_table(game_table);
   }
 
+  #[test_only]
+  public fun add_game_table_test(
+    casino : &Casino, 
+    lounge : &mut Lounge, 
+    ante_amount : u64, 
+    bet_unit : u64, 
+    game_seats : u8, 
+    ctx : &mut TxContext) {
+      add_game_table(casino, lounge, ante_amount, bet_unit, game_seats, ctx);
+    }
+
   // --------- For Player ---------
 
   // 게임 입장
@@ -57,17 +68,30 @@ module shallwemove::cardgame {
     public_key : vector<u8>,
     deposit : Coin<SUI>,
     ctx : &mut TxContext) : ID {
-    assert!(casino.id() == lounge.casino_id(), 403);
+      //casino id 와 lounge의 casino id가 같은지 체크
+      assert!(casino.id() == lounge.casino_id(), 403);
 
-    // deposit은 일정량 이상으로 -> game_table의 bet_unit의 20배..?
+      // deposit은 일정량 이상으로 -> game_table의 bet_unit의 20배..? -> 일단 테스트를 위해서 보류
 
-    let mut available_game_table_id = lounge.available_game_table_id();
-    assert!(available_game_table_id != option::none());
+      // available한 GameTable 가져온다
+      let mut available_game_table_id = lounge.available_game_table_id();
+      assert!(available_game_table_id != option::none());
 
-    let avail_game_table = lounge.borrow_mut_game_table(option::extract(&mut available_game_table_id));
-    avail_game_table.enter_player(public_key, deposit, ctx);
+      // player를 GameTable에 참여 시킨다.
+      let avail_game_table = lounge.borrow_mut_game_table(option::extract(&mut available_game_table_id));
+      avail_game_table.enter_player(public_key, deposit, ctx);
 
-    return avail_game_table.id()
+      return avail_game_table.id()
+  }
+
+  #[test_only]
+  public fun enter_test(
+    casino : &Casino, 
+    lounge : &mut Lounge, 
+    public_key : vector<u8>,
+    deposit : Coin<SUI>,
+    ctx : &mut TxContext) : ID {
+      enter(casino, lounge, public_key, deposit, ctx)
   }
 
   // 게임 퇴장

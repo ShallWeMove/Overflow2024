@@ -30,7 +30,8 @@ module shallwemove::player_info {
   // ============================================
   // ============== STRUCTS =====================
 
-  public struct PlayerInfo has copy, store, drop {
+  // public struct PlayerInfo has copy, store, drop {
+  public struct PlayerInfo has store, drop {
     index : u8,
     player_address : Option<address>,
     public_key : vector<u8>,
