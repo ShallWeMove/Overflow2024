@@ -10,7 +10,7 @@ module shallwemove::player_info {
 
   // ==================== Playing Statuses ==========================
 
-  const EMPTY : u8 = 10;
+  const EMPTY : u8 = 10; 
   const ENTER : u8 = 11;
   const READY : u8 = 12;
   const PLAYING : u8 = 13;
@@ -34,6 +34,7 @@ module shallwemove::player_info {
     player_address : Option<address>,
     public_key : vector<u8>,
     playing_status : u8,
+    // player action 추가해야 함
     number_of_holding_cards : u8,
     previous_bet_amount : u64,
     total_bet_amount : u64

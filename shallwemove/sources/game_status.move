@@ -98,11 +98,11 @@ module shallwemove::game_status {
     game_status.game_info.manager_player = option::some(player);
   }
 
-  fun is_manager_player(game_status: &GameStatus, ctx : &mut TxContext) : bool {
+  public fun is_manager_player(game_status: &GameStatus, ctx : &mut TxContext) : bool {
     return game_status.manager_player() == option::some(tx_context::sender(ctx))
   }
 
-  fun game_playing_status(game_status : &GameStatus) : u8 {game_status.game_info.game_playing_status}
+  public fun game_playing_status(game_status : &GameStatus) : u8 {game_status.game_info.game_playing_status}
 
   fun current_turn_player(game_status : &GameStatus) : Option<address> {game_status.game_info.current_turn_player}
 
@@ -149,6 +149,10 @@ module shallwemove::game_status {
 
     // avail_seat 하나 추가
     game_status.increment_avail_seat();
+  }
+
+  public fun next_player(game_status : &mut GameStatus, ctx : &mut TxContext) {
+
   }
 
   

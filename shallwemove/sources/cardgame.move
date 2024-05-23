@@ -34,7 +34,7 @@ module shallwemove::cardgame {
     lounge::create(casino, ctx);
   }
 
-  entry fun create_and_add_game_table(
+  entry fun add_game_table(
     casino : &Casino, 
     lounge : &mut Lounge, 
     ante_amount : u64, 
@@ -62,9 +62,9 @@ module shallwemove::cardgame {
     // deposit은 일정량 이상으로 -> game_table의 bet_unit의 20배..?
 
     let mut available_game_table_id = lounge.available_game_table_id();
-    // let avail_game_table = dynamic_object_field::borrow_mut<ID, GameTable> (&mut lounge.id, option::extract(&mut available_game_table_id));
-    let avail_game_table = lounge.borrow_mut_game_table(option::extract(&mut available_game_table_id));
+    assert!(available_game_table_id != option::none());
 
+    let avail_game_table = lounge.borrow_mut_game_table(option::extract(&mut available_game_table_id));
     avail_game_table.enter_player(public_key, deposit, ctx);
 
     return avail_game_table.id()
@@ -80,10 +80,22 @@ module shallwemove::cardgame {
     assert!(casino.id() == lounge.casino_id(), 403);
     assert!(lounge.id() == game_table.lounge_id(), 403);
 
-    // let game_table = dynamic_object_field::borrow_mut<ID, GameTable> (&mut lounge.id, game_table.id());
     let game_table = lounge.borrow_mut_game_table(game_table.id());
     
     game_table.exit_player(ctx);
+  }
+
+  // 최초 게임 시작 시 내는 돈. 게임 준비 상태 전환.
+  entry fun ante(
+    casino: &Casino,
+    lounge: &mut Lounge,
+    game_table: &mut GameTable,
+    ctx: &mut TxContext,
+  ) : ID {
+    assert!(casino.id() == lounge.casino_id(), 403);
+    assert!(lounge.id() == game_table.lounge_id(), 403);
+    
+    return game_table.id()
   }
 
   // 게임 시작
@@ -96,19 +108,23 @@ module shallwemove::cardgame {
     assert!(casino.id() == lounge.casino_id(), 403);
     assert!(lounge.id() == game_table.lounge_id(), 403);
     
-    // let game_table = dynamic_object_field::borrow_mut<ID, GameTable> (&mut lounge.id, game_table.id());
     let game_table = lounge.borrow_mut_game_table(game_table.id());
+
     assert!(game_table.game_status().manager_player() != option::none(), 403);
-    assert!(tx_context::sender(ctx) == option::extract(&mut game_table.game_status().manager_player()), 403);
+    assert!(game_table.game_status().is_manager_player(ctx), 403);
+    // assert!(tx_context::sender(ctx) == option::extract(&mut game_table.game_status().manager_player()), 403);
+    
+    game_table.start();
 
     return game_table.id()
   }
+
 
   // 플레이어 콜 => 마지막 턴의 액션이면 Move에서 알아서 게임 종료해줌
   entry fun action(
     casino: &Casino, 
     game_table: &mut GameTable,
-    // action_type: ActionType, // ante, check, bet, call, raise
+    // action_type: ActionType, // ante(요건 없애야 할 듯), check, bet, call, raise
     action_type: u8, // ante, check, bet, call, raise
     with_new_card: bool, // 새 카드를 받을지 
     chip_count: u64, // 몇 개의 칩을 베팅할지 (칩 하나가 ? SUI일지는 GameTable마다 다르다)

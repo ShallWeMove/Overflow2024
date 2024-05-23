@@ -89,6 +89,7 @@ module shallwemove::game_table {
     };
   }
 
+
   public fun enter_player(game_table : &mut GameTable, public_key : vector<u8>, deposit : Coin<SUI>, ctx : &mut TxContext) {
     let mut i = 0;
     let is_full = false;
@@ -155,34 +156,31 @@ module shallwemove::game_table {
       i = i + 1;
     };
 
+    // 못 찾는다면 잘못된 game_table이라는 것. 
+    assert!(is_player_found, 403);
 
     // 일단 game_table에 있는 player_seats 한 바퀴 돈 상황
-      // player_seats에서 찾았을 수도 있고
-    if (is_player_found) {
-      // 다음 player seat에 있는 player address로 manager_plaery 넘겨주고 싶은데 로직이.....
-      // if (game_table.game_status.is_manager_player(ctx)) {
-      //   if (i < game_table.player_seats.length()){
-      //     let next_player_seat = game_table.player_seats.borrow_mut(i+1);
-      //     game_table.game_status.set_manager_player(next_player_seat.)
+      // player_seats에서 찾았음
 
-      //   } else {
-      //     let player_seat = game_table.player_seats.borrow_mut(0);
-      //   }
-
-
-      // };
-      let player_seat = game_table.player_seats.borrow_mut(i);
-      let player_info = game_table.game_status.player_infos().borrow_mut(i);
-
-      player_seat.remove_player(ctx);
-      player_info.remove_player(ctx);
-      game_table.game_status.remove_player(ctx);
+    // 게임 중인가??
+    if (game_table.game_status().game_playing_status() == 1) {
 
     } else {
-      // 못 찾는다면 잘못된 game_table이라는 것. 
 
     };
 
+
+    let player_seat = game_table.player_seats.borrow_mut(i);
+    let player_info = game_table.game_status.player_infos().borrow_mut(i);
+
+    player_seat.remove_player(ctx);
+    player_info.remove_player(ctx);
+    game_table.game_status.remove_player(ctx);
+
+  }
+
+  public fun start(game_table : &mut GameTable) {
+    
   }
 
   // ============================================
