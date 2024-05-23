@@ -49,10 +49,13 @@ module shallwemove::shallwemove_tests {
   fun test_enter_exit() {
     let mut ts1 = test_scenario::begin(@0xA);
     let mut ts2 = test_scenario::begin(@0xB);
+    let mut ts3 = test_scenario::begin(@0xC);
     let ctx1 = test_scenario::ctx(&mut ts1);
     let ctx2 = test_scenario::ctx(&mut ts2);
+    let ctx3 = test_scenario::ctx(&mut ts3);
     let deposit1 = coin::mint_for_testing<SUI>(50000, ctx1);
     let deposit2 = coin::mint_for_testing<SUI>(50000, ctx2);
+    // let deposit3 = coin::mint_for_testing<SUI>(50000, ctx3);
 
     let (casino, mut lounge) = create_game();
     
@@ -60,15 +63,24 @@ module shallwemove::shallwemove_tests {
 
     let game_table_id = cardgame::enter_test(&casino, &mut lounge, user_public_key, deposit1, ctx1);
     let game_table_id = cardgame::enter_test(&casino, &mut lounge, user_public_key, deposit2, ctx2);
+    // let game_table_id = cardgame::enter_test(&casino, &mut lounge, user_public_key, deposit3, ctx3);
 
     cardgame::ante_test(&casino, &mut lounge, game_table_id, ctx1);
     cardgame::ante_test(&casino, &mut lounge, game_table_id, ctx2);
 
+    // ctx1 유저가 한 번더 ante (assert 유도)
+    // cardgame::ante_test(&casino, &mut lounge, game_table_id, ctx1);
+
+    // ctx3 유저가 enter 없이 ante(assert 유도)
+    // cardgame::ante_test(&casino, &mut lounge, game_table_id, ctx3);
+
     cardgame::exit_test(&casino, &mut lounge, game_table_id, ctx1);
+    cardgame::exit_test(&casino, &mut lounge, game_table_id, ctx2);
 
     remove_game(casino, lounge);
     test_scenario::end(ts1);
     test_scenario::end(ts2);
+    test_scenario::end(ts3);
   }
 
   // #[test]

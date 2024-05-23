@@ -4,6 +4,9 @@ module shallwemove::player_info {
   // ============= IMPORTS ======================
   
   use std::string::{Self, String};
+  use std::debug;
+  use sui::coin::{Self, Coin};
+  use sui::sui::SUI;
 
   // ============================================
   // ============== CONSTANTS ===================
@@ -77,7 +80,7 @@ module shallwemove::player_info {
   public fun CONST_EMPTY() : u8 {
     EMPTY
   }
-  public fun CONST_EMTER() : u8 {
+  public fun CONST_ENTER() : u8 {
     ENTER
   }
   public fun CONST_READY() : u8 {
@@ -98,11 +101,20 @@ module shallwemove::player_info {
 
   public fun playing_status(player_info : &PlayerInfo) : u8 {player_info.playing_status}
 
-  fun pnumber_of_holding_cards(player_info : &PlayerInfo) : u8 {player_info.number_of_holding_cards}
+  public fun set_playing_status(player_info : &mut PlayerInfo, playing_status : u8) {
+    player_info.playing_status = playing_status;
+  }
+
+  fun number_of_holding_cards(player_info : &PlayerInfo) : u8 {player_info.number_of_holding_cards}
 
   fun previous_bet_amount(player_info : &PlayerInfo) : u64 {player_info.previous_bet_amount}
 
   fun total_bet_amount(player_info : &PlayerInfo) : u64 {player_info.total_bet_amount}
+
+  public fun add_bet_amount(player_info : &mut PlayerInfo, bet_amount : u64) {
+    player_info.previous_bet_amount = bet_amount;
+    player_info.total_bet_amount = player_info.total_bet_amount + bet_amount;
+  }
 
   public fun set_player(player_info : &mut PlayerInfo, ctx : &mut TxContext) {
     player_info.player_address = option::some(tx_context::sender(ctx));
@@ -111,16 +123,18 @@ module shallwemove::player_info {
   public fun remove_player(player_info : &mut PlayerInfo, ctx : &mut TxContext) {
     assert!(tx_context::sender(ctx) == player_info.player_address().extract(), 403);
     player_info.player_address = option::none();
-    player_info.set_playing_status(EMPTY);
+    player_info.playing_status = EMPTY;
+    player_info.playing_action = NONE;
+
+    player_info.previous_bet_amount = 0;
+    player_info.total_bet_amount = 0;
+    player_info.number_of_holding_cards = 0;
   }
 
   public fun set_public_key(player_info : &mut PlayerInfo, public_key : vector<u8>) {
     player_info.public_key = public_key;
   }
 
-  public fun set_playing_status(player_info : &mut PlayerInfo, playing_status : u8) {
-    player_info.playing_status = playing_status;
-  }
 
   // public fun is_participated(player_info : &mut PlayerInfo, ctx : &mut TxContext) : bool {
   //   if (player_info.player_address() == option::none()) {

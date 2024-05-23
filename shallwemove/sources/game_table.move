@@ -71,6 +71,7 @@ module shallwemove::game_table {
 
   fun used_card_decks(game_table : &GameTable) : vector<ID> {game_table.used_card_decks}
 
+
   public fun game_status(game_table : &GameTable) : &GameStatus {
     &game_table.game_status
   }
@@ -130,7 +131,7 @@ module shallwemove::game_table {
 
       player_info.set_player(ctx);
       player_info.set_public_key(public_key);
-      player_info.set_playing_status(player_info::CONST_EMTER());
+      player_info.set_playing_status(player_info::CONST_ENTER());
 
       game_table.game_status.enter_player(ctx);
     };
@@ -219,7 +220,7 @@ module shallwemove::game_table {
     let player_seat = game_table.player_seats.borrow_mut(i);
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(i);
 
-    player_seat.remove_player(ctx);
+    player_seat.remove_player(game_table.card_deck.borrow_mut(), ctx);
     player_info.remove_player(ctx);
     game_table.game_status.remove_player(ctx);
 
@@ -232,7 +233,7 @@ module shallwemove::game_table {
     while (i < game_table.game_status.player_infos().length()) {
       let player_info = game_table.game_status.player_infos().borrow(i);
       if (player_info.player_address() == option::some(tx_context::sender(ctx))){
-        assert!(player_info.playing_status() == player_info::CONST_EMTER());
+        assert!(player_info.playing_status() == player_info::CONST_ENTER());
         break
       };
 
@@ -243,6 +244,10 @@ module shallwemove::game_table {
     //각 PlayerSeat의 deposit에서 ante 만큼 꺼내기
     let player_seat = vector::borrow_mut(&mut game_table.player_seats, i);
     let money_to_send = player_seat.split_money(game_table.game_status.ante_amount(), ctx);
+    // PlayerInfo bet amount 업데이트 & READY 상태
+    let player_info = game_table.game_status.player_infos_mut().borrow_mut(i);
+    player_info.add_bet_amount(money_to_send.value());
+    player_info.set_playing_status(player_info::CONST_READY());
     //MoneyBox total 금액 업데이트 및 MoneyBox로 전송
     game_table.game_status.add_money(&money_to_send);
     game_table.money_box.add_money(money_to_send);

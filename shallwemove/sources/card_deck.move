@@ -59,6 +59,10 @@ module shallwemove::card_deck {
     };
   }
 
+  public fun add_used_card(card_deck : &mut CardDeck, card : Card) {
+    card_deck.used_cards.push_back(card);
+  }
+
   // --------- Card ---------
 
   fun card_id(card : &Card) : ID {object::id(card)}

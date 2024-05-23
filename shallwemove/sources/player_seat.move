@@ -3,7 +3,7 @@ module shallwemove::player_seat {
   // ============================================
   // ============= IMPORTS ======================
 
-  use shallwemove::card_deck::{Self, Card};
+  use shallwemove::card_deck::{Self, CardDeck, Card};
   use sui::dynamic_object_field;
   use sui::coin::{Self, Coin};
   use sui::sui::SUI;
@@ -53,10 +53,13 @@ module shallwemove::player_seat {
     player_seat.player = option::some(tx_context::sender(ctx));
   }
 
-  public fun remove_player(player_seat : &mut PlayerSeat, ctx : &mut TxContext){
+  public fun remove_player(player_seat : &mut PlayerSeat, card_deck : &mut CardDeck, ctx : &mut TxContext){
     // let player_address = tx_context::sender(ctx);
     player_seat.player = option::none();
     player_seat.public_key = vector<u8>[];
+
+    // 카드도 정리해야지??
+    player_seat.remove_cards(card_deck);
 
     player_seat.remove_deposit(ctx);
   }
@@ -94,7 +97,7 @@ module shallwemove::player_seat {
     let mut i = 0;
     let mut money_container = coin::zero<SUI>(ctx);
     while (i < player_seat.deposit.length()) {
-      let money = vector::remove(&mut player_seat.deposit,i);
+      let money = player_seat.deposit.pop_back();
       // let money_id = vector::remove(&mut player_seat.deposit(),i);
       // let money = dynamic_object_field::remove<ID, Coin<SUI>>(&mut player_seat.id, money_id);
       coin::join<SUI>(&mut money_container, money);
@@ -105,6 +108,16 @@ module shallwemove::player_seat {
     let money = coin::split<SUI>(&mut money_container, amount, ctx);
     vector::push_back(&mut player_seat.deposit, money_container);
     return money
+  }
+
+  fun remove_cards(player_seat : &mut PlayerSeat, card_deck : &mut CardDeck) {
+    let mut i = 0;
+    while (i < player_seat.cards.length()) {
+      let card = player_seat.cards.pop_back();
+      card_deck.add_used_card(card);
+
+      i = i + 1;
+    };
   }
 
   // ============================================
