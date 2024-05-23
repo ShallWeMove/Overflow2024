@@ -30,7 +30,7 @@ module shallwemove::card_deck {
     };
 
     // test 용으로 임시 주석 처리
-    // card_deck.fill_cards(public_key, ctx);
+    card_deck.fill_cards(public_key, ctx);
 
     card_deck
   }
