@@ -21,8 +21,8 @@ module shallwemove::player_info {
 
   const NONE : u8 = 20;
   const ANTE : u8 = 21;
-  const CHECK : u8 = 22;
-  const BET : u8 = 23;
+  const BET : u8 = 22;
+  const CHECK : u8 = 23;
   const CALL : u8 = 24;
   const RAISE : u8 = 25;
   const FOLD : u8 = 26;
