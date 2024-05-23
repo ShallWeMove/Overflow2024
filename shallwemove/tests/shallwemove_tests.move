@@ -74,6 +74,9 @@ module shallwemove::shallwemove_tests {
     // ctx3 유저가 enter 없이 ante(assert 유도)
     // cardgame::ante_test(&casino, &mut lounge, game_table_id, ctx3);
 
+    cardgame::start_test(&casino, &mut lounge, game_table_id, ctx1);
+    // cardgame::start_test(&casino, &mut lounge, game_table_id, ctx2);
+
     cardgame::exit_test(&casino, &mut lounge, game_table_id, ctx1);
     cardgame::exit_test(&casino, &mut lounge, game_table_id, ctx2);
 

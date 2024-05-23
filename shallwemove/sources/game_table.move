@@ -255,6 +255,7 @@ module shallwemove::game_table {
   }
 
   public fun start(game_table : &mut GameTable) {
+    // 이제 여기를 채워야 할 시간!!!!
     
   }
 

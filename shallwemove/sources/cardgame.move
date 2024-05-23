@@ -182,13 +182,35 @@ module shallwemove::cardgame {
 
     assert!(game_table.game_status().manager_player() != option::none(), 403);
     assert!(game_table.game_status().is_manager_player(ctx), 403);
-    // assert!(tx_context::sender(ctx) == option::extract(&mut game_table.game_status().manager_player()), 403);
     
     game_table.start();
 
     return game_table.id()
   }
 
+  #[test_only]
+  public fun start_test(
+    casino: &Casino, 
+    lounge: &mut Lounge,
+    game_table_id: ID, 
+    ctx: &mut TxContext,
+  ) : ID {
+    assert!(casino.id() == lounge.casino_id(), 403);
+    let lounge_id = lounge.id();
+    let game_table = lounge.borrow_mut_game_table(game_table_id);
+    assert!(lounge_id == game_table.lounge_id(), 403);
+    
+    assert!(game_table.game_status().manager_player() != option::none(), 403);
+    assert!(game_table.game_status().is_manager_player(ctx), 403);
+    
+    game_table.start();
+
+    debug::print(&string::utf8(b"=========================== START =========================="));
+    debug::print(game_table);
+
+    return game_table.id()
+
+  }
 
   // 플레이어 콜 => 마지막 턴의 액션이면 Move에서 알아서 게임 종료해줌
   entry fun action(
