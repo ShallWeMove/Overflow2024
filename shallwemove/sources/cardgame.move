@@ -94,6 +94,10 @@ module shallwemove::cardgame {
   ) : ID {
     assert!(casino.id() == lounge.casino_id(), 403);
     assert!(lounge.id() == game_table.lounge_id(), 403);
+
+    let game_table = lounge.borrow_mut_game_table(game_table.id());
+
+    game_table.ante(ctx);
     
     return game_table.id()
   }

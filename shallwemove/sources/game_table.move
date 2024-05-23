@@ -12,6 +12,9 @@ module shallwemove::game_table {
   use sui::sui::SUI;
   use std::string::{Self, String};
   use std::debug;
+  use std::vector::{Self};
+  use sui::dynamic_object_field;
+
 
   // ============================================
   // ============== CONSTANTS ===================
@@ -72,6 +75,10 @@ module shallwemove::game_table {
     &game_table.game_status
   }
 
+  public fun game_status_mut(game_table : &mut GameTable) : &mut GameStatus {
+    &mut game_table.game_status
+  }
+
   fun add_player_seat(game_table : &mut GameTable, player_seat : PlayerSeat) {
     game_table.player_seats.push_back(player_seat);
   }
@@ -91,14 +98,16 @@ module shallwemove::game_table {
 
 
   public fun enter_player(game_table : &mut GameTable, public_key : vector<u8>, deposit : Coin<SUI>, ctx : &mut TxContext) {
+    assert!(!game_table.is_player_entered(ctx));
+
     let mut i = 0;
-    let is_full = false;
+    let is_game_table_full = false;
     
     while (i < (game_table.game_status.game_seats() ) as u64) {
       let player_info = game_table.game_status.player_infos().borrow_mut(i);
       let player_seat = game_table.player_seats.borrow_mut(i);
 
-      assert!(!player_info.is_participated(ctx) , 403);
+      // assert!(!player_info.is_participated(ctx) , 403);
 
       if (player_info.player_address() == option::none() && player_seat.player() == option::none()) {
         break
@@ -108,10 +117,10 @@ module shallwemove::game_table {
     };
 
     if (i == (game_table.game_status.avail_seats() ) as u64) {
-      is_full == true;
+      is_game_table_full == true;
     };
 
-    if (is_full) {
+    if (is_game_table_full) {
       transfer::public_transfer(deposit, tx_context::sender(ctx));
     } else {
       if (game_table.game_status.manager_player() == option::none()) {
@@ -127,11 +136,26 @@ module shallwemove::game_table {
 
       player_info.set_player(ctx);
       player_info.set_public_key(public_key);
-      player_info.set_playing_status(player_info::get_playing_status(string::utf8(b"ENTER")));
+      player_info.set_playing_status(player_info::CONST_EMTER());
 
       // manager_player 등록 등 설정 필요함      
       game_table.game_status.enter_player(ctx);
     }
+  }
+
+  public fun is_player_entered(game_table : &GameTable, ctx : &mut TxContext) : bool {
+    let mut i = 0;
+    while (i < game_table.game_status.player_infos().length()) {
+      let player_info = vector::borrow(&game_table.game_status.player_infos(), i);
+      if (player_info.player_address() == option::some(tx_context::sender(ctx))){
+        return true
+      };
+
+      i = i + 1;
+    };
+
+
+    return false
   }
 
   public fun exit_player(game_table : &mut GameTable, ctx : &mut TxContext) {
@@ -162,20 +186,45 @@ module shallwemove::game_table {
     // 일단 game_table에 있는 player_seats 한 바퀴 돈 상황
       // player_seats에서 찾았음
 
-    // 게임 중인가??
-    if (game_table.game_status().game_playing_status() == 1) {
-
+    // 게임 중인가?? 그리고 지금 exit 하는 유저가 current turn인가?? -> next turn
+    if (game_table.game_status().game_playing_status() == game_status::CONST_PRE_GAME() 
+    && game_table.game_status().is_current_turn(ctx)) {
+      game_table.game_status_mut().next_turn();
     } else {
 
     };
 
-
+    // player 정보 제거, PlayerSeat에서도 제거
     let player_seat = game_table.player_seats.borrow_mut(i);
     let player_info = game_table.game_status.player_infos().borrow_mut(i);
 
     player_seat.remove_player(ctx);
     player_info.remove_player(ctx);
     game_table.game_status.remove_player(ctx);
+
+  }
+
+  public fun ante(game_table : &mut GameTable, ctx : &mut TxContext) {
+    assert!(game_table.is_player_entered(ctx));
+    assert!(game_table.game_status.game_playing_status() == game_status::CONST_PRE_GAME());
+    let mut i = 0;
+    while (i < game_table.game_status.player_infos().length()) {
+      let player_info = vector::borrow(&game_table.game_status.player_infos(), i);
+      if (player_info.player_address() == option::some(tx_context::sender(ctx))){
+        assert!(player_info.playing_status() == player_info::CONST_EMTER());
+        break
+      };
+
+      i = i + 1;
+    };
+
+    // 이제 진짜 로직
+    //각 PlayerSeat의 deposit에서 ante 만큼 꺼내기
+    let player_seat = vector::borrow_mut(&mut game_table.player_seats, i);
+    let money_to_send = player_seat.split_money(game_table.game_status.ante_amount(), ctx);
+    //MoneyBox total 금액 업데이트 및 MoneyBox로 전송
+    game_table.game_status.add_money(&money_to_send);
+    game_table.money_box.add_money(money_to_send);
 
   }
 

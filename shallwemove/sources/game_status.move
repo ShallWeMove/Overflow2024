@@ -4,6 +4,9 @@ module shallwemove::game_status {
   // ============= IMPORTS ======================
 
   use shallwemove::player_info::{Self, PlayerInfo};
+  use std::vector::{Self};
+  use sui::coin::{Self, Coin};
+  use sui::sui::SUI;
 
   // ============================================
   // ============== CONSTANTS ===================
@@ -28,7 +31,7 @@ module shallwemove::game_status {
   public struct GameInfo has store {
     manager_player : Option<address>,
     game_playing_status : u8,
-    current_turn_player : Option<address>,
+    current_turn : u8,
     winner_player : Option<address>,
     ante_amount : u64,
     bet_unit : u64,
@@ -71,18 +74,28 @@ module shallwemove::game_status {
   }
 
   fun new_game_info(ante_amount : u64, bet_unit : u64, game_seats : u8) : GameInfo {
-    assert!(game_seats >= 2 && game_seats <= 6, 403);
+    assert!(game_seats >= 2 && game_seats <= 5, 403);
 
     GameInfo {
       manager_player : option::none(),
       game_playing_status : 0,
-      current_turn_player : option::none(),
+      current_turn : 0,
       winner_player : option::none(),
       ante_amount : ante_amount,
       bet_unit : bet_unit,
       game_seats : game_seats,
       avail_seats : game_seats
     }
+  }
+
+  public fun CONST_PRE_GAME() : u8 {
+    return PRE_GAME
+  }
+  public fun CONST_IN_GAME() : u8 {
+    return IN_GAME
+  }
+  public fun CONST_GAME_FINISHED() : u8 {
+    return GAME_FINISHED
   }
 
   // ===================== Methods ===============================
@@ -104,11 +117,22 @@ module shallwemove::game_status {
 
   public fun game_playing_status(game_status : &GameStatus) : u8 {game_status.game_info.game_playing_status}
 
-  fun current_turn_player(game_status : &GameStatus) : Option<address> {game_status.game_info.current_turn_player}
+  fun current_turn(game_status : &GameStatus) : u8 {game_status.game_info.current_turn}
+
+  fun current_turn_player(game_status : &GameStatus) : Option<address> {
+    let current_turn_player_info = vector::borrow(&game_status.player_infos(), game_status.current_turn() as u64);
+    return current_turn_player_info.player_address()
+  }
+
+  public fun is_current_turn(game_status : &GameStatus, ctx : &mut TxContext) : bool {
+    game_status.current_turn_player() == option::some(tx_context::sender(ctx))
+  }
+
+  // fun find_
 
   fun winner_player(game_status : &GameStatus) : Option<address> {game_status.game_info.winner_player}
 
-  fun ante_amount(game_status : &GameStatus) : u64 {game_status.game_info.ante_amount}
+  public fun ante_amount(game_status : &GameStatus) : u64 {game_status.game_info.ante_amount}
 
   fun bet_unit(game_status : &GameStatus) : u64 {game_status.game_info.bet_unit}
 
@@ -126,11 +150,28 @@ module shallwemove::game_status {
 
   fun total_bet_amount(game_status : &GameStatus) : u64 {game_status.money_box_info.total_bet_amount}
 
+  public fun add_money(game_status : &mut GameStatus, money : &Coin<SUI>) {
+    game_status.money_box_info.total_bet_amount = game_status.money_box_info.total_bet_amount + money.value();
+  }
+
   fun game_status_number_of_avail_cards(game_status : &GameStatus) : u8 {game_status.card_info.number_of_avail_cards}
 
   fun number_of_used_cards(game_status : &GameStatus) : u8 {game_status.card_info.number_of_used_cards}
 
   public fun player_infos(game_status : &GameStatus) : vector<PlayerInfo> {game_status.player_infos}
+
+  // public fun player_info(game_status : &GameStatus, ctx : &mut TxContext) : &PlayerInfo {
+  //   let mut i = 0;
+  //   while (i < game_status.player_infos().length()) {
+  //     let player_info = vector::borrow(&game_status.player_infos(), i);
+  //     if (player_info.player_address() == option::some(tx_context::sender(ctx))){
+  //       return player_info
+  //     };
+
+  //     i = i + 1;
+  //   };
+  //   // return 
+  // }
 
   public fun add_player_info(game_status : &mut GameStatus, player_info : PlayerInfo) {game_status.player_infos.push_back(player_info);}
 
@@ -151,8 +192,13 @@ module shallwemove::game_status {
     game_status.increment_avail_seat();
   }
 
-  public fun next_player(game_status : &mut GameStatus, ctx : &mut TxContext) {
-
+  public fun next_turn(game_status : &mut GameStatus) {
+    // current turn을 다음 턴으로
+    if ( (game_status.current_turn() + 1) as u64 == game_status.player_infos().length()) {
+      game_status.game_info.current_turn = 0;
+    } else {
+      game_status.game_info.current_turn = game_status.game_info.current_turn + 1;
+    };
   }
 
   

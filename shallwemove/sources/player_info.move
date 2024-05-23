@@ -15,7 +15,7 @@ module shallwemove::player_info {
   const READY : u8 = 12;
   const PLAYING : u8 = 13;
   const GAME_END : u8 = 14;
-  const WRONG_PLAYING_STATUS : u8 = 19;
+  // const WRONG_PLAYING_STATUS : u8 = 19;
 
   // ==================== Playing Actions ==========================
 
@@ -44,21 +44,21 @@ module shallwemove::player_info {
   // ============================================
   // ============== FUNCTIONS ===================
 
-  public fun get_playing_status(playing_status : String) : u8 {
-    if (playing_status == string::utf8(b"EMPTY")) {
-      return EMPTY
-    } else if (playing_status == string::utf8(b"ENTER")) {
-      return ENTER
-    } else if (playing_status == string::utf8(b"READY")) {
-      return READY
-    } else if (playing_status == string::utf8(b"PLAYING")) {
-      return PLAYING
-    } else if (playing_status == string::utf8(b"GAME_END")) {
-      return GAME_END
-    };
+  // public fun get_playing_status(playing_status : String) : u8 {
+  //   if (playing_status == string::utf8(b"EMPTY")) {
+  //     return EMPTY
+  //   } else if (playing_status == string::utf8(b"ENTER")) {
+  //     return ENTER
+  //   } else if (playing_status == string::utf8(b"READY")) {
+  //     return READY
+  //   } else if (playing_status == string::utf8(b"PLAYING")) {
+  //     return PLAYING
+  //   } else if (playing_status == string::utf8(b"GAME_END")) {
+  //     return GAME_END
+  //   };
 
-    return WRONG_PLAYING_STATUS
-  }
+  //   return WRONG_PLAYING_STATUS
+  // }
 
   public fun new(index : u8) : PlayerInfo {
     PlayerInfo {
@@ -73,13 +73,29 @@ module shallwemove::player_info {
     }
   }
 
+  public fun CONST_EMPTY() : u8 {
+    EMPTY
+  }
+  public fun CONST_EMTER() : u8 {
+    ENTER
+  }
+  public fun CONST_READY() : u8 {
+    READY
+  }
+  public fun CONST_PLAYING() : u8 {
+    PLAYING
+  }
+  public fun CONST_GAME_END() : u8 {
+    GAME_END
+  }
+
   // ===================== Methods ===============================
 
   public fun player_address(player_info : &PlayerInfo) : Option<address> {player_info.player_address}
 
   fun public_key(player_info : &PlayerInfo) : vector<u8> {player_info.public_key}
 
-  fun playing_status(player_info : &PlayerInfo) : u8 {player_info.playing_status}
+  public fun playing_status(player_info : &PlayerInfo) : u8 {player_info.playing_status}
 
   fun pnumber_of_holding_cards(player_info : &PlayerInfo) : u8 {player_info.number_of_holding_cards}
 
@@ -104,13 +120,13 @@ module shallwemove::player_info {
     player_info.playing_status = playing_status;
   }
 
-  public fun is_participated(player_info : &mut PlayerInfo, ctx : &mut TxContext) : bool {
-    if (player_info.player_address() == option::none()) {
-      false
-    } else {
-      option::extract(&mut player_info.player_address()) == tx_context::sender(ctx)
-    }
-  }
+  // public fun is_participated(player_info : &mut PlayerInfo, ctx : &mut TxContext) : bool {
+  //   if (player_info.player_address() == option::none()) {
+  //     false
+  //   } else {
+  //     option::extract(&mut player_info.player_address()) == tx_context::sender(ctx)
+  //   }
+  // }
   
   // ============================================
   // ================ TEST ======================
