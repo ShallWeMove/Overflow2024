@@ -135,7 +135,7 @@ module shallwemove::cardgame {
   entry fun ante(
     casino: &Casino,
     lounge: &mut Lounge,
-    game_table: &mut GameTable,
+    game_table: &GameTable,
     ctx: &mut TxContext,
   ) : ID {
     assert!(casino.id() == lounge.casino_id(), 403);
@@ -144,6 +144,26 @@ module shallwemove::cardgame {
     let game_table = lounge.borrow_mut_game_table(game_table.id());
 
     game_table.ante(ctx);
+    
+    return game_table.id()
+  }
+
+  #[test_only]
+  public fun ante_test(
+    casino: &Casino,
+    lounge: &mut Lounge,
+    game_table_id: ID,
+    ctx: &mut TxContext,
+  ) : ID {
+    assert!(casino.id() == lounge.casino_id(), 403);
+
+    let lounge_id = lounge.id();
+    let game_table = lounge.borrow_mut_game_table(game_table_id);
+    assert!(lounge_id == game_table.lounge_id(), 403);
+
+    game_table.ante(ctx);
+    debug::print(&string::utf8(b"=========================== ANTE =========================="));
+    debug::print(game_table);
     
     return game_table.id()
   }

@@ -61,6 +61,9 @@ module shallwemove::shallwemove_tests {
     let game_table_id = cardgame::enter_test(&casino, &mut lounge, user_public_key, deposit1, ctx1);
     let game_table_id = cardgame::enter_test(&casino, &mut lounge, user_public_key, deposit2, ctx2);
 
+    cardgame::ante_test(&casino, &mut lounge, game_table_id, ctx1);
+    cardgame::ante_test(&casino, &mut lounge, game_table_id, ctx2);
+
     cardgame::exit_test(&casino, &mut lounge, game_table_id, ctx1);
 
     remove_game(casino, lounge);

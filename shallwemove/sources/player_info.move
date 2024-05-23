@@ -109,7 +109,7 @@ module shallwemove::player_info {
   }
 
   public fun remove_player(player_info : &mut PlayerInfo, ctx : &mut TxContext) {
-    assert!(tx_context::sender(ctx) == option::extract(&mut player_info.player_address()), 403);
+    assert!(tx_context::sender(ctx) == player_info.player_address().extract(), 403);
     player_info.player_address = option::none();
     player_info.set_playing_status(EMPTY);
   }

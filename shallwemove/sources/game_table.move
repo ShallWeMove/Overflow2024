@@ -151,7 +151,7 @@ module shallwemove::game_table {
   }
 
   public fun exit_player(game_table : &mut GameTable, ctx : &mut TxContext) {
-    let mut i = 0;
+    let mut i = 0; // 여기는 I
     let mut is_player_found = false;
     let player_address = tx_context::sender(ctx);
 
@@ -185,15 +185,15 @@ module shallwemove::game_table {
       // 근데 플레이어 4명 중 3번째 유저가 manager player고 exit을 한대. 
       // 근데 4번째 순서는 없고 1,2번째에 유저가 있어. 그럼 1번째 유저한테 manager player를 줘야 해.
       // 단순 while문이면 안 되고 순환해야 해
-    i = i + 1;
+    let mut j = i + 1; // 여기는 J
     loop {
-      if (i == game_table.player_seats.length()) {
-        i = 0;
+      if (j == game_table.player_seats.length()) {
+        j = 0;
       };
 
-      let player_seat = game_table.player_seats.borrow_mut(i);
+      let player_seat = game_table.player_seats.borrow_mut(j);
       if (player_seat.player() == option::none()) {
-        i = i + 1;
+        j = j + 1;
         continue
       };
 
@@ -202,7 +202,7 @@ module shallwemove::game_table {
         break
       };
 
-      i = i + 1;
+      j = j + 1;
     };
 
 
