@@ -210,13 +210,24 @@ module shallwemove::cardgame {
   // 플레이어 콜 => 마지막 턴의 액션이면 Move에서 알아서 게임 종료해줌
   entry fun action(
     casino: &Casino, 
-    game_table: &mut GameTable,
+    lounge: &mut Lounge,
+    game_table: &GameTable,
     // action_type: ActionType, // ante(요건 없애야 할 듯), check, bet, call, raise
     action_type: u8, // ante, check, bet, call, raise
     with_new_card: bool, // 새 카드를 받을지 
     chip_count: u64, // 몇 개의 칩을 베팅할지 (칩 하나가 ? SUI일지는 GameTable마다 다르다)
     ctx: &mut TxContext,
   ) : ID {
+    assert!(casino.id() == lounge.casino_id(), 403);
+    assert!(lounge.id() == game_table.lounge_id(), 403);
+
+    let game_table = lounge.borrow_mut_game_table(game_table.id());
+
+    assert!(game_table.game_status().is_current_turn(ctx), 403);
+
+    game_table.action(action_type, chip_count, ctx);
+  
+    
     return game_table.id()
   }
 

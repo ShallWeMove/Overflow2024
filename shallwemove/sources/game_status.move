@@ -31,14 +31,14 @@ module shallwemove::game_status {
   }
 
   public struct GameInfo has store {
-    manager_player : Option<address>,
     game_playing_status : u8,
+    manager_player : Option<address>,
     current_turn : u8,
     winner_player : Option<address>,
     ante_amount : u64,
     bet_unit : u64,
     game_seats : u8,
-    avail_seats : u8
+    avail_game_seats : u8
   }
 
   public struct MoneyBoxInfo has store {
@@ -79,14 +79,14 @@ module shallwemove::game_status {
     assert!(game_seats >= 2 && game_seats <= 5, 403);
 
     GameInfo {
-      manager_player : option::none(),
       game_playing_status : 0,
+      manager_player : option::none(),
       current_turn : 0,
       winner_player : option::none(),
       ante_amount : ante_amount,
       bet_unit : bet_unit,
       game_seats : game_seats,
-      avail_seats : game_seats
+      avail_game_seats : game_seats
     }
   }
 
@@ -101,7 +101,7 @@ module shallwemove::game_status {
   }
 
   // ===================== Methods ===============================
-  // --------- GameStatus ---------
+  // --------- GameInfo ---------
 
   public fun game_info(game_status : &GameStatus) : &GameInfo {
     &game_status.game_info
@@ -111,58 +111,83 @@ module shallwemove::game_status {
     &mut game_status.game_info
   }
 
-  public fun manager_player(game_status : &GameStatus) : Option<address>{game_status.game_info.manager_player}
-
-  public fun set_manager_player(game_status: &mut GameStatus, player : address) {
-    game_status.game_info_mut().manager_player = option::some(player);
-  }
-
-  public fun is_manager_player(game_status: &GameStatus, ctx : &mut TxContext) : bool {
-    return game_status.manager_player() == option::some(tx_context::sender(ctx))
-  }
-
   public fun game_playing_status(game_status : &GameStatus) : u8 {game_status.game_info.game_playing_status}
 
-  public fun set_game_playing_status(game_status : &mut GameStatus, game_playing_status : u8){
-    game_status.game_info.game_playing_status = game_playing_status
-  }
+  public fun manager_player(game_status : &GameStatus) : Option<address>{game_status.game_info.manager_player}
 
   fun current_turn(game_status : &GameStatus) : u8 {game_status.game_info.current_turn}
 
-  fun current_turn_player(game_status : &GameStatus) : Option<address> {
-    let current_turn_player_info = vector::borrow(&game_status.player_infos, game_status.current_turn() as u64);
-    return current_turn_player_info.player_address()
-  }
-
-  public fun is_current_turn(game_status : &GameStatus, ctx : &mut TxContext) : bool {
-    game_status.current_turn_player() == option::some(tx_context::sender(ctx))
-  }
-
-  // fun find_
-
   fun winner_player(game_status : &GameStatus) : Option<address> {game_status.game_info.winner_player}
-
+  
   public fun ante_amount(game_status : &GameStatus) : u64 {game_status.game_info.ante_amount}
 
   fun bet_unit(game_status : &GameStatus) : u64 {game_status.game_info.bet_unit}
 
   public fun game_seats(game_status : &GameStatus) : u8 {game_status.game_info.game_seats}
 
-  public fun avail_seats(game_status : &GameStatus) : u8 {game_status.game_info.avail_seats}
+  public fun avail_game_seats(game_status : &GameStatus) : u8 {game_status.game_info.avail_game_seats}
+
+  public fun is_manager_player(game_status: &GameStatus, ctx : &mut TxContext) : bool {
+    return game_status.manager_player() == option::some(tx_context::sender(ctx))
+  }
+
+  public fun is_current_turn(game_status : &GameStatus, ctx : &mut TxContext) : bool {
+    game_status.current_turn_player() == option::some(tx_context::sender(ctx))
+  }
+
+  fun current_turn_player(game_status : &GameStatus) : Option<address> {
+    let current_turn_player_info = game_status.player_infos.borrow(game_status.current_turn() as u64);
+    return current_turn_player_info.player_address()
+  }
+
+  fun set_current_turn(game_status : &mut GameStatus, index : u8) {
+    game_status.game_info.current_turn = index;
+  }
+
+  public fun set_game_playing_status(game_status : &mut GameStatus, game_playing_status : u8){
+    game_status.game_info.game_playing_status = game_playing_status
+  }
+
+  public fun set_manager_player(game_status: &mut GameStatus, manager_player_address : Option<address>) {
+    game_status.game_info_mut().manager_player = manager_player_address;
+    
+    // 그리고 해당 manager player의 자리로 set current turn 해야 함.
+      // player가 속한 player_info index 찾아내기
+    let mut i = 0; 
+    while (i < game_status.player_infos().length()) {
+      let player_seat = game_status.player_infos_mut().borrow_mut(i);
+      if (player_seat.player_address() == option::none<address>()) {
+        i = i + 1;
+        continue
+      };
+
+      let player_address_of_seat = game_status.player_infos()[i].player_address();
+      if (manager_player_address == player_address_of_seat) {
+        break
+      };
+
+      i = i + 1;
+    };
+
+    game_status.set_current_turn(i as u8);
+  }
 
   fun increment_avail_seat(game_status : &mut GameStatus) {
-    game_status.game_info.avail_seats = game_status.game_info.avail_seats + 1; 
+    game_status.game_info.avail_game_seats = game_status.game_info.avail_game_seats + 1; 
   }
 
   fun decrement_avail_seat(game_status : &mut GameStatus) {
-    game_status.game_info.avail_seats = game_status.game_info.avail_seats - 1; 
+    game_status.game_info.avail_game_seats = game_status.game_info.avail_game_seats - 1; 
   }
 
+  // --------- MoneyBoxInfo ---------
   fun total_bet_amount(game_status : &GameStatus) : u64 {game_status.money_box_info.total_bet_amount}
 
   public fun add_money(game_status : &mut GameStatus, money : &Coin<SUI>) {
     game_status.money_box_info.total_bet_amount = game_status.money_box_info.total_bet_amount + money.value();
   }
+
+  // --------- CardInfo ---------
 
   fun number_of_avail_cards(game_status : &GameStatus) : u8 {game_status.card_info.number_of_avail_cards}
 
@@ -177,37 +202,23 @@ module shallwemove::game_status {
     game_status.card_info.number_of_used_cards = game_status.card_info.number_of_used_cards + 1;
   }
 
-
-
-
   public fun player_receive_card(game_status : &mut GameStatus, index : u64) {
     let player_info = game_status.player_infos.borrow_mut(index);
     player_info.receive_card();
     game_status.draw_card();
   }
+  // --------- PlayerInfo ---------
 
   public fun player_infos(game_status : &GameStatus) : &vector<PlayerInfo> {&game_status.player_infos}
+
   public fun player_infos_mut(game_status : &mut GameStatus) : &mut vector<PlayerInfo> {&mut game_status.player_infos}
-
-  // public fun player_info(game_status : &GameStatus, ctx : &mut TxContext) : &PlayerInfo {
-  //   let mut i = 0;
-  //   while (i < game_status.player_infos().length()) {
-  //     let player_info = vector::borrow(&game_status.player_infos(), i);
-  //     if (player_info.player_address() == option::some(tx_context::sender(ctx))){
-  //       return player_info
-  //     };
-
-  //     i = i + 1;
-  //   };
-  //   // return 
-  // }
 
   public fun add_player_info(game_status : &mut GameStatus, player_info : PlayerInfo) {game_status.player_infos.push_back(player_info);}
 
   public fun enter_player(game_status : &mut GameStatus, ctx : &mut TxContext) {
     // player가 해당 게임의 첫 번째 유저면 manager_player로 등록
     if (game_status.manager_player() == option::none<address>()) {
-      game_status.set_manager_player(tx_context::sender(ctx));
+      game_status.set_manager_player(option::some(tx_context::sender(ctx)));
     };
 
     // avail_seat 하나 감소
@@ -215,12 +226,6 @@ module shallwemove::game_status {
   }
 
   public fun remove_player(game_status : &mut GameStatus, ctx : &mut TxContext) {
-
-    // player가 해당 게임의 manager_player이면 다음으로 넘겨주거나 마지막 유저면 null
-
-    // player가 현재 턴 유저면 넘겨주는 로직
-
-    // avail_seat 하나 추가
     game_status.increment_avail_seat();
   }
 

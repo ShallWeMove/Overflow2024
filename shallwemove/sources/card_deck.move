@@ -37,6 +37,7 @@ module shallwemove::card_deck {
   fun id(card_deck : &CardDeck) : ID {object::id(card_deck)}
 
   public fun fill_cards(card_deck : &mut CardDeck, game_status : &mut GameStatus, public_key : vector<u8>, ctx : &mut TxContext) {
+    // 여기에 encrypt 하고 shuffle 하는 로직이 들어가야 함
     let fifty_two_numbers_array = utils::get_fifty_two_numbers_array();
     let shuffled_fifty_two_numbers_array = utils::shuffle(fifty_two_numbers_array);
     let mut encrypted_fifty_two_numbers_array = utils::encrypt(shuffled_fifty_two_numbers_array, public_key);

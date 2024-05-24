@@ -10,7 +10,6 @@ module shallwemove::money_box {
 
   public struct MoneyBox has key, store {
     id : UID,
-    // money : vector<ID>
     money : vector<Coin<SUI>>
   }
   // ============================================

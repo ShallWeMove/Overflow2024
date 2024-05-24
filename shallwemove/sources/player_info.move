@@ -47,22 +47,6 @@ module shallwemove::player_info {
   // ============================================
   // ============== FUNCTIONS ===================
 
-  // public fun get_playing_status(playing_status : String) : u8 {
-  //   if (playing_status == string::utf8(b"EMPTY")) {
-  //     return EMPTY
-  //   } else if (playing_status == string::utf8(b"ENTER")) {
-  //     return ENTER
-  //   } else if (playing_status == string::utf8(b"READY")) {
-  //     return READY
-  //   } else if (playing_status == string::utf8(b"PLAYING")) {
-  //     return PLAYING
-  //   } else if (playing_status == string::utf8(b"GAME_END")) {
-  //     return GAME_END
-  //   };
-
-  //   return WRONG_PLAYING_STATUS
-  // }
-
   public fun new(index : u8) : PlayerInfo {
     PlayerInfo {
       index : index,
@@ -161,14 +145,6 @@ module shallwemove::player_info {
     player_info.number_of_holding_cards = player_info.number_of_holding_cards - 1;
   }
 
-  // public fun is_participated(player_info : &mut PlayerInfo, ctx : &mut TxContext) : bool {
-  //   if (player_info.player_address() == option::none()) {
-  //     false
-  //   } else {
-  //     option::extract(&mut player_info.player_address()) == tx_context::sender(ctx)
-  //   }
-  // }
-  
   // ============================================
   // ================ TEST ======================
 }
