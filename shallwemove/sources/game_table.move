@@ -122,20 +122,6 @@ module shallwemove::game_table {
     };
   }
 
-  fun is_player_entered(game_table : &GameTable, ctx : &mut TxContext) : bool {
-    let mut i = 0;
-    while (i < game_table.game_status.player_infos().length()) {
-      let player_info = game_table.game_status.player_infos().borrow(i);
-      if (player_info.player_address().is_some() 
-      && player_info.player_address().borrow() == tx_context::sender(ctx) ) {
-        return true
-      };
-      i = i + 1;
-    };
-
-    return false
-  }
-
   fun find_empty_seat_index(game_table : &GameTable) : u64 {
     let is_game_table_full = false;
     let mut index = 0;
@@ -159,7 +145,6 @@ module shallwemove::game_table {
 
   fun find_player_seat_index(game_table : &mut GameTable, ctx : &mut TxContext) : u64 {
     let mut index = 0; // 여기는 I
-    let player_address = tx_context::sender(ctx);
 
     // player가 속한 player_seat index 찾아내기
     while (index < game_table.player_seats.length()) {
@@ -170,7 +155,7 @@ module shallwemove::game_table {
       };
 
       let player_address_of_seat = game_table.player_seats.borrow(index).player_address().borrow();
-      if (player_address == player_address_of_seat) {
+      if (player_address_of_seat == tx_context::sender(ctx)) {
         return index
       };
 
@@ -180,6 +165,35 @@ module shallwemove::game_table {
     PLAYER_NOT_FOUND
   }
 
+  fun get_number_of_players(game_table : &GameTable) : u64 {
+    let mut i = 0;
+    let mut number_of_players = 0;
+    while (i < game_table.player_seats.length()) {
+      let player_seat = game_table.player_seats.borrow(i);
+      if (player_seat.player_address() != option::none()) {
+        number_of_players = number_of_players + 1;
+      };
+      i = i + 1;
+    };
+    return number_of_players
+  }
+
+  fun is_all_player_ready(game_table : &GameTable) : bool {
+    let mut i = 0;
+    let mut is_all_player_ready = true;
+    while (i < game_table.game_status.player_infos().length()) {
+      let player_info = game_table.game_status.player_infos().borrow(i);
+      if (player_info.player_address() == option::none<address>()) {
+        i = i + 1;
+        continue
+      };
+      if (player_info.playing_status() != player_info::CONST_READY()) {
+        is_all_player_ready = false;
+      };
+      i = i + 1;
+    };
+    is_all_player_ready
+  }
 
   fun set_player(game_table : &mut GameTable, empty_seat_index : u64, public_key : vector<u8>, deposit : Coin<SUI>, ctx : &mut TxContext) {
       game_table.set_player_address(empty_seat_index, ctx);
@@ -230,18 +244,6 @@ module shallwemove::game_table {
     };
   }
 
-  fun get_number_of_players(game_table : &GameTable) : u64 {
-    let mut i = 0;
-    let mut number_of_players = 0;
-    while (i < game_table.player_seats.length()) {
-      let player_seat = game_table.player_seats.borrow(i);
-      if (player_seat.player_address() != option::none()) {
-        number_of_players = number_of_players + 1;
-      };
-      i = i + 1;
-    };
-    return number_of_players
-  }
 
   fun exit_player(game_table : &mut GameTable, player_seat_index : u64, ctx : &mut TxContext) {
     // player 정보 초기화
@@ -255,7 +257,7 @@ module shallwemove::game_table {
     // player가 해당 게임의 manager_player이면 다음으로 넘겨주거나 마지막 유저면 option::none()
     game_table.update_manager_player(player_seat_index);
 
-    // 만약 남은 플레이어가 1명이다
+    // 만약 남은 플레이어가 1명이면
     if (game_table.get_number_of_players() == 1) {
       // Money box에 있는 거 남은 player의 PlayerSeat에게 주고
       let mut i = 0;
@@ -271,12 +273,56 @@ module shallwemove::game_table {
       // 게임 종료 (추후 개발)
       // game_table.finish_game();
     };
-    
+  }
+
+  fun send_ante(game_table : &mut GameTable, player_seat_index : u64, ctx : &mut TxContext) {
+    let player_seat = game_table.player_seats.borrow_mut(player_seat_index);
+    //PlayerSeat의 deposit에서 ante 만큼 꺼내기
+    let money_to_send = player_seat.split_money(game_table.game_status.ante_amount(), ctx);
+
+    // PlayerInfo bet amount 업데이트 & READY 상태로 변환
+    let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
+    player_info.add_bet_amount(money_to_send.value());
+    player_info.set_playing_status(player_info::CONST_READY());
+
+    //MoneyBox total 금액 업데이트 및 MoneyBox로 전송
+    game_table.game_status.add_money(&money_to_send);
+    game_table.money_box.add_money(money_to_send);
+  }
+
+  fun draw_card(game_table : &mut GameTable, player_seat_index : u64) {
+    {
+      let player_seat = game_table.player_seats.borrow_mut(player_seat_index);
+      if (player_seat.player_address() == option::none<address>()){
+        return
+      };
+      player_seat.receive_card(game_table.card_deck.borrow_mut().draw_card());
+    };
+    {
+      let player_info = game_table.game_status_mut().player_infos_mut().borrow_mut(player_seat_index);
+      if (player_info.player_address() == option::none<address>()){
+        return
+      };
+      player_info.receive_card();
+    };
+    game_table.game_status_mut().draw_card();
+  }
+
+  fun draw_card_to_all_player(game_table : &mut GameTable) {
+    let mut player_seat_index = 0;
+    while (player_seat_index < game_table.player_seats.length()) {
+      game_table.draw_card(player_seat_index);
+
+      player_seat_index = player_seat_index + 1;
+    };
   }
 
   public fun enter(game_table : &mut GameTable, public_key : vector<u8>, deposit : Coin<SUI>, ctx : &mut TxContext) {
-    // player 가 이미 enter 했는데 또 하는 건 아닌지 체크한다.
-    assert!(!game_table.is_player_entered(ctx));
+    // player가 속한 player_seat index 찾아내기
+    let player_seat_index = game_table.find_player_seat_index(ctx);
+
+    // 못 찾는다면 enter 가능! 
+    assert!(player_seat_index == PLAYER_NOT_FOUND, 403);
 
     // game_table이 다 차서 enter를 못 하는 상황인지 체크한다.
     let empty_seat_index = game_table.find_empty_seat_index();
@@ -290,9 +336,8 @@ module shallwemove::game_table {
     };
   }
 
-
   public fun exit(game_table : &mut GameTable, ctx : &mut TxContext) {
-    // // player가 속한 player_seat index 찾아내기
+    // player가 속한 player_seat index 찾아내기
     let player_seat_index = game_table.find_player_seat_index(ctx);
 
     // 못 찾는다면 잘못된 game_table이라는 것. 
@@ -302,83 +347,24 @@ module shallwemove::game_table {
   }
 
   public fun ante(game_table : &mut GameTable, ctx : &mut TxContext) {
-    assert!(game_table.is_player_entered(ctx));
-    assert!(game_table.game_status.game_playing_status() == game_status::CONST_PRE_GAME());
-    let mut i = 0;
-    while (i < game_table.game_status.player_infos().length()) {
-      let player_info = game_table.game_status.player_infos().borrow(i);
-      if (player_info.player_address() == option::some(tx_context::sender(ctx))){
-        assert!(player_info.playing_status() == player_info::CONST_ENTER());
-        break
-      };
+    // player가 속한 player_seat index 찾아내기
+    let player_seat_index = game_table.find_player_seat_index(ctx);
 
-      i = i + 1;
-    };
+    // 못 찾는다면 잘못된 game_table이라는 것. enter 하지 않았다는 뜻
+    assert!(player_seat_index != PLAYER_NOT_FOUND, 403);
 
-    // 이제 진짜 로직
-    //각 PlayerSeat의 deposit에서 ante 만큼 꺼내기
-    let player_seat = vector::borrow_mut(&mut game_table.player_seats, i);
-    let money_to_send = player_seat.split_money(game_table.game_status.ante_amount(), ctx);
-    // PlayerInfo bet amount 업데이트 & READY 상태
-    let player_info = game_table.game_status.player_infos_mut().borrow_mut(i);
-    player_info.add_bet_amount(money_to_send.value());
-    player_info.set_playing_status(player_info::CONST_READY());
-    //MoneyBox total 금액 업데이트 및 MoneyBox로 전송
-    game_table.game_status.add_money(&money_to_send);
-    game_table.money_box.add_money(money_to_send);
-
+    // ante 내기
+    game_table.send_ante(player_seat_index, ctx);
   }
 
   public fun start(game_table : &mut GameTable) {
-    // 이제 여기를 채워야 할 시간!!!!
-
     // 플레이어 수가 2명 이상이고 모든 참여 플레이어가 READY 상태인가??
-    let mut i = 0;
-    let mut player_playing_status_vector = vector<u8>[];
-    while (i < game_table.game_status.player_infos().length()) {
-      let player_info = game_table.game_status.player_infos().borrow(i);
-      if (player_info.player_address() == option::none<address>()) {
-        i = i + 1;
-        continue
-      };
-      player_playing_status_vector.push_back(player_info.playing_status());
-      i = i + 1;
-    };
-
-    assert!(player_playing_status_vector.length() >= 2, 403);
-
-    let mut j = player_playing_status_vector.length();
-    let mut is_all_player_ready = true;
-    while (j > 0 ) {
-      if (player_playing_status_vector.pop_back() != player_info::CONST_READY()) {
-        is_all_player_ready = false;
-        break
-      };
-      j = j - 1;
-    };
-
-    assert!(is_all_player_ready);
+    assert!(game_table.get_number_of_players() >= 2, 403);
+    assert!(game_table.is_all_player_ready());
 
     // 모든 참여 PlayerSeat에 카드 2장씩 분배하기
-    let mut k = 0;
-    while (k < game_table.player_seats.length()) {
-      let player_seat = game_table.player_seats.borrow_mut(k);
-      // let player_info = game_table.game_status.player_infos_mut().borrow_mut(k);
-      if (player_seat.player_address() == option::none<address>()){
-        k = k + 1;
-        continue
-      };
-
-      // player 2장 주고 -> 다음 player 2장 주는 방식인데
-      // 1장 -> 1장 -> 1장 -> 1장 ..해서 한 바퀴씩 도는 방식으로 변경하자 나중에
-      player_seat.receive_card(game_table.card_deck.borrow_mut().draw_card());
-      game_table.game_status.player_receive_card(k); // GameStatus 업데이트 -> PlayerInfo CardInfo
-
-      player_seat.receive_card(game_table.card_deck.borrow_mut().draw_card());
-      game_table.game_status.player_receive_card(k);
-
-      k = k + 1;
-    };
+    game_table.draw_card_to_all_player();
+    game_table.draw_card_to_all_player();
 
     // GameStatus 업데이트 -> GameInfo
     game_table.game_status.set_game_playing_status(game_status::CONST_IN_GAME());

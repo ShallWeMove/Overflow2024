@@ -19,7 +19,6 @@ module shallwemove::game_status {
   const IN_GAME : u8 = 1;
   const GAME_FINISHED : u8 = 2;
 
-
   // ============================================
   // ============== STRUCTS =====================
 
@@ -202,16 +201,16 @@ module shallwemove::game_status {
     game_status.card_info.number_of_avail_cards = game_status.card_info.number_of_avail_cards + 1;
   }
 
-  fun draw_card(game_status : &mut GameStatus) {
+  public fun draw_card(game_status : &mut GameStatus) {
     game_status.card_info.number_of_avail_cards = game_status.card_info.number_of_avail_cards - 1;
     game_status.card_info.number_of_used_cards = game_status.card_info.number_of_used_cards + 1;
   }
 
-  public fun player_receive_card(game_status : &mut GameStatus, index : u64) {
-    let player_info = game_status.player_infos.borrow_mut(index);
-    player_info.receive_card();
-    game_status.draw_card();
-  }
+  // public fun player_receive_card(game_status : &mut GameStatus, index : u64) {
+  //   let player_info = game_status.player_infos.borrow_mut(index);
+  //   player_info.receive_card();
+  //   game_status.draw_card();
+  // }
   // --------- PlayerInfo ---------
 
   public fun player_infos(game_status : &GameStatus) : &vector<PlayerInfo> {&game_status.player_infos}

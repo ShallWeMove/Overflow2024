@@ -169,7 +169,6 @@ module shallwemove::cardgame {
     // game이 현재 PRE_GAME 일 때만 가능
     assert!(game_table.game_status().game_playing_status() == game_status::CONST_PRE_GAME(), 403);
 
-
     game_table.ante(ctx);
     debug::print(game_table);
     
@@ -240,29 +239,57 @@ module shallwemove::cardgame {
 
     let game_table = lounge.borrow_mut_game_table(game_table.id());
 
+    // game이 현재 IN_GAME 일 때만 가능
+    assert!(game_table.game_status().game_playing_status() == game_status::CONST_IN_GAME(), 403);
+
+    // 현재 턴인 player만 실행 가능
     assert!(game_table.game_status().is_current_turn(ctx), 403);
 
     game_table.action(action_type, chip_count, ctx);
-  
-    
+      
     return game_table.id()
   }
 
   // 중도 포기(기권)
   entry fun fold(
     casino: &Casino, 
-    game_table: &mut GameTable,
+    lounge: &mut Lounge,
+    game_table: &GameTable,
     ctx: &mut TxContext,
   ) : ID {
+    assert!(casino.id() == lounge.casino_id(), 403);
+    assert!(lounge.id() == game_table.lounge_id(), 403);
+
+    let game_table = lounge.borrow_mut_game_table(game_table.id());
+
+    // game이 현재 IN_GAME 일 때만 가능
+    assert!(game_table.game_status().game_playing_status() == game_status::CONST_IN_GAME(), 403);
+
+    // 현재 턴인 player만 실행 가능
+    assert!(game_table.game_status().is_current_turn(ctx), 403);
+
+    // game_table.fold();
+
     return game_table.id()
   }
 
   // 정산 받기 (승자가 트랜잭션 콜 해야 함)
   entry fun settle_up(
     casino: &Casino, 
-    game_table: &mut GameTable,
+    lounge: &mut Lounge,
+    game_table: &GameTable,
     ctx: &mut TxContext,
   ) : ID {
+    assert!(casino.id() == lounge.casino_id(), 403);
+    assert!(lounge.id() == game_table.lounge_id(), 403);
+
+    let game_table = lounge.borrow_mut_game_table(game_table.id());
+
+    // game이 현재 GAME_FINISHED 일 때만 가능
+    assert!(game_table.game_status().game_playing_status() == game_status::CONST_GAME_FINISHED(), 403);
+
+    // game_table.settle_up();
+    
     return game_table.id()
   }
 
