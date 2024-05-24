@@ -150,6 +150,11 @@ module shallwemove::game_status {
 
   public fun set_manager_player(game_status: &mut GameStatus, manager_player_address : Option<address>) {
     game_status.game_info_mut().manager_player = manager_player_address;
+
+    if (manager_player_address == option::none()) {
+      game_status.set_current_turn(0);
+      return
+    };
     
     // 그리고 해당 manager player의 자리로 set current turn 해야 함.
       // player가 속한 player_info index 찾아내기

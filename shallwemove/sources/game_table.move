@@ -298,8 +298,6 @@ module shallwemove::game_table {
     };
     assert!(is_all_player_ante);
 
-    // current turn을 manager player 순서로 변경하기
-
     // 모든 참여 PlayerSeat에 카드 2장씩 분배하기
     let mut k = 0;
     while (k < game_table.player_seats.length()) {

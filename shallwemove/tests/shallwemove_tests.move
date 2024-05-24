@@ -68,8 +68,6 @@ module shallwemove::shallwemove_tests {
     let game_table_id = cardgame::enter_test(&casino, &mut lounge, user_public_key, deposit1, ctx1);
     debug::print(&string::utf8(b"===================================================== ENTER2 ===================================================="));
     let game_table_id = cardgame::enter_test(&casino, &mut lounge, user_public_key, deposit2, ctx2);
-    // let game_table_id = cardgame::enter_test(&casino, &mut lounge, user_public_key, deposit3, ctx3);
-    cardgame::exit_test(&casino, &mut lounge, game_table_id, ctx1);
 
     debug::print(&string::utf8(b"===================================================== ANTE1 ===================================================="));
     cardgame::ante_test(&casino, &mut lounge, game_table_id, ctx1);
