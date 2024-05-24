@@ -9,8 +9,14 @@ export const EnterGameBox = () => {
 	const router = useRouter();
 
 	async function handleClick() {
-		const gameTableId = await enter(wallet);
-		router.push(`/game/${gameTableId}`);
+		const gameTableId = await enter(wallet)
+			.then((res) => {
+				console.log("res: ", res);
+				if (res) {
+					router.push(`/game/${gameTableId}`);
+				}
+			})
+			.catch((e) => console.log("error: ", e));
 	}
 
 	return (

@@ -12,6 +12,8 @@ export const CallButton = () => {
 			onClick={handleClick}
 			disabled={disabled}
 			title={ActionType.Call}
+			value={1000}
+			color="green"
 		/>
 	);
 };
