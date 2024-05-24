@@ -272,7 +272,7 @@ module shallwemove::game_table {
     // game_playing_status가 PRE_GAME 상태인가?
     assert!(game_table.game_status.game_playing_status() == game_status::CONST_PRE_GAME(), 403);
 
-    // 모든 참여 플레이어가 READY 상태인가??
+    // 플레이어 수가 2명 이상이고 모든 참여 플레이어가 READY 상태인가??
     let mut i = 0;
     let mut player_playing_status_vector = vector<u8>[];
     while (i < game_table.game_status.player_infos().length()) {
@@ -285,18 +285,19 @@ module shallwemove::game_table {
       i = i + 1;
     };
 
-    debug::print(&player_playing_status_vector);
+    assert!(player_playing_status_vector.length() >= 2, 403);
 
     let mut j = player_playing_status_vector.length();
-    let mut is_all_player_ante = true;
+    let mut is_all_player_ready = true;
     while (j > 0 ) {
       if (player_playing_status_vector.pop_back() != player_info::CONST_READY()) {
-        is_all_player_ante = false;
+        is_all_player_ready = false;
         break
       };
       j = j - 1;
     };
-    assert!(is_all_player_ante);
+
+    assert!(is_all_player_ready);
 
     // 모든 참여 PlayerSeat에 카드 2장씩 분배하기
     let mut k = 0;
