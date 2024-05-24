@@ -23,12 +23,11 @@ module shallwemove::player_info {
   // ==================== Playing Actions ==========================
 
   const NONE : u8 = 20;
-  const ANTE : u8 = 21;
-  const BET : u8 = 22;
-  const CHECK : u8 = 23;
-  const CALL : u8 = 24;
-  const RAISE : u8 = 25;
-  const FOLD : u8 = 26;
+  const BET : u8 = 21;
+  const CHECK : u8 = 22;
+  const CALL : u8 = 23;
+  const RAISE : u8 = 24;
+  const FOLD : u8 = 25;
 
   // ============================================
   // ============== STRUCTS =====================
@@ -93,6 +92,25 @@ module shallwemove::player_info {
     GAME_END
   }
 
+  public fun CONST_NONE() : u8 {
+    NONE
+  }
+  public fun CONST_BET() : u8 {
+    BET
+  }
+  public fun CONST_CHECK() : u8 {
+    CHECK
+  }
+  public fun CONST_CALL() : u8 {
+    CALL
+  }
+  public fun CONST_RAISE() : u8 {
+    RAISE
+  }
+  public fun CONST_FOLD() : u8 {
+    FOLD
+  }
+
   // ===================== Methods ===============================
 
   public fun player_address(player_info : &PlayerInfo) : Option<address> {player_info.player_address}
@@ -135,6 +153,13 @@ module shallwemove::player_info {
     player_info.public_key = public_key;
   }
 
+  public fun receive_card(player_info : &mut PlayerInfo) {
+    player_info.number_of_holding_cards = player_info.number_of_holding_cards + 1;
+  }
+
+  public fun discard_card(player_info : &mut PlayerInfo) {
+    player_info.number_of_holding_cards = player_info.number_of_holding_cards - 1;
+  }
 
   // public fun is_participated(player_info : &mut PlayerInfo, ctx : &mut TxContext) : bool {
   //   if (player_info.player_address() == option::none()) {

@@ -123,6 +123,10 @@ module shallwemove::game_status {
 
   public fun game_playing_status(game_status : &GameStatus) : u8 {game_status.game_info.game_playing_status}
 
+  public fun set_game_playing_status(game_status : &mut GameStatus, game_playing_status : u8){
+    game_status.game_info.game_playing_status = game_playing_status
+  }
+
   fun current_turn(game_status : &GameStatus) : u8 {game_status.game_info.current_turn}
 
   fun current_turn_player(game_status : &GameStatus) : Option<address> {
@@ -160,9 +164,27 @@ module shallwemove::game_status {
     game_status.money_box_info.total_bet_amount = game_status.money_box_info.total_bet_amount + money.value();
   }
 
-  fun game_status_number_of_avail_cards(game_status : &GameStatus) : u8 {game_status.card_info.number_of_avail_cards}
+  fun number_of_avail_cards(game_status : &GameStatus) : u8 {game_status.card_info.number_of_avail_cards}
 
   fun number_of_used_cards(game_status : &GameStatus) : u8 {game_status.card_info.number_of_used_cards}
+
+  public fun add_card(game_status : &mut GameStatus) {
+    game_status.card_info.number_of_avail_cards = game_status.card_info.number_of_avail_cards + 1;
+  }
+
+  fun draw_card(game_status : &mut GameStatus) {
+    game_status.card_info.number_of_avail_cards = game_status.card_info.number_of_avail_cards - 1;
+    game_status.card_info.number_of_used_cards = game_status.card_info.number_of_used_cards + 1;
+  }
+
+
+
+
+  public fun player_receive_card(game_status : &mut GameStatus, index : u64) {
+    let player_info = game_status.player_infos.borrow_mut(index);
+    player_info.receive_card();
+    game_status.draw_card();
+  }
 
   public fun player_infos(game_status : &GameStatus) : &vector<PlayerInfo> {&game_status.player_infos}
   public fun player_infos_mut(game_status : &mut GameStatus) : &mut vector<PlayerInfo> {&mut game_status.player_infos}

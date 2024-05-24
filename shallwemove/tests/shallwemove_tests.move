@@ -6,6 +6,8 @@ module shallwemove::shallwemove_tests {
   use shallwemove::lounge::{Self, Lounge};
   use sui::coin::{Self, Coin};
   use sui::sui::SUI;
+  use std::debug;
+  use std::string::{Self};
 
   const ENotImplemented: u64 = 0;
 
@@ -57,15 +59,20 @@ module shallwemove::shallwemove_tests {
     let deposit2 = coin::mint_for_testing<SUI>(50000, ctx2);
     // let deposit3 = coin::mint_for_testing<SUI>(50000, ctx3);
 
+    debug::print(&string::utf8(b"===================================================== CREATE GAME ===================================================="));
     let (casino, mut lounge) = create_game();
     
     let user_public_key = vector<u8>[23,124,1,23,53,63,22];
 
+    debug::print(&string::utf8(b"===================================================== ENTER1 ===================================================="));
     let game_table_id = cardgame::enter_test(&casino, &mut lounge, user_public_key, deposit1, ctx1);
+    debug::print(&string::utf8(b"===================================================== ENTER2 ===================================================="));
     let game_table_id = cardgame::enter_test(&casino, &mut lounge, user_public_key, deposit2, ctx2);
     // let game_table_id = cardgame::enter_test(&casino, &mut lounge, user_public_key, deposit3, ctx3);
 
+    debug::print(&string::utf8(b"===================================================== ANTE1 ===================================================="));
     cardgame::ante_test(&casino, &mut lounge, game_table_id, ctx1);
+    debug::print(&string::utf8(b"===================================================== ANTE2 ===================================================="));
     cardgame::ante_test(&casino, &mut lounge, game_table_id, ctx2);
 
     // ctx1 유저가 한 번더 ante (assert 유도)
@@ -74,10 +81,13 @@ module shallwemove::shallwemove_tests {
     // ctx3 유저가 enter 없이 ante(assert 유도)
     // cardgame::ante_test(&casino, &mut lounge, game_table_id, ctx3);
 
+    debug::print(&string::utf8(b"===================================================== START ===================================================="));
     cardgame::start_test(&casino, &mut lounge, game_table_id, ctx1);
     // cardgame::start_test(&casino, &mut lounge, game_table_id, ctx2);
 
+    debug::print(&string::utf8(b"===================================================== EXIT1 ===================================================="));
     cardgame::exit_test(&casino, &mut lounge, game_table_id, ctx1);
+    debug::print(&string::utf8(b"===================================================== EXIT2 ===================================================="));
     cardgame::exit_test(&casino, &mut lounge, game_table_id, ctx2);
 
     remove_game(casino, lounge);

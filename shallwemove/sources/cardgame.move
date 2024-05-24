@@ -82,7 +82,6 @@ module shallwemove::cardgame {
       let avail_game_table = lounge.borrow_mut_game_table(option::extract(&mut available_game_table_id));
       avail_game_table.enter_player(public_key, deposit, ctx);
 
-      debug::print(&string::utf8(b"=========================== ENTER =========================="));
       debug::print(avail_game_table);
       return avail_game_table.id()
   }
@@ -126,7 +125,6 @@ module shallwemove::cardgame {
     assert!(lounge_id == game_table.lounge_id(), 403);
     
     game_table.exit_player(ctx);
-    debug::print(&string::utf8(b"=========================== EXIT =========================="));
     debug::print(game_table);
   }
 
@@ -162,7 +160,6 @@ module shallwemove::cardgame {
     assert!(lounge_id == game_table.lounge_id(), 403);
 
     game_table.ante(ctx);
-    debug::print(&string::utf8(b"=========================== ANTE =========================="));
     debug::print(game_table);
     
     return game_table.id()
@@ -204,8 +201,6 @@ module shallwemove::cardgame {
     assert!(game_table.game_status().is_manager_player(ctx), 403);
     
     game_table.start();
-
-    debug::print(&string::utf8(b"=========================== START =========================="));
     debug::print(game_table);
 
     return game_table.id()

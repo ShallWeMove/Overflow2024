@@ -43,9 +43,11 @@ module shallwemove::game_table {
     game_seats : u8, 
     ctx : &mut TxContext) : GameTable {
 
-    let game_status = game_status::new(ante_amount, bet_unit, game_seats);
+    let mut game_status = game_status::new(ante_amount, bet_unit, game_seats);
     let money_box = money_box::new(ctx);
-    let card_deck = card_deck::new(public_key, ctx);
+    let mut card_deck = card_deck::new(public_key, ctx);
+
+    card_deck.fill_cards(&mut game_status, public_key, ctx);
 
     let mut game_table = GameTable {
       id : object::new(ctx),
@@ -141,8 +143,8 @@ module shallwemove::game_table {
     let mut i = 0;
     while (i < game_table.game_status.player_infos().length()) {
       let player_info = game_table.game_status.player_infos().borrow(i);
-      if (option::is_some(&player_info.player_address()) 
-      && option::extract(&mut player_info.player_address()) == tx_context::sender(ctx) ) {
+      if (player_info.player_address().is_some() 
+      && player_info.player_address().borrow() == tx_context::sender(ctx) ) {
         return true
       };
       i = i + 1;
@@ -159,12 +161,12 @@ module shallwemove::game_table {
     // player가 속한 player_seat index 찾아내기
     while (i < game_table.player_seats.length()) {
       let player_seat = game_table.player_seats.borrow_mut(i);
-      if (player_seat.player() == option::none()) {
+      if (player_seat.player() == option::none<address>()) {
         i = i + 1;
         continue
       };
 
-      let player_address_of_seat = option::extract(&mut game_table.player_seats[i].player());
+      let player_address_of_seat = game_table.player_seats[i].player().borrow();
       if (player_address == player_address_of_seat) {
         is_player_found = true;
         break
@@ -193,12 +195,12 @@ module shallwemove::game_table {
       };
 
       let player_seat = game_table.player_seats.borrow_mut(j);
-      if (player_seat.player() == option::none()) {
+      if (player_seat.player() == option::none<address>()) {
         j = j + 1;
         continue
       };
 
-      if (player_seat.player() != option::none()) {
+      if (player_seat.player() != option::none<address>()) {
         game_table.game_status.set_manager_player(player_seat.player().extract());
         break
       };
@@ -256,7 +258,56 @@ module shallwemove::game_table {
 
   public fun start(game_table : &mut GameTable) {
     // 이제 여기를 채워야 할 시간!!!!
-    
+    // game_playing_status가 PRE_GAME 상태인가?
+    assert!(game_table.game_status.game_playing_status() == game_status::CONST_PRE_GAME(), 403);
+
+    // 모든 참여 플레이어가 READY 상태인가??
+    let mut i = 0;
+    let mut player_playing_status_vector = vector<u8>[];
+    while (i < game_table.game_status.player_infos().length()) {
+      let player_info = game_table.game_status.player_infos().borrow(i);
+      if (player_info.player_address() == option::none<address>()) {
+        i = i + 1;
+        continue
+      };
+      player_playing_status_vector.push_back(player_info.playing_status());
+      i = i + 1;
+    };
+
+    debug::print(&player_playing_status_vector);
+
+    let mut j = 0;
+    let mut is_all_player_ante = true;
+    while (j < player_playing_status_vector.length()) {
+      if (player_playing_status_vector.pop_back() != player_info::CONST_READY()) {
+        is_all_player_ante = false;
+        break
+      };
+      j = j + 1;
+    };
+    assert!(is_all_player_ante);
+
+    // 모든 참여 PlayerSeat에 카드 2장씩 분배하기
+    let mut k = 0;
+    while (k < game_table.player_seats.length()) {
+      let player_seat = game_table.player_seats.borrow_mut(k);
+      // let player_info = game_table.game_status.player_infos_mut().borrow_mut(k);
+      if (player_seat.player() == option::none<address>()){
+        k = k + 1;
+        continue
+      };
+
+      player_seat.receive_card(game_table.card_deck.borrow_mut().draw_card());
+      game_table.game_status.player_receive_card(k); // GameStatus 업데이트 -> PlayerInfo CardInfo
+
+      player_seat.receive_card(game_table.card_deck.borrow_mut().draw_card());
+      game_table.game_status.player_receive_card(k);
+
+      k = k + 1;
+    };
+
+    // GameStatus 업데이트 -> GameInfo
+    game_table.game_status.set_game_playing_status(game_status::CONST_IN_GAME());
   }
 
   // ============================================

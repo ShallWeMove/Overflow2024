@@ -120,6 +120,10 @@ module shallwemove::player_seat {
     };
   }
 
+  public fun receive_card(player_seat : &mut PlayerSeat, card : Card) {
+    player_seat.cards.push_back(card);
+  }
+
   // ============================================
   // ================ TEST ======================
 

@@ -3,6 +3,7 @@ module shallwemove::card_deck {
   // ============= IMPORTS ======================
 
   use shallwemove::utils;
+  use shallwemove::game_status::{Self, GameStatus};
   
   // ============================================
   // ============== STRUCTS =====================
@@ -23,16 +24,11 @@ module shallwemove::card_deck {
   // ============== FUNCTIONS ===================
 
   public fun new(public_key : vector<u8>, ctx : &mut TxContext) : CardDeck {
-    let mut card_deck = CardDeck {
+    CardDeck {
       id : object::new(ctx),
       avail_cards : vector[],
       used_cards : vector[],
-    };
-
-    // test 용으로 임시 주석 처리
-    card_deck.fill_cards(public_key, ctx);
-
-    card_deck
+    }
   }
 
   // ===================== Methods ===============================
@@ -40,7 +36,7 @@ module shallwemove::card_deck {
 
   fun id(card_deck : &CardDeck) : ID {object::id(card_deck)}
 
-  fun fill_cards(card_deck : &mut CardDeck, public_key : vector<u8>, ctx : &mut TxContext) {
+  public fun fill_cards(card_deck : &mut CardDeck, game_status : &mut GameStatus, public_key : vector<u8>, ctx : &mut TxContext) {
     let fifty_two_numbers_array = utils::get_fifty_two_numbers_array();
     let shuffled_fifty_two_numbers_array = utils::shuffle(fifty_two_numbers_array);
     let mut encrypted_fifty_two_numbers_array = utils::encrypt(shuffled_fifty_two_numbers_array, public_key);
@@ -54,6 +50,7 @@ module shallwemove::card_deck {
       };
 
       card_deck.avail_cards.push_back(card);
+      game_status.add_card();
 
       i = i - 1;
     };
@@ -61,6 +58,10 @@ module shallwemove::card_deck {
 
   public fun add_used_card(card_deck : &mut CardDeck, card : Card) {
     card_deck.used_cards.push_back(card);
+  }
+
+  public fun draw_card(card_deck : &mut CardDeck) : Card {
+    card_deck.avail_cards.pop_back()
   }
 
   // --------- Card ---------
