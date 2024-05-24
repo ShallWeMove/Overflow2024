@@ -37,6 +37,7 @@ module shallwemove::player_info {
     index : u8,
     player_address : Option<address>,
     public_key : vector<u8>,
+    deposit : u64,
     playing_status : u8,
     playing_action : u8,
     number_of_holding_cards : u8,
@@ -51,6 +52,7 @@ module shallwemove::player_info {
     PlayerInfo {
       index : index,
       player_address : option::none(),
+      deposit : 0,
       public_key : vector<u8>[],
       playing_status : EMPTY,
       playing_action : NONE,
@@ -113,18 +115,23 @@ module shallwemove::player_info {
 
   fun total_bet_amount(player_info : &PlayerInfo) : u64 {player_info.total_bet_amount}
 
+  public fun add_money(player_info : &mut PlayerInfo, money_amount : u64) {
+    player_info.deposit = player_info.deposit + money_amount;
+  }
+
   public fun add_bet_amount(player_info : &mut PlayerInfo, bet_amount : u64) {
     player_info.previous_bet_amount = bet_amount;
     player_info.total_bet_amount = player_info.total_bet_amount + bet_amount;
   }
 
-  public fun set_player(player_info : &mut PlayerInfo, ctx : &mut TxContext) {
+  public fun set_player_address(player_info : &mut PlayerInfo, ctx : &mut TxContext) {
     player_info.player_address = option::some(tx_context::sender(ctx));
   }
 
   public fun remove_player(player_info : &mut PlayerInfo, ctx : &mut TxContext) {
     assert!(tx_context::sender(ctx) == player_info.player_address().extract(), 403);
     player_info.player_address = option::none();
+    player_info.public_key = vector<u8>[];
     player_info.playing_status = EMPTY;
     player_info.playing_action = NONE;
 

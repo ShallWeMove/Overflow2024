@@ -177,7 +177,7 @@ module shallwemove::game_status {
     game_status.set_current_turn(i as u8);
   }
 
-  fun increment_avail_seat(game_status : &mut GameStatus) {
+  public fun increment_avail_seat(game_status : &mut GameStatus) {
     game_status.game_info.avail_game_seats = game_status.game_info.avail_game_seats + 1; 
   }
 
@@ -230,17 +230,40 @@ module shallwemove::game_status {
     game_status.decrement_avail_seat();
   }
 
-  public fun remove_player(game_status : &mut GameStatus, ctx : &mut TxContext) {
-    game_status.increment_avail_seat();
-  }
-
   public fun next_turn(game_status : &mut GameStatus) {
-    // current turn을 다음 턴으로
-    if ( (game_status.current_turn() + 1) as u64 == game_status.player_infos.length()) {
-      game_status.game_info.current_turn = 0;
-    } else {
-      game_status.game_info.current_turn = game_status.game_info.current_turn + 1;
+    // 빈자리가 아닌 player가 있는 다음 player_seat index 찾아내기
+    let mut i = game_status.current_turn() as u64;
+    loop {
+      if (i == game_status.player_infos().length()) {
+        i = 0;
+      };
+
+      // 만약 아무도 없어서 다시 돌아오면 break 즉, next turn 못하고 다시 제자리로
+      if (i == game_status.current_turn() as u64) {
+        break
+      };
+
+      let player_seat = game_status.player_infos_mut().borrow_mut(i);
+      if (player_seat.player_address() == option::none<address>()) {
+        i = i + 1;
+        continue
+      };
+
+      // if (player_address == player_address_of_seat) {
+      if (player_seat.player_address() != option::none<address>()) {
+        break
+      };
+
+      i = i + 1;
     };
+
+    game_status.game_info.current_turn = i as u8;
+    // // current turn을 다음 턴으로
+    // if ( (game_status.current_turn() + 1) as u64 == game_status.player_infos.length()) {
+    //   game_status.game_info.current_turn = 0;
+    // } else {
+    //   game_status.game_info.current_turn = game_status.game_info.current_turn + 1;
+    // };
   }
 
   

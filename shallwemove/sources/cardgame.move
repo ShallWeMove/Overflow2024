@@ -5,6 +5,7 @@ module shallwemove::cardgame {
   use shallwemove::casino::{Self, Casino};
   use shallwemove::lounge::{Self, Lounge};
   use shallwemove::game_table::{Self, GameTable};
+  use shallwemove::game_status::{Self, GameStatus};
   use sui::coin::{Self, Coin};
   use sui::sui::SUI;
   use std::debug;
@@ -78,11 +79,15 @@ module shallwemove::cardgame {
       let mut available_game_table_id = lounge.available_game_table_id();
       assert!(available_game_table_id != option::none());
 
-      // player를 GameTable에 참여 시킨다.
       let avail_game_table = lounge.borrow_mut_game_table(option::extract(&mut available_game_table_id));
-      avail_game_table.enter_player(public_key, deposit, ctx);
 
-      debug::print(avail_game_table);
+      // game이 현재 PRE_GAME 일 때만 가능
+      assert!(avail_game_table.game_status().game_playing_status() == game_status::CONST_PRE_GAME());
+
+      // player를 GameTable에 참여 시킨다.
+      avail_game_table.enter(public_key, deposit, ctx);
+
+      // debug::print(avail_game_table);
       return avail_game_table.id()
   }
 
@@ -108,7 +113,7 @@ module shallwemove::cardgame {
 
     let game_table = lounge.borrow_mut_game_table(game_table.id());
     
-    game_table.exit_player(ctx);
+    game_table.exit(ctx);
   }
 
   #[test_only]
@@ -124,7 +129,7 @@ module shallwemove::cardgame {
     let game_table = lounge.borrow_mut_game_table(game_table_id);
     assert!(lounge_id == game_table.lounge_id(), 403);
     
-    game_table.exit_player(ctx);
+    game_table.exit(ctx);
     debug::print(game_table);
   }
 
@@ -140,6 +145,9 @@ module shallwemove::cardgame {
     assert!(lounge.id() == game_table.lounge_id(), 403);
 
     let game_table = lounge.borrow_mut_game_table(game_table.id());
+    
+    // game이 현재 PRE_GAME 일 때만 가능
+    assert!(game_table.game_status().game_playing_status() == game_status::CONST_PRE_GAME(), 403);
 
     game_table.ante(ctx);
     
@@ -158,6 +166,9 @@ module shallwemove::cardgame {
     let lounge_id = lounge.id();
     let game_table = lounge.borrow_mut_game_table(game_table_id);
     assert!(lounge_id == game_table.lounge_id(), 403);
+    // game이 현재 PRE_GAME 일 때만 가능
+    assert!(game_table.game_status().game_playing_status() == game_status::CONST_PRE_GAME(), 403);
+
 
     game_table.ante(ctx);
     debug::print(game_table);
@@ -177,7 +188,10 @@ module shallwemove::cardgame {
     
     let game_table = lounge.borrow_mut_game_table(game_table.id());
 
-    assert!(game_table.game_status().manager_player() != option::none(), 403);
+    // game이 현재 PRE_GAME 일 때만 가능
+    assert!(game_table.game_status().game_playing_status() == game_status::CONST_PRE_GAME(), 403);
+
+    // manager player가 아니면 start() 실행 불가
     assert!(game_table.game_status().is_manager_player(ctx), 403);
     
     game_table.start();
@@ -196,8 +210,11 @@ module shallwemove::cardgame {
     let lounge_id = lounge.id();
     let game_table = lounge.borrow_mut_game_table(game_table_id);
     assert!(lounge_id == game_table.lounge_id(), 403);
-    
-    assert!(game_table.game_status().manager_player() != option::none(), 403);
+
+    // game이 현재 PRE_GAME 일 때만 가능
+    assert!(game_table.game_status().game_playing_status() == game_status::CONST_PRE_GAME(), 403);
+
+    // manager player가 아니면 start() 실행 불가
     assert!(game_table.game_status().is_manager_player(ctx), 403);
     
     game_table.start();
