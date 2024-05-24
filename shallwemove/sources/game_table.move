@@ -217,7 +217,6 @@ module shallwemove::game_table {
 
     };
 
-
     // player 정보 제거, PlayerSeat에서도 제거
     let player_seat = game_table.player_seats.borrow_mut(i);
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(i);
@@ -225,6 +224,8 @@ module shallwemove::game_table {
     player_seat.remove_player(game_table.card_deck.borrow_mut(), ctx);
     player_info.remove_player(ctx);
     game_table.game_status.remove_player(ctx);
+
+    // 만약 남은 플레이어가 1명 이하이다 -> Money box에 있는 거 남은 사람에게 주고 게임 강제 종료
 
   }
 
@@ -276,14 +277,14 @@ module shallwemove::game_table {
 
     debug::print(&player_playing_status_vector);
 
-    let mut j = 0;
+    let mut j = player_playing_status_vector.length();
     let mut is_all_player_ante = true;
-    while (j < player_playing_status_vector.length()) {
+    while (j > 0 ) {
       if (player_playing_status_vector.pop_back() != player_info::CONST_READY()) {
         is_all_player_ante = false;
         break
       };
-      j = j + 1;
+      j = j - 1;
     };
     assert!(is_all_player_ante);
 
@@ -297,6 +298,8 @@ module shallwemove::game_table {
         continue
       };
 
+      // player 2장 주고 -> 다음 player 2장 주는 방식인데
+      // 1장 -> 1장 -> 1장 -> 1장 ..해서 한 바퀴씩 도는 방식으로 변경하자 나중에
       player_seat.receive_card(game_table.card_deck.borrow_mut().draw_card());
       game_table.game_status.player_receive_card(k); // GameStatus 업데이트 -> PlayerInfo CardInfo
 

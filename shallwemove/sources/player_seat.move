@@ -7,6 +7,8 @@ module shallwemove::player_seat {
   use sui::dynamic_object_field;
   use sui::coin::{Self, Coin};
   use sui::sui::SUI;
+  use std::string::{Self, String};
+  use std::debug;
 
   // ============================================
   // ============== STRUCTS =====================
@@ -77,10 +79,10 @@ module shallwemove::player_seat {
 
   public fun remove_deposit(player_seat : &mut PlayerSeat, ctx : &mut TxContext) {
     let player_address = tx_context::sender(ctx);
-     let mut i = 0;
+     let mut i = player_seat.deposit.length();
      let mut money_container = coin::zero<SUI>(ctx);
       // while(i < player_seat.money.length()) {
-      while(i < player_seat.deposit.length()) {
+      while(i > 0) {
         // let money_id = player_seat.money.pop_back();
         let money = player_seat.deposit.pop_back();
         // let money_id = player_seat.deposit.pop_back();
@@ -88,21 +90,21 @@ module shallwemove::player_seat {
         coin::join<SUI>(&mut money_container, money);
         // transfer::public_transfer(money, player_address);
 
-        i = i + 1;
+        i = i - 1;
       };
       transfer::public_transfer(money_container, player_address);
   }
 
   public fun split_money(player_seat : &mut PlayerSeat, amount : u64, ctx : &mut TxContext) : Coin<SUI> {
-    let mut i = 0;
+    let mut i = player_seat.deposit.length();
     let mut money_container = coin::zero<SUI>(ctx);
-    while (i < player_seat.deposit.length()) {
+    while (i > 0) {
       let money = player_seat.deposit.pop_back();
       // let money_id = vector::remove(&mut player_seat.deposit(),i);
       // let money = dynamic_object_field::remove<ID, Coin<SUI>>(&mut player_seat.id, money_id);
       coin::join<SUI>(&mut money_container, money);
 
-      i = i + 1;
+      i = i - 1;
     };
 
     let money = coin::split<SUI>(&mut money_container, amount, ctx);
@@ -111,12 +113,14 @@ module shallwemove::player_seat {
   }
 
   fun remove_cards(player_seat : &mut PlayerSeat, card_deck : &mut CardDeck) {
-    let mut i = 0;
-    while (i < player_seat.cards.length()) {
+    debug::print(&string::utf8(b"remove cards"));
+    let mut i = player_seat.cards.length();
+    while (i > 0) {
+      // debug::print(&i);
       let card = player_seat.cards.pop_back();
       card_deck.add_used_card(card);
 
-      i = i + 1;
+      i = i - 1;
     };
   }
 
