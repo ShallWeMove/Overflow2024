@@ -133,7 +133,7 @@ module shallwemove::game_table {
       index = index + 1;
     };
 
-    if (index == game_table.game_status.avail_game_seats() as u64) {
+    if (index == game_table.game_status.game_seats() as u64) {
       is_game_table_full == true;
       index = GAME_TABLE_FULL; // 완전 PlayerSeat index 범위를 벗어나는 숫자
     };
