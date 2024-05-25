@@ -5,7 +5,10 @@ module shallwemove::encrypt {
     //     n: u256, // mod
     //     e: u256, // exponent
     // }
+    #[test_only]
     use sui::test_utils::{Self};
+    
+    #[test_only]
     use std::debug;
 
     const EXPONENT : u256 = 65537;
@@ -100,9 +103,6 @@ module shallwemove::encrypt {
 
         while (i < length) {
             char = *vector::borrow(&string, i);
-            if (char <48 || char > 57){
-                test_utils::print(b"number string only");
-            };
             assert!(char >= 48 && char <= 57, 1);
 
             result = result * 10 + ((char-48) as u256);
