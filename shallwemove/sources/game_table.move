@@ -584,12 +584,16 @@ module shallwemove::game_table {
             // 모든 player의 playing action은 NONE으로 초기화
             // 그리고 previous turn은 current turn과 동일하게 초기화
           // 게임을 더 진행할 수 없는가? -> 남아있는 사람들은 카드를 오픈한다
+    let previous_player_seat_index = game_table.game_status.previous_turn_index() as u64;
+    let previous_player_total_bet_amount = game_table.game_status.player_infos().borrow(previous_player_seat_index).total_bet_amount();
+
     let player_seat_index = game_table.find_player_seat_index(ctx);
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
     player_info.set_playing_action(player_info::CONST_CALL());
 
-    let bet_unit = game_table.game_status.bet_unit();
-    game_table.send_money(player_seat_index,bet_unit , ctx);
+      // 현재 플레이어의 총 베팅 금액을 직전 플레이어의 총 베팅 금액과 동일하게 맞춘다.
+    let bet_amount = previous_player_total_bet_amount - player_info.total_bet_amount();
+    game_table.send_money(player_seat_index, bet_amount, ctx);
     
     if (!game_table.is_all_player_bet_amount_same()) {
       game_table.next_turn(ctx);
