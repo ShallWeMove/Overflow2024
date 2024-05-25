@@ -116,6 +116,14 @@ module shallwemove::game_status {
 
   public fun previous_turn_index(game_status : &GameStatus) : u8 {game_status.game_info.previous_turn_index}
 
+  public fun max_round(game_status : &GameStatus) : u8 {game_status.game_info.max_round}
+
+  public fun current_round(game_status : &GameStatus) : u8 {game_status.game_info.current_round}
+
+  public fun next_round(game_status : &mut GameStatus) {
+    game_status.game_info.current_round = game_status.game_info.current_round + 1; 
+  }
+
   fun winner_player(game_status : &GameStatus) : Option<address> {game_status.game_info.winner_player}
   
   public fun ante_amount(game_status : &GameStatus) : u64 {game_status.game_info.ante_amount}
