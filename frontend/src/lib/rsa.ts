@@ -107,42 +107,27 @@ export class RSA {
         localStorage.removeItem(LOCAL_STORAGE_KEY_EXPIRATION);
     }
 
-    private encrypt(msg: number): number {
+    private modular_exponent(base: number, exp: number, mod: number): number {
         let result = 1;
-        let exp = this.publicKey;
-
-        msg %= this.n;
+        base %= mod;
 
         while (exp > 0) {
             if (exp % 2 === 1) {
-                result *= msg;
-                result %= this.n;
+                result = (result * base) % mod;
             }
             exp = exp >> 1;
-            msg *= msg;
-            msg %= this.n;
+            base = (base * base) % mod;
         }
 
         return result;
     }
 
+    private encrypt(msg: number): number {
+        return this.modular_exponent(msg, this.publicKey, this.n);
+    }
+
     private decrypt(encryptedMsg: number): number {
-        let result = 1;
-        let exp = this.privateKey;
-
-        encryptedMsg %= this.n;
-
-        while (exp > 0) {
-            if (exp % 2 === 1) {
-                result *= encryptedMsg;
-                result %= this.n;
-            }
-            exp = exp >> 1;
-            encryptedMsg *= encryptedMsg;
-            encryptedMsg %= this.n;
-        }
-
-        return result;
+        return this.modular_exponent(encryptedMsg, this.privateKey, this.n);
     }
 
     // encode message to encrypted number array
