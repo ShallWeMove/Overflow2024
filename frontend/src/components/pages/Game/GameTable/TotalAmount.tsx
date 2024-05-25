@@ -1,15 +1,26 @@
-import { Box, Typography, styled } from "@mui/material";
-import { useSpring, animated } from "react-spring";
+import {Box, styled, Typography} from "@mui/material";
+import {animated, useSpring} from "react-spring";
+import {GameInfo, GameStatus, Player} from "@/components/pages/Game/Game";
+import {useState} from "react";
 
 interface TotalAmountProps {
 	totalBetAmount: number | undefined;
 	callAmount: number | undefined;
+	players: Player[];
+	gameInfo: null | GameInfo;
 }
 
 export const TotalAmount = ({
+	players,
+	gameInfo,
 	totalBetAmount,
 	callAmount,
 }: TotalAmountProps) => {
+	const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
+	if (gameInfo?.currentTurnIndex) {
+		setCurrentPlayer(players[gameInfo.currentTurnIndex]);
+	}
+
 	return (
 		<Container>
 			<Wrapper>
@@ -37,6 +48,45 @@ export const TotalAmount = ({
 				>
 					<AnimatedSUI n={callAmount?.toString() ?? "0"} />
 					SUI
+				</Typography>
+			</Wrapper>
+			<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
+			<Wrapper>
+				<Typography color="#C1CCDC" fontWeight={700}>
+					Players
+				</Typography>
+				<Typography
+					color="#C1CCDC"
+					fontWeight={700}
+					sx={{ display: "flex", gap: 0.5 }}
+				>
+					{players.length} Players
+				</Typography>
+			</Wrapper>
+			<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
+			<Wrapper>
+				<Typography color="#C1CCDC" fontWeight={700}>
+					Game Status
+				</Typography>
+				<Typography
+					color="#C1CCDC"
+					fontWeight={700}
+					sx={{ display: "flex", gap: 0.5 }}
+				>
+					{gameInfo?.gamePlayingStatus === GameStatus.PRE_GAME ? "Pre Game" : gameInfo?.gamePlayingStatus === GameStatus.IN_GAME ? "In Game" : "Game Finished"}
+				</Typography>
+			</Wrapper>
+			<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
+			<Wrapper>
+				<Typography color="#C1CCDC" fontWeight={700}>
+					Current Turn
+				</Typography>
+				<Typography
+					color="#C1CCDC"
+					fontWeight={700}
+					sx={{ display: "flex", gap: 0.5 }}
+				>
+					{currentPlayer?.address}
 				</Typography>
 			</Wrapper>
 		</Container>

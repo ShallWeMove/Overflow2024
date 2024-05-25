@@ -8,14 +8,22 @@ const TESTNET_ENDPOINT = "https://sui-testnet.nodeinfra.com";
 export const client = new SuiClient({ url: TESTNET_ENDPOINT });
 
 export const getObject = async (objectId: string): Promise<any> => {
+	if (!objectId) {
+		return;
+	}
+
 	try {
 		const input: GetObjectParams = {
 			id: objectId,
+			options: {
+				showContent: true,
+			}
 		};
 		const res = await client.getObject(input);
+
 		return res.data;
 	} catch (e) {
-		console.error("getObject failed", e);
+		console.log("getObject failed: ", e, "objectId: ", objectId);
 	}
 };
 

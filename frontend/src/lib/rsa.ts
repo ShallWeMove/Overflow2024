@@ -130,6 +130,10 @@ export class RSA {
         return this.modular_exponent(encryptedMsg, this.privateKey, this.n);
     }
 
+    public getPublicKey(): number {
+        return this.publicKey;
+    }
+
     // encode message to encrypted number array
     public encode(message: string): number[] {
         const utf8Encoder = new TextEncoder();

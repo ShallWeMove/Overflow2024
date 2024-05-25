@@ -4,15 +4,18 @@ import { BetButton } from "./BetButton";
 import { CallButton } from "./CallButton";
 import { CheckButton } from "./CheckButton";
 import { FoldButton } from "./FoldButton";
-import { gamePlayBarAtom } from "@/lib/states";
-import { useAtom } from "jotai";
+import { AnteButton } from "./AnteButton";
+import {StartButton} from "@/components/pages/Game/GamePlayBar/StartButton";
 
-// 배팅 금액 정보 가져오기
+interface GamePlayBarProps {
+	gameTableId: string;
+}
 
-export const GamePlayBar = () => {
-	const [gameTable] = useAtom(gamePlayBarAtom);
+export const GamePlayBar = ({gameTableId}: GamePlayBarProps) => {
 	return (
 		<Container>
+			<StartButton gameTableId={gameTableId} />
+			<AnteButton gameTableId={gameTableId} />
 			<FoldButton />
 			<BetButton value={1000} />
 			<CheckButton />
