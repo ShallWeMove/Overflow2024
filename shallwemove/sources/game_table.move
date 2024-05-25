@@ -275,26 +275,22 @@ module shallwemove::game_table {
   }
 
   public fun next_turn(game_table : &mut GameTable, ctx : &mut TxContext) {
-    // next_turn 할 때 action이 FOLD거나 EXIT이면 previous_turn_index 안 바꿈
     let player_seat_index = game_table.find_player_seat_index(ctx);
     let player_info = game_table.game_status.player_infos().borrow(player_seat_index);
 
-    // 빈자리가 아닌 player가 있는 다음 player_seat index 찾아내기
-    let mut i = player_seat_index as u64;
+    let current_turn_index = game_table.game_status.current_turn_index();
+    // next_turn 할 때 action이 FOLD거나 EXIT이면 previous_turn_index 안 바꿈
     if (player_info.playing_action() == player_info::CONST_FOLD() || player_info.playing_action() == player_info::CONST_EXIT()) {
       // 딱히 할게 없나?
     } else {
-      let current_turn_index = game_table.game_status.current_turn_index();
       game_table.game_status.set_previous_turn(current_turn_index); 
     };
+
+    // 빈자리가 아닌 player가 있는 다음 부터 player_seat index 찾아내기
+    let mut i = (player_seat_index + 1) as u64;
     loop {
       if (i == game_table.game_status.player_infos().length()) {
         i = 0;
-      };
-
-      // 만약 아무도 없어서 다시 돌아오면 break 즉, next turn 못하고 다시 제자리로
-      if (i == game_table.game_status.current_turn_index() as u64) {
-        break
       };
 
       let player_seat = game_table.game_status.player_infos_mut().borrow_mut(i);
@@ -308,8 +304,14 @@ module shallwemove::game_table {
         break
       };
 
+      // 만약 아무도 없어서 다시 돌아오면 break 즉, next turn 못하고 다시 제자리로
+      if (i == current_turn_index as u64) {
+        break
+      };
+
       i = i + 1;
     };
+
     game_table.game_status.set_current_turn(i as u8);
   }
 
