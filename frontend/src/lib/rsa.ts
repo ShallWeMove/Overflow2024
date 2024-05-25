@@ -5,19 +5,22 @@ export const LOCAL_STORAGE_KEY_EXPIRATION = 'keyExpiration';
 
 export class RSA {
     private prime: Set<number> = new Set();
-    private publicKey: number;
-    private privateKey: number;
-    private n: number;
+    private publicKey: number = 0;
+    private privateKey: number = 0;
+    private n: number = 0;
 
-    constructor() {
-        this.publicKey = 0;
-        this.privateKey = 0;
-        this.n = 0;
-
-        if (!this.loadKeys()) {
-            this.primeFiller();
-            this.generateKeys();
+    constructor(mod?: number, publicKey?: number, privateKey?: number) {
+        if (mod == undefined || !publicKey || !privateKey) {
+            if (!this.loadKeys()) {
+                this.primeFiller();
+                this.generateKeys();
+            }
+            return;
         }
+
+        this.publicKey = publicKey;
+        this.n = mod;
+        this.privateKey = privateKey;
     }
 
     private primeFiller(): void {
@@ -104,24 +107,42 @@ export class RSA {
         localStorage.removeItem(LOCAL_STORAGE_KEY_EXPIRATION);
     }
 
-    private encrypt(message: number): number {
-        let e = this.publicKey;
-        let encryptedText = 1;
-        while (e--) {
-            encryptedText *= message;
-            encryptedText %= this.n;
+    private encrypt(msg: number): number {
+        let result = 1;
+        let exp = this.publicKey;
+
+        msg %= this.n;
+
+        while (exp > 0) {
+            if (exp % 2 === 1) {
+                result *= msg;
+                result %= this.n;
+            }
+            exp = exp >> 1;
+            msg *= msg;
+            msg %= this.n;
         }
-        return encryptedText;
+
+        return result;
     }
 
-    private decrypt(encryptedText: number): number {
-        let d = this.privateKey;
-        let decrypted = 1;
-        while (d--) {
-            decrypted *= encryptedText;
-            decrypted %= this.n;
+    private decrypt(encryptedMsg: number): number {
+        let result = 1;
+        let exp = this.privateKey;
+
+        encryptedMsg %= this.n;
+
+        while (exp > 0) {
+            if (exp % 2 === 1) {
+                result *= encryptedMsg;
+                result %= this.n;
+            }
+            exp = exp >> 1;
+            encryptedMsg *= encryptedMsg;
+            encryptedMsg %= this.n;
         }
-        return decrypted;
+
+        return result;
     }
 
     // encode message to encrypted number array
