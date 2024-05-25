@@ -282,7 +282,7 @@ module shallwemove::game_table {
     // 빈자리가 아닌 player가 있는 다음 player_seat index 찾아내기
     let mut i = player_seat_index as u64;
     if (player_info.playing_action() == player_info::CONST_FOLD() || player_info.playing_action() == player_info::CONST_EXIT()) {
-
+      // 딱히 할게 없나?
     } else {
       let current_turn_index = game_table.game_status.current_turn_index();
       game_table.game_status.set_previous_turn(current_turn_index); 
@@ -434,7 +434,7 @@ module shallwemove::game_table {
   public fun start(game_table : &mut GameTable) {
     // 플레이어 수가 2명 이상이고 모든 참여 플레이어가 READY 상태인가??
     assert!(game_table.get_number_of_players() >= 2, 403);
-    assert!(game_table.is_all_player_ready());
+    assert!(game_table.is_all_player_ready(), 403);
 
     // 모든 참여 PlayerSeat에 카드 2장씩 분배하기
     game_table.draw_card_to_all_player();
@@ -574,8 +574,8 @@ module shallwemove::game_table {
 
   fun call(game_table : &mut GameTable, ctx : &mut TxContext) {
     // action이 CALL이면 다음 진행
-      // 현재 플레이어의 총 베팅 금액을 직전 플레이어의 총 베팅 금액과 동일하게 맞춘다.
       // player action 은 CALL
+      // 현재 플레이어의 총 베팅 금액을 직전 플레이어의 총 베팅 금액과 동일하게 맞춘다.
       // CALL을 하고 PLAYING 중인 모든 플레이어의 베팅 총액이 동일해 졌는가?
         // 아니라면 다음 턴
         // 맞다면
@@ -610,11 +610,34 @@ module shallwemove::game_table {
     } else {
       game_table.open_all_player_card();
     }
+  }
+  
+  fun raise(game_table : &mut GameTable, raise_chip_count : u64, ctx : &mut TxContext) {
+    // action이 RAISE이면 다음 진행
+      // player action 은 RAISE
+      // FOLD를 제외한 현재 플레이어의 총 베팅 금액을 직전 플레이어의 총 베팅 금액과 동일하게 맞춘다.
+      // 추가로 chip_count X bet_unit 만큼 추가 베팅을 한다.
+      // 그리고 다음 턴
+    let previous_player_seat_index = game_table.game_status.previous_turn_index() as u64;
+    let previous_player_total_bet_amount = game_table.game_status.player_infos().borrow(previous_player_seat_index).total_bet_amount();
 
+    let player_seat_index = game_table.find_player_seat_index(ctx);
+    let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
+    player_info.set_playing_action(player_info::CONST_RAISE());
+
+      // 현재 플레이어의 총 베팅 금액을 직전 플레이어의 총 베팅 금액과 동일한 금액에
+      // 추가로 raise 금액만큼 추가 베팅한다.
+    let call_bet_amount = previous_player_total_bet_amount - player_info.total_bet_amount();
+    let raise_bet_amount = raise_chip_count * game_table.game_status.bet_unit();
+    let bet_amount = call_bet_amount + raise_bet_amount;
+    game_table.send_money(player_seat_index, bet_amount, ctx);
+
+      // 다음 턴
+    game_table.next_turn(ctx);
 
   }
 
-  public fun action(game_table : &mut GameTable, action_type : u8, chip_count : u64, ctx : &mut TxContext) {
+  public fun action(game_table : &mut GameTable, action_type : u8, raise_chip_count : u64, ctx : &mut TxContext) {
     // 현재 턴인 player만 실행 가능
     assert!(game_table.game_status().is_current_turn(ctx), 403);
 
@@ -665,13 +688,8 @@ module shallwemove::game_table {
       game_table.call(ctx);
     };
 
-    // action이 RAISE이면 다음 진행
-      // 현재 플레이어의 총 베팅 금액을 직전 플레이어의 총 베팅 금액과 동일하게 맞춘다.
-      // player action 은 RAISE
-      // 추가로 chip_count X bet_unit 만큼 추가 베팅을 한다.
-      // 그리고 다음 턴
     if (action_type == player_info::CONST_RAISE()) {
-
+      game_table.raise(raise_chip_count, ctx);
     };
 
     // action이 FOLD이면 다음 진행

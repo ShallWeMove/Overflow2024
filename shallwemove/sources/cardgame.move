@@ -86,6 +86,7 @@ module shallwemove::cardgame {
 
       // player를 GameTable에 참여 시킨다.
       avail_game_table.enter(public_key, deposit, ctx);
+      debug::print(avail_game_table);
 
       // debug::print(avail_game_table);
       return avail_game_table.id()
