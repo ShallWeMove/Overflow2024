@@ -41,12 +41,13 @@ module shallwemove::game_table {
   public fun new(
     lounge_id : ID,
     public_key : vector<u8>,
+    max_round : u8,
     ante_amount : u64, 
     bet_unit : u64, 
     game_seats : u8, 
     ctx : &mut TxContext) : GameTable {
 
-    let mut game_status = game_status::new(ante_amount, bet_unit, game_seats);
+    let mut game_status = game_status::new(max_round, ante_amount, bet_unit, game_seats);
     let money_box = money_box::new(ctx);
     let mut card_deck = card_deck::new(public_key, ctx);
 
@@ -436,7 +437,6 @@ module shallwemove::game_table {
     if (game_table.game_status.player_infos().borrow(game_table.game_status.previous_turn_index() as u64).playing_action() == player_info::CONST_BET()) {
       assert!(action_type == player_info::CONST_CHECK(), 403);
       assert!(action_type == player_info::CONST_BET(), 403);
-
     };
 
     // previous turn index의 베팅이 CALL인가? 
@@ -445,7 +445,6 @@ module shallwemove::game_table {
     if (game_table.game_status.player_infos().borrow(game_table.game_status.previous_turn_index() as u64).playing_action() == player_info::CONST_CALL()) {
       assert!(action_type == player_info::CONST_CHECK(), 403);
       assert!(action_type == player_info::CONST_BET(), 403);
-
     };
 
     // 모든 검토 과정이 끝나고 결국 실제 action을 여기서 진행

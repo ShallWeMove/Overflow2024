@@ -32,6 +32,8 @@ module shallwemove::game_status {
   public struct GameInfo has store {
     game_playing_status : u8,
     manager_player : Option<address>,
+    max_round : u8,
+    current_round : u8,
     current_turn_index : u8,
     previous_turn_index : u8,
     winner_player : Option<address>,
@@ -53,8 +55,8 @@ module shallwemove::game_status {
   // ============================================
   // ============== FUNCTIONS ===================
 
-  public fun new(ante_amount : u64, bet_unit : u64, game_seats : u8) : GameStatus {
-    let game_info = new_game_info(ante_amount, bet_unit, game_seats);
+  public fun new(max_round : u8, ante_amount : u64, bet_unit : u64, game_seats : u8) : GameStatus {
+    let game_info = new_game_info(max_round, ante_amount, bet_unit, game_seats);
 
     let money_box_info = MoneyBoxInfo {
       total_bet_amount : 0
@@ -75,12 +77,14 @@ module shallwemove::game_status {
     game_status
   }
 
-  fun new_game_info(ante_amount : u64, bet_unit : u64, game_seats : u8) : GameInfo {
+  fun new_game_info(max_round : u8, ante_amount : u64, bet_unit : u64, game_seats : u8) : GameInfo {
     assert!(game_seats >= 2 && game_seats <= 5, 403);
 
     GameInfo {
       game_playing_status : 0,
       manager_player : option::none(),
+      max_round : max_round,
+      current_round : 0,
       current_turn_index : 0,
       previous_turn_index : 0,
       winner_player : option::none(),

@@ -17,40 +17,45 @@ module shallwemove::lounge {
   public struct Lounge has key, store { //for test
     id: UID,
     casino_id : ID,
+    max_round : u8,
     game_tables : vector<ID>
   }
 
   // ============================================
   // ============== FUNCTIONS ===================
 
-  public fun create(casino : &Casino, ctx: &mut TxContext) {
+  public fun create(casino : &Casino, max_round: u8, ctx: &mut TxContext) {
     assert!(casino.admin() == tx_context::sender(ctx), 403);
 
     transfer::share_object(Lounge{
       id : object::new(ctx),
       // casino_id : object::id(casino),
       casino_id : casino.id(),
+      max_round : max_round,
       game_tables : vector[]
     });
   }
 
-  public fun new(casino : &Casino, ctx : &mut TxContext) : Lounge {
+  public fun new(casino : &Casino, max_round : u8, ctx : &mut TxContext) : Lounge {
     Lounge{
       id : object::new(ctx),
       casino_id : casino.id(),
+      max_round : max_round,
       game_tables : vector[]
     }
   }
 
   // ===================== Methods ===============================
   public fun delete(lounge : Lounge) {
-    let Lounge {id : lounge_id, casino_id : _, game_tables : _} = lounge;
+    let Lounge {id : lounge_id, casino_id : _, max_round : _, game_tables : _} = lounge;
     object::delete(lounge_id);
   }
   
   public fun id(lounge : &Lounge) : ID {object::id(lounge)}
 
   public fun casino_id(lounge : &Lounge) : ID {lounge.casino_id}
+
+  public fun max_round(lounge : &Lounge) : u8 {lounge.max_round}
 
   public fun borrow_game_table(lounge: &Lounge, game_table_id : ID) : &GameTable {
     dynamic_object_field::borrow<ID, GameTable> (&lounge.id, game_table_id)

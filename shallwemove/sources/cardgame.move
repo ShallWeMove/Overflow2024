@@ -32,8 +32,8 @@ module shallwemove::cardgame {
     casino::create(public_key, ctx);
   }
 
-  entry fun create_lounge(casino : &Casino, ctx: &mut TxContext) {
-    lounge::create(casino, ctx);
+  entry fun create_lounge(casino : &Casino, max_round : u8, ctx: &mut TxContext) {
+    lounge::create(casino,max_round, ctx);
   }
 
   entry fun add_game_table(
@@ -45,7 +45,7 @@ module shallwemove::cardgame {
     ctx : &mut TxContext) {
     assert!(casino.admin() == tx_context::sender(ctx), 403);
 
-    let game_table = game_table::new(lounge.id(), casino.public_key(), ante_amount, bet_unit, game_seats, ctx);
+    let game_table = game_table::new(lounge.id(), casino.public_key(), lounge.max_round(), ante_amount, bet_unit, game_seats, ctx);
 
     lounge.add_game_table(game_table);
   }
@@ -73,7 +73,7 @@ module shallwemove::cardgame {
       //casino id 와 lounge의 casino id가 같은지 체크
       assert!(casino.id() == lounge.casino_id(), 403);
 
-      // deposit은 일정량 이상으로 -> game_table의 bet_unit의 20배..? -> 일단 테스트를 위해서 보류
+      // deposit은 일정량 -> game_table의 bet_unit의 100배
 
       // available한 GameTable 가져온다
       let mut available_game_table_id = lounge.available_game_table_id();
