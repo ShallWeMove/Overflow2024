@@ -1,5 +1,9 @@
 import Image from "next/image";
 
+export const FlippedCard = () => {
+	return <Image src="/cards/card.png" alt="card" width={110} height={150} />;
+};
+
 export const SpadeA = () => {
 	return (
 		<Image src="/cards/spade/ace.png" alt="card" width={110} height={150} />

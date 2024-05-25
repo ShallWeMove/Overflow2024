@@ -2,7 +2,6 @@ import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { Box, styled } from "@mui/material";
 import { getObject } from "@/api/object";
-import { Dealer } from "./Dealer/Dealer";
 import { GamePlayerSpace } from "./GamePlayerSpace/GamePlayerSpace";
 import { UserSpace } from "./UserSpace/UserSpace";
 import { GamePlayBar } from "./GamePlayBar/GamePlayBar";
@@ -42,7 +41,7 @@ const Container = styled(Box)({
 	alignItems: "center",
 	height: "100vh",
 	overflow: "hidden",
-	backgroundImage: "url('/background.jpg')",
+	backgroundImage: "url('/background.png')",
 	backgroundSize: "cover",
 	backgroundPosition: "center",
 });
