@@ -392,7 +392,17 @@ module shallwemove::game_table {
     game_table.draw_card_to_all_player();
     game_table.draw_card_to_all_player();
 
-    // GameStatus 업데이트 -> GameInfo
+    // GameStatus 및 PlayerInfo playing_status 업데이트
+    let mut i = 0;
+    while (i < game_table.game_status.player_infos().length()) {
+      let player_info = game_table.game_status.player_infos_mut().borrow_mut(i);
+      if (player_info.player_address() == option::none()) {
+        i = i + 1;
+        continue
+      };
+      player_info.set_playing_status(player_info::CONST_PLAYING());
+      i = i + 1;
+    };
     game_table.game_status.set_game_playing_status(game_status::CONST_IN_GAME());
   }
 
@@ -450,6 +460,9 @@ module shallwemove::game_table {
             // 모든 player의 playing action은 NONE으로 초기화
             // 그리고 previous turn은 current turn과 동일하게 초기화
           // 게임을 더 진행할 수 없는가? -> 남아있는 사람들은 카드를 오픈한다
+    let player_seat_index = game_table.find_player_seat_index(ctx);
+
+
     if (!game_table.is_all_player_check()) {
       game_table.game_status.next_turn();
       return
@@ -512,7 +525,7 @@ module shallwemove::game_table {
       // player action 은 BET
       // 그리고 다음 턴
     if (action_type == player_info::CONST_BET()) {
-
+      // game_table.bet(ctx);
     };
 
     // action이 CALL이면 다음 진행
