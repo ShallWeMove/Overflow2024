@@ -1,12 +1,18 @@
 import { Box, styled } from "@mui/material";
 import { Table } from "./Table";
 import { TotalAmount } from "./TotalAmount";
+import { tableAtom } from "@/lib/states";
+import { useAtom } from "jotai";
 
 export const GameTable = () => {
+	const [gameTable] = useAtom(tableAtom);
 	return (
 		<Container>
 			<Table />
-			<TotalAmount />
+			<TotalAmount
+				totalBetAmount={gameTable?.totalBetAmount}
+				callAmount={gameTable?.callAmount}
+			/>
 		</Container>
 	);
 };
