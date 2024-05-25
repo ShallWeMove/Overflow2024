@@ -461,6 +461,8 @@ module shallwemove::game_table {
             // 그리고 previous turn은 current turn과 동일하게 초기화
           // 게임을 더 진행할 수 없는가? -> 남아있는 사람들은 카드를 오픈한다
     let player_seat_index = game_table.find_player_seat_index(ctx);
+    let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
+    player_info.set_playing_action(player_info::CONST_CHECK());
 
 
     if (!game_table.is_all_player_check()) {
