@@ -504,6 +504,35 @@ module shallwemove::game_table {
     game_table.game_status.next_turn();
   }
 
+  fun is_all_player_bet_amount_same(game_table : &GameTable) : bool {
+    let mut i = 0;
+    let mut player_total_bet_amount_vetor = vector<u64>[];
+    while(i < game_table.player_seats.length()){
+      if (game_table.game_status.player_infos().borrow(i).player_address() == option::none()) {
+        i = i + 1;
+        continue
+      };
+      if (game_table.game_status.player_infos().borrow(i).playing_action() == player_info::CONST_FOLD()) {
+        i = i + 1;
+        continue
+      };
+
+      player_total_bet_amount_vetor.push_back(game_table.game_status.player_infos().borrow(i).total_bet_amount());
+      i = i + 1;
+    };
+
+    let first_total_bet_amount = player_total_bet_amount_vetor.borrow(0);
+    let mut j = 0;
+    while (j < player_total_bet_amount_vetor.length()) {
+      if (first_total_bet_amount != player_total_bet_amount_vetor.borrow(j)) {
+        return false
+      };
+      j = j + 1;
+    };
+
+    return true
+  }
+
   fun call(game_table : &mut GameTable, ctx : &mut TxContext) {
     // action이 CALL이면 다음 진행
       // 현재 플레이어의 총 베팅 금액을 직전 플레이어의 총 베팅 금액과 동일하게 맞춘다.
@@ -516,6 +545,27 @@ module shallwemove::game_table {
             // 모든 player의 playing action은 NONE으로 초기화
             // 그리고 previous turn은 current turn과 동일하게 초기화
           // 게임을 더 진행할 수 없는가? -> 남아있는 사람들은 카드를 오픈한다
+    let player_seat_index = game_table.find_player_seat_index(ctx);
+    let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
+    player_info.set_playing_action(player_info::CONST_CALL());
+    
+    if (!game_table.is_all_player_bet_amount_same()) {
+      game_table.game_status.next_turn();
+      return
+    };
+
+    if (game_table.is_game_able_to_continue()){
+      game_table.draw_card_to_all_player();
+      game_table.game_status.next_turn();
+      game_table.game_status.next_round();
+      game_table.reset_all_player_playing_action();
+      let current_turn_index = game_table.game_status.current_turn_index();
+      game_table.game_status.set_previous_turn(current_turn_index);
+    } else {
+      game_table.open_all_player_card();
+    }
+
+
   }
 
   public fun action(game_table : &mut GameTable, action_type : u8, chip_count : u64, ctx : &mut TxContext) {

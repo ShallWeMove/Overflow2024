@@ -117,7 +117,7 @@ module shallwemove::player_info {
 
   fun previous_bet_amount(player_info : &PlayerInfo) : u64 {player_info.previous_bet_amount}
 
-  fun total_bet_amount(player_info : &PlayerInfo) : u64 {player_info.total_bet_amount}
+  public fun total_bet_amount(player_info : &PlayerInfo) : u64 {player_info.total_bet_amount}
 
 
   public fun add_bet_amount(player_info : &mut PlayerInfo, bet_amount : u64) {
