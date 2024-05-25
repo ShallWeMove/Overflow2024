@@ -170,7 +170,8 @@ export const action = async (
 		target: `${PACKAGE_ID}::${MODULE}::action`,
 		arguments: [
 			txb.object(CASINO_ID), // casino
-			txb.object(gameTableId), // game table
+			txb.object(LOUNGE_ID), // lounge
+			txb.object(gameTableId), // game table id
 			txb.pure(convertActionTypeToInt(actionType)), // action type
 			txb.pure(withNewCard), // with new card
 			txb.pure(chipCount), // chip count
