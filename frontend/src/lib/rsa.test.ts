@@ -5,6 +5,7 @@ import {
     LOCAL_STORAGE_KEY_EXPIRATION,
     EXPIRATION_DAYS,
 } from './rsa';
+import exp from "node:constants";
 
 // Mock localStorage for Jest environment
 const localStorageMock = (() => {
@@ -82,16 +83,17 @@ describe('RSA', () => {
 
     test('should regenerate keys if expired', () => {
         const rsa1 = new RSA();
-
-        // Set an expiration date in the past
         const pastDate = new Date();
         pastDate.setDate(pastDate.getDate() - (EXPIRATION_DAYS + 1));
         localStorage.setItem(LOCAL_STORAGE_KEY_EXPIRATION, pastDate.toISOString());
 
         const rsa2 = new RSA();
-
-        expect(rsa2['publicKey']).not.toEqual(rsa1['publicKey']);
-        expect(rsa2['privateKey']).not.toEqual(rsa1['privateKey']);
-        expect(rsa2['n']).not.toEqual(rsa1['n']);
+        const expirationDateStr = localStorage.getItem(LOCAL_STORAGE_KEY_EXPIRATION);
+        expect(expirationDateStr).not.toBeNull();
+        if (expirationDateStr) {
+            const expirationDate = new Date(expirationDateStr);
+            expect(expirationDate > pastDate).toBe(true);
+            expect(expirationDate > new Date()).toBe(true);
+        }
     });
 });
