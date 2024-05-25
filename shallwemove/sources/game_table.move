@@ -314,7 +314,7 @@ module shallwemove::game_table {
     // //PlayerSeat의 deposit에서 ante 만큼 꺼내서 MoneyBox 로 보내기
     let ante_amount = game_table.game_status.ante_amount();
     game_table.send_money(player_seat_index, ante_amount, ctx);
-    
+
     // // PlayerInfo bet amount 업데이트 & READY 상태로 변환
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
     player_info.set_playing_status(player_info::CONST_READY());
@@ -473,7 +473,6 @@ module shallwemove::game_table {
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
     player_info.set_playing_action(player_info::CONST_CHECK());
 
-
     if (!game_table.is_all_player_check()) {
       game_table.game_status.next_turn();
       return
@@ -496,13 +495,33 @@ module shallwemove::game_table {
       // bet_unit 만큼의 금액을 베팅한다.
       // player action 은 BET
       // 그리고 다음 턴
+    let player_seat_index = game_table.find_player_seat_index(ctx);
+    let bet_unit = game_table.game_status.bet_unit();
+    game_table.send_money(player_seat_index,bet_unit , ctx);
+    let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
+    player_info.set_playing_action(player_info::CONST_BET());
 
+    game_table.game_status.next_turn();
+  }
+
+  fun call(game_table : &mut GameTable, ctx : &mut TxContext) {
+    // action이 CALL이면 다음 진행
+      // 현재 플레이어의 총 베팅 금액을 직전 플레이어의 총 베팅 금액과 동일하게 맞춘다.
+      // player action 은 CALL
+      // CALL을 하고 PLAYING 중인 모든 플레이어의 베팅 총액이 동일해 졌는가?
+        // 아니라면 다음 턴
+        // 맞다면
+          // 게임을 더 진행할 수 있는가? -> 남아있는 사람들은 카드를 더 받는다
+            // 그리고 다음 라운드, 다음 턴
+            // 모든 player의 playing action은 NONE으로 초기화
+            // 그리고 previous turn은 current turn과 동일하게 초기화
+          // 게임을 더 진행할 수 없는가? -> 남아있는 사람들은 카드를 오픈한다
   }
 
   public fun action(game_table : &mut GameTable, action_type : u8, chip_count : u64, ctx : &mut TxContext) {
     // 현재 턴인 player만 실행 가능
     assert!(game_table.game_status().is_current_turn(ctx), 403);
-    
+
     // 첫 베팅인가? => current turn index 랑 previous turn index 랑 같은가?
     if (game_table.game_status.current_turn_index() == game_table.game_status.previous_turn_index()){
       // 한 라운드의 최초의 턴일 경우 CHECK or BET or FOLD 할 수 있음
@@ -546,19 +565,8 @@ module shallwemove::game_table {
       game_table.bet(ctx);
     };
 
-    // action이 CALL이면 다음 진행
-      // 현재 플레이어의 총 베팅 금액을 직전 플레이어의 총 베팅 금액과 동일하게 맞춘다.
-      // player action 은 CALL
-      // CALL을 하고 PLAYING 중인 모든 플레이어의 베팅 총액이 동일해 졌는가?
-        // 아니라면 다음 턴
-        // 맞다면
-          // 게임을 더 진행할 수 있는가? -> 남아있는 사람들은 카드를 더 받는다
-            // 그리고 다음 라운드, 다음 턴
-            // 모든 player의 playing action은 NONE으로 초기화
-            // 그리고 previous turn은 current turn과 동일하게 초기화
-          // 게임을 더 진행할 수 없는가? -> 남아있는 사람들은 카드를 오픈한다
     if (action_type == player_info::CONST_CALL()) {
-
+      game_table.call(ctx);
     };
 
     // action이 RAISE이면 다음 진행

@@ -128,7 +128,7 @@ module shallwemove::game_status {
   
   public fun ante_amount(game_status : &GameStatus) : u64 {game_status.game_info.ante_amount}
 
-  fun bet_unit(game_status : &GameStatus) : u64 {game_status.game_info.bet_unit}
+  public fun bet_unit(game_status : &GameStatus) : u64 {game_status.game_info.bet_unit}
 
   public fun game_seats(game_status : &GameStatus) : u8 {game_status.game_info.game_seats}
 
