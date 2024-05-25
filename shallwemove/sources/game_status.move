@@ -236,6 +236,7 @@ module shallwemove::game_status {
   public fun next_turn(game_status : &mut GameStatus) {
     // 빈자리가 아닌 player가 있는 다음 player_seat index 찾아내기
     let mut i = game_status.current_turn_index() as u64;
+    game_status.game_info.previous_turn_index = game_status.game_info.current_turn_index;
     loop {
       if (i == game_status.player_infos().length()) {
         i = 0;
@@ -259,14 +260,7 @@ module shallwemove::game_status {
 
       i = i + 1;
     };
-
     game_status.game_info.current_turn_index = i as u8;
-    // // current turn을 다음 턴으로
-    // if ( (game_status.current_turn() + 1) as u64 == game_status.player_infos.length()) {
-    //   game_status.game_info.current_turn = 0;
-    // } else {
-    //   game_status.game_info.current_turn = game_status.game_info.current_turn + 1;
-    // };
   }
 
   
