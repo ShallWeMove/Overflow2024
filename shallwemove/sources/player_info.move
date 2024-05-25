@@ -28,6 +28,7 @@ module shallwemove::player_info {
   const CALL : u8 = 23;
   const RAISE : u8 = 24;
   const FOLD : u8 = 25;
+  const EXIT : u8 = 26;
 
   // ============================================
   // ============== STRUCTS =====================
@@ -96,6 +97,9 @@ module shallwemove::player_info {
   public fun CONST_FOLD() : u8 {
     FOLD
   }
+  public fun CONST_EXIT() : u8 {
+    EXIT
+  }
 
   // ===================== Methods ===============================
 
@@ -103,7 +107,11 @@ module shallwemove::player_info {
 
   fun public_key(player_info : &PlayerInfo) : vector<u8> {player_info.public_key}
 
+  public fun deposit(player_info : &PlayerInfo) : u64 {player_info.deposit}
+
   public fun playing_status(player_info : &PlayerInfo) : u8 {player_info.playing_status}
+
+  public fun playing_action(player_info : &PlayerInfo) : u8 {player_info.playing_action}
 
   public fun set_playing_status(player_info : &mut PlayerInfo, playing_status : u8) {
     player_info.playing_status = playing_status;
@@ -113,11 +121,8 @@ module shallwemove::player_info {
 
   fun previous_bet_amount(player_info : &PlayerInfo) : u64 {player_info.previous_bet_amount}
 
-  fun total_bet_amount(player_info : &PlayerInfo) : u64 {player_info.total_bet_amount}
+  public fun total_bet_amount(player_info : &PlayerInfo) : u64 {player_info.total_bet_amount}
 
-  public fun add_money(player_info : &mut PlayerInfo, money_amount : u64) {
-    player_info.deposit = player_info.deposit + money_amount;
-  }
 
   public fun add_bet_amount(player_info : &mut PlayerInfo, bet_amount : u64) {
     player_info.previous_bet_amount = bet_amount;
@@ -128,20 +133,29 @@ module shallwemove::player_info {
     player_info.player_address = option::some(tx_context::sender(ctx));
   }
 
-  public fun remove_player(player_info : &mut PlayerInfo, ctx : &mut TxContext) {
-    assert!(tx_context::sender(ctx) == player_info.player_address().extract(), 403);
+  public fun remove_player_info(player_info : &mut PlayerInfo) {
     player_info.player_address = option::none();
     player_info.public_key = vector<u8>[];
+
     player_info.playing_status = EMPTY;
     player_info.playing_action = NONE;
+  }
 
-    player_info.previous_bet_amount = 0;
-    player_info.total_bet_amount = 0;
-    player_info.number_of_holding_cards = 0;
+
+  public fun add_deposit(player_info : &mut PlayerInfo, deposit_amount : u64) {
+    player_info.deposit = player_info.deposit + deposit_amount;
+  }
+
+  public fun discard_deposit(player_info : &mut PlayerInfo, deposit_amount : u64) {
+    player_info.deposit = player_info.deposit - deposit_amount;
   }
 
   public fun set_public_key(player_info : &mut PlayerInfo, public_key : vector<u8>) {
     player_info.public_key = public_key;
+  }
+
+  public fun set_playing_action(player_info : &mut PlayerInfo, playing_action : u8) {
+    player_info.playing_action = playing_action;
   }
 
   public fun receive_card(player_info : &mut PlayerInfo) {

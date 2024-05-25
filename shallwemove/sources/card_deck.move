@@ -17,7 +17,7 @@ module shallwemove::card_deck {
   public struct Card has key, store {
     id : UID,
     index : u8,
-    card_number : u8
+    card_number : u256
   }
 
   // ============================================
@@ -71,7 +71,7 @@ module shallwemove::card_deck {
 
   fun card_index(card : &Card) : u8 {card.index}
 
-  fun card_number(card : &Card) : u8 {card.card_number}
+  fun card_number(card : &Card) : u256 {card.card_number}
 
   // ============================================
   // ================ TEST ======================
