@@ -1,5 +1,5 @@
-import { Box, Typography, styled } from "@mui/material";
-import {GameInfo, Player} from "@/components/pages/Game/Game";
+import {Box, styled, Typography} from "@mui/material";
+import {GameInfo, GameStatus, Player} from "@/components/pages/Game/Game";
 import {useState} from "react";
 
 interface GameTableProps {
@@ -46,10 +46,10 @@ export const GameTable = ({ players, gameInfo }: GameTableProps) => {
 				<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
 				<Wrapper>
 					<Typography color="#C1CCDC" fontWeight={700}>
-						Current Round
+						Game Status
 					</Typography>
 					<Typography color="#C1CCDC" fontWeight={700}>
-						{gameInfo?.currentRound} Round
+						{gameInfo?.gamePlayingStatus === GameStatus.PRE_GAME ? "Pre Game" : gameInfo?.gamePlayingStatus === GameStatus.IN_GAME ? "In Game" : "Game Finished"}
 					</Typography>
 				</Wrapper>
 				<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />

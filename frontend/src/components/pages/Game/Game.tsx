@@ -17,12 +17,32 @@ export interface GameInfo {
 	betUnit: string;
 	currentRound: number;
 	currentTurnIndex: number;
-	gamePlayingStatus: number;
+	gamePlayingStatus: GameStatus;
 	gameSeats: number;
 	managerPlayer: null | string;
 	maxRound: number;
 	previousTurnIndex: number;
 	winnerPlayer: null | string;
+}
+
+export enum GameStatus {
+	PRE_GAME = 0,
+	IN_GAME = 1,
+	GAME_FINISHED = 2
+}
+
+const convertGameStatus = (status: number): GameStatus => {
+	switch (status) {
+		case 0:
+			return GameStatus.PRE_GAME;
+		case 1:
+			return GameStatus.IN_GAME;
+		case 2:
+			return GameStatus.GAME_FINISHED;
+		default:
+			return GameStatus.PRE_GAME;
+
+	}
 }
 
 export const Game = () => {
@@ -61,7 +81,6 @@ export const Game = () => {
 				}
 
 				if (players.length !== newPlayers.length) {
-					console.log("newPlayers: ", newPlayers);
 					setPlayers(newPlayers);
 				}
 			}
@@ -73,7 +92,7 @@ export const Game = () => {
 					betUnit: data.content.fields.game_status.fields.game_info.fields.bet_unit,
 					currentRound: data.content.fields.game_status.fields.game_info.fields.current_round,
 					currentTurnIndex: data.content.fields.game_status.fields.game_info.fields.current_turn_index,
-					gamePlayingStatus: data.content.fields.game_status.fields.game_info.fields.game_playing_status,
+					gamePlayingStatus: convertGameStatus(data.content.fields.game_status.fields.game_info.fields.game_playing_status),
 					gameSeats: data.content.fields.game_status.fields.game_info.fields.game_seats,
 					managerPlayer: data.content.fields.game_status.fields.game_info.fields.manager_player,
 					maxRound: data.content.fields.game_status.fields.game_info.fields.max_round,
@@ -82,6 +101,7 @@ export const Game = () => {
 				};
 
 				if ((gameInfo === null) || (gameInfo.currentTurnIndex !== newGameInfo.currentTurnIndex)) {
+					console.log("gameInfo:", newGameInfo)
 					setGameInfo(newGameInfo);
 				}
 			}

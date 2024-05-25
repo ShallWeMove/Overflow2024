@@ -3,7 +3,7 @@ import {Box, Button} from "@mui/material";
 import Image from "next/image";
 import backgroundImage from "../../../public/bg_landing.jpg";
 import {useRouter} from "next/router";
-import {enter} from "@/api/game";
+import {enter, GAME_TABLE_TYPE} from "@/api/game";
 import {useAtomValue} from "jotai/index";
 import {walletAtom} from "@/lib/states";
 
@@ -14,9 +14,17 @@ const Landing = () => {
 	const enterGame = async () => {
 		try {
 			const response = await enter(wallet);
-			console.log("response: ", response);
-			// TODO(Jarry): response 에서 gameTableId를 받아와야 함
-			// await router.push(`/game/${gameId}`);
+
+			if (response?.objectChanges) {
+				for (let i = 0; i < response.objectChanges?.length; i++) {
+					const objectChange = response.objectChanges[i];
+					if ((objectChange.type === "mutated") && (objectChange.objectType === GAME_TABLE_TYPE)) {
+						const gameTableId = objectChange.objectId;
+						await router.push(`/game/${gameTableId}`);
+					}
+				}
+			}
+
 		} catch (error) {
 			console.error('Failed to enter the game:', error);
 		}

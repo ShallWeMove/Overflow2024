@@ -5,12 +5,14 @@ import { GetCoinsParams } from "@mysten/sui.js/client";
 import { RSA } from "@/lib/rsa";
 
 const PACKAGE_ID =
-	"0x4053a7e19e497b9f6f3bfa9eff1dec36fec1a8d6f29fe613d9ce3b76976d0ca1";
+	"0x94ccb3f97236f52229a8d09d270f12334780e2a3885b9593f4498a9f24e06ea2";
 const CASINO_ID =
-	"0xb2c9a4652ed140b8592e252a14f9e1baf9e7add0d79a4eeb4c964ebb899f3866";
+	"0xeeebd8770fce4a854b5818286c4b88872199fa292ec368006bdbfe2b00c2aee9";
 const LOUNGE_ID =
-	"0x9386ebfa4b512b3b66f3845f2be7dc601f697207a1a6b4659c1351becd55bca6";
+	"0x80b5557536271d75a0adb89cc46152ed974e78151f8b4fc69633dfb82590d96e";
 const MODULE = "cardgame";
+
+export const GAME_TABLE_TYPE = `${PACKAGE_ID}::game_table::GameTable`
 
 // depositAmount - the amount of chips needed to enter the game
 const depositAmountInMist = 1000000;
@@ -45,6 +47,7 @@ export const enter = async (wallet: WalletContextState) => {
 				showInput: true,
 				showEffects: true,
 				showEvents: true,
+				showObjectChanges: true,
 			}
 		});
 		console.log("'enter' transaction result: ", res);
@@ -93,8 +96,8 @@ export const ante = async (
 			txb.object(CASINO_ID),
 			// lounge
 			txb.object(LOUNGE_ID),
-			// game table
-			txb.object(gameTableId),
+			// game table id as a string
+			txb.pure(gameTableId),
 		],
 	});
 
@@ -105,6 +108,7 @@ export const ante = async (
 				showInput: true,
 				showEffects: true,
 				showEvents: true,
+				showObjectChanges: true,
 			}
 		});
 		console.log("'ante' transaction result: ", res);
@@ -120,20 +124,33 @@ export const start = async (
 	gameTableId: string
 ) => {
 	const txb = new TransactionBlock();
+
+	txb.setGasBudget(gasBudgetInMist);
+
 	txb.moveCall({
 		target: `${PACKAGE_ID}::${MODULE}::start`,
 		arguments: [
-			txb.object(CASINO_ID), // casino
-			txb.object(LOUNGE_ID), // lounge
-			txb.object(gameTableId), // game table
+			// casino
+			txb.object(CASINO_ID),
+			// lounge
+			txb.object(LOUNGE_ID),
+			// game table as a string
+			txb.pure(gameTableId),
 		],
 	});
 
 	try {
 		const res = wallet.signAndExecuteTransactionBlock({
 			transactionBlock: txb,
+			options: {
+				showInput: true,
+				showEffects: true,
+				showEvents: true,
+				showObjectChanges: true,
+			}
 		});
-		console.log("start transaction result: ", res);
+		console.log("'start' transaction result: ", res);
+		return res;
 	} catch (e) {
 		console.error("'start' transaction failed", e);
 	}

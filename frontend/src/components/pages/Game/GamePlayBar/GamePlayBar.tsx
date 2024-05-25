@@ -5,6 +5,7 @@ import { CallButton } from "./CallButton";
 import { CheckButton } from "./CheckButton";
 import { FoldButton } from "./FoldButton";
 import { AnteButton } from "./AnteButton";
+import {StartButton} from "@/components/pages/Game/GamePlayBar/StartButton";
 
 interface GamePlayBarProps {
 	gameTableId: string;
@@ -13,6 +14,7 @@ interface GamePlayBarProps {
 export const GamePlayBar = ({gameTableId}: GamePlayBarProps) => {
 	return (
 		<Container>
+			<StartButton gameTableId={gameTableId} />
 			<AnteButton gameTableId={gameTableId} />
 			<FoldButton />
 			<BetButton />
