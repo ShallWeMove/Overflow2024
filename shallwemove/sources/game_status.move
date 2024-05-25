@@ -151,6 +151,10 @@ module shallwemove::game_status {
     game_status.game_info.current_turn_index = index;
   }
 
+  public fun set_previous_turn(game_status : &mut GameStatus, index : u8) {
+    game_status.game_info.previous_turn_index = index;
+  }
+
   public fun set_game_playing_status(game_status : &mut GameStatus, game_playing_status : u8){
     game_status.game_info.game_playing_status = game_playing_status
   }

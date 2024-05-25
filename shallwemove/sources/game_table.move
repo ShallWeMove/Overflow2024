@@ -142,7 +142,7 @@ module shallwemove::game_table {
   }
 
   fun find_player_seat_index(game_table : &mut GameTable, ctx : &mut TxContext) : u64 {
-    let mut index = 0; // 여기는 I
+    let mut index = 0;
 
     // player가 속한 player_seat index 찾아내기
     while (index < game_table.player_seats.length()) {
@@ -276,42 +276,23 @@ module shallwemove::game_table {
 
 
   fun exit_player(game_table : &mut GameTable, player_seat_index : u64, ctx : &mut TxContext) {
-    // player 정보 초기화
-    game_table.remove_player(player_seat_index, ctx);
-
+    // player가 해당 게임의 manager_player이면 다음으로 넘겨주거나 마지막 유저면 option::none()
+    game_table.update_manager_player(player_seat_index);
+    
     // 게임 중인가?? 그리고 지금 exit 하는 유저가 current turn인가?? -> next turn
     if (game_table.game_status.game_playing_status() == game_status::CONST_IN_GAME() && game_table.game_status.is_current_turn(ctx)) {
       game_table.game_status.next_turn();
     };
 
-    // player가 해당 게임의 manager_player이면 다음으로 넘겨주거나 마지막 유저면 option::none()
-    game_table.update_manager_player(player_seat_index);
-
-    // 만약 남은 플레이어가 1명이라 게임이 불가하면
-    if (game_table.get_number_of_players() == 1) {
-      // // Money box에 있는 거 남은 player의 PlayerSeat에게 주고
-      // let mut i = 0;
-      // while (i < game_table.player_seats.length()) {
-      //   if (game_table.player_seats.borrow(i).player_address() != option::none()) {
-      //     break
-      //   };
-      //   i = i + 1;
-      // };
-
-      // let player_seat = game_table.player_seats.borrow_mut(i);
-      
-      // let mut i = game_table.money_box.money().length();
-      // while (i > 0) {
-      //   let money = game_table.money_box.money_mut().pop_back();
-      //   game_table.game_status.discard_money(&money);
-      //   let player_info = game_table.game_status.player_infos_mut().borrow_mut(i);
-      //   player_seat.add_money(player_info, money);
-      //   i = i - 1;
-      // };
-
+    // 만약 게임 중이고 남은 플레이어가 1명이라 게임이 불가하면
+    if (game_table.game_status.game_playing_status() == game_status::CONST_IN_GAME() && game_table.get_number_of_players() == 1) {
+      // 남은 사람이 이기게 되는 걸로 게임 종료
       // 게임 종료 (추후 개발)
       // game_table.finish_game();
     };
+
+    // player 정보 제거
+    game_table.remove_player(player_seat_index, ctx);
   }
 
   fun send_ante(game_table : &mut GameTable, player_seat_index : u64, ctx : &mut TxContext) {
@@ -333,6 +314,7 @@ module shallwemove::game_table {
   fun draw_card(game_table : &mut GameTable, player_seat_index : u64) {
     {
       let player_seat = game_table.player_seats.borrow_mut(player_seat_index);
+      // 자리 없으면 건너 뜀
       if (player_seat.player_address() == option::none<address>()){
         return
       };
@@ -340,6 +322,7 @@ module shallwemove::game_table {
     };
     {
       let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
+      // 자리 없으면 건너 뜀
       if (player_info.player_address() == option::none<address>()){
         return
       };
@@ -413,6 +396,77 @@ module shallwemove::game_table {
     game_table.game_status.set_game_playing_status(game_status::CONST_IN_GAME());
   }
 
+  fun is_all_player_check(game_table : &GameTable) : bool {
+    let mut i = 0;
+    while(i < game_table.player_seats.length()){
+      if (game_table.game_status.player_infos().borrow(i).player_address() == option::none()) {
+        i = i + 1;
+        continue
+      };
+      if (game_table.game_status.player_infos().borrow(i).playing_action() == player_info::CONST_FOLD()) {
+        i = i + 1;
+        continue
+      };
+      if (game_table.game_status.player_infos().borrow(i).playing_action() != player_info::CONST_CHECK()) {
+        return false
+      };
+
+      i = i + 1;
+    };
+
+    return true
+  }
+
+  fun is_game_able_to_continue(game_table : &GameTable) : bool {
+    game_table.game_status.max_round() > game_table.game_status.current_round()
+  }
+
+  fun reset_all_player_playing_action(game_table : &mut GameTable) {
+    let mut i = 0;
+    while (i < game_table.game_status.player_infos().length()) {
+      if (game_table.game_status.player_infos_mut().borrow_mut(i).player_address() == option::none()) {
+        i = i + 1;
+        continue
+      };
+
+      game_table.game_status.player_infos_mut().borrow_mut(i).set_playing_action(player_info::CONST_NONE());
+      i = i + 1;
+    };
+  }
+
+  fun open_all_player_card(game_table : &mut GameTable) {
+
+  }
+  
+  fun check(game_table : &mut GameTable, ctx : &mut TxContext) {
+    // action이 CHECK이면 다음 진행
+      // 추가 베팅 없다.
+      // player action 은 CHECK
+      // CHECK 후 PLAYING 중인 모든 player가 CHECK를 했는가?
+        // 아니라면 다음 턴
+        // 맞다면
+          // 게임을 더 진행할 수 있는가? -> 남아있는 사람들은 카드를 더 받는다
+            // 그리고 다음 라운드, 다음 턴
+            // 모든 player의 playing action은 NONE으로 초기화
+            // 그리고 previous turn은 current turn과 동일하게 초기화
+          // 게임을 더 진행할 수 없는가? -> 남아있는 사람들은 카드를 오픈한다
+    if (!game_table.is_all_player_check()) {
+      game_table.game_status.next_turn();
+      return
+    };
+
+    if (game_table.is_game_able_to_continue()){
+      game_table.draw_card_to_all_player();
+      game_table.game_status.next_turn();
+      game_table.game_status.next_round();
+      game_table.reset_all_player_playing_action();
+      let current_turn_index = game_table.game_status.current_turn_index();
+      game_table.game_status.set_previous_turn(current_turn_index);
+    } else {
+      game_table.open_all_player_card();
+    };
+  }
+
   public fun action(game_table : &mut GameTable, action_type : u8, chip_count : u64, ctx : &mut TxContext) {
     // 첫 베팅인가? => current turn index 랑 previous turn index 랑 같은가?
     if (game_table.game_status.current_turn_index() == game_table.game_status.previous_turn_index()){
@@ -449,21 +503,13 @@ module shallwemove::game_table {
 
     // 모든 검토 과정이 끝나고 결국 실제 action을 여기서 진행
 
-    // action이 CHECK이면 다음 진행
-      // 추가 베팅 없다.
-      // CHECK 후 PLAYING 중인 모든 player가 CHECK를 했는가?
-        // 아니라면 다음 턴
-        // 맞다면
-          // 게임을 더 진행할 수 있는가? -> 남아있는 사람들은 카드를 더 받는다
-            // 그리고 다음 턴
-            // 그리고 previous turn은 current turn과 동일하게 초기화
-          // 게임을 더 진행할 수 없는가? -> 남아있는 사람들은 카드를 오픈한다
     if (action_type == player_info::CONST_CHECK()) {
-
+      game_table.check(ctx);
     };
 
     // action이 BET이면 다음 진행
       // bet_unit 만큼의 금액을 베팅한다.
+      // player action 은 BET
       // 그리고 다음 턴
     if (action_type == player_info::CONST_BET()) {
 
@@ -471,11 +517,13 @@ module shallwemove::game_table {
 
     // action이 CALL이면 다음 진행
       // 현재 플레이어의 총 베팅 금액을 직전 플레이어의 총 베팅 금액과 동일하게 맞춘다.
+      // player action 은 CALL
       // CALL을 하고 PLAYING 중인 모든 플레이어의 베팅 총액이 동일해 졌는가?
         // 아니라면 다음 턴
         // 맞다면
           // 게임을 더 진행할 수 있는가? -> 남아있는 사람들은 카드를 더 받는다
-            // 그리고 다음 턴
+            // 그리고 다음 라운드, 다음 턴
+            // 모든 player의 playing action은 NONE으로 초기화
             // 그리고 previous turn은 current turn과 동일하게 초기화
           // 게임을 더 진행할 수 없는가? -> 남아있는 사람들은 카드를 오픈한다
     if (action_type == player_info::CONST_CALL()) {
@@ -484,6 +532,7 @@ module shallwemove::game_table {
 
     // action이 RAISE이면 다음 진행
       // 현재 플레이어의 총 베팅 금액을 직전 플레이어의 총 베팅 금액과 동일하게 맞춘다.
+      // player action 은 RAISE
       // 추가로 chip_count X bet_unit 만큼 추가 베팅을 한다.
       // 그리고 다음 턴
     if (action_type == player_info::CONST_RAISE()) {
@@ -491,7 +540,29 @@ module shallwemove::game_table {
     };
 
     // action이 FOLD이면 다음 진행
+      // player action 은 FOLD
+      // FOLD를 하고 남은 PLAYING 중인 player가 한 명이라 게임 진행이 불가한가?
+        // 아니라면 다음 질문
+        // 맞다면
+          // 남은 사람이 이기게 되는 걸로 게임 종료
+      // FOLD를 하고 남은 PLAYING 중인 모든 player가 CHECK를 했는가?
+        // 아니라면 다음 질문
+        // 맞다면
+          // 게임을 더 진행할 수 있는가? -> 남아있는 사람들은 카드를 더 받는다
+            // 그리고 다음 라운드, 다음 턴
+            // 모든 player의 playing action은 NONE으로 초기화
+            // 그리고 previous turn은 current turn과 동일하게 초기화
+          // 게임을 더 진행할 수 없는가? -> 남아있는 사람들은 카드를 오픈한다
+      // FOLD를 하고 남은 PLAYING 중인 모든 플레이어의 베팅 총액이 동일해 졌는가?
+        // 아니라면 다음 턴
+        // 맞다면
+          // 게임을 더 진행할 수 있는가? -> 남아있는 사람들은 카드를 더 받는다
+            // 그리고 다음 라운드, 다음 턴
+            // 모든 player의 playing action은 NONE으로 초기화
+            // 그리고 previous turn은 current turn과 동일하게 초기화
+          // 게임을 더 진행할 수 없는가? -> 남아있는 사람들은 카드를 오픈한다
       // playing_status 가 GAME_END가 되고, 카드를 반납한다.
+      // 그리고 다음 턴
     if (action_type == player_info::CONST_FOLD()) {
 
     };

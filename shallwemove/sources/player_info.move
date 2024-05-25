@@ -132,7 +132,11 @@ module shallwemove::player_info {
   public fun remove_player_info(player_info : &mut PlayerInfo) {
     player_info.player_address = option::none();
     player_info.public_key = vector<u8>[];
+
+    player_info.playing_status = EMPTY;
+    player_info.playing_action = NONE;
   }
+
 
   public fun add_deposit(player_info : &mut PlayerInfo, deposit_amount : u64) {
     player_info.deposit = player_info.deposit + deposit_amount;
@@ -144,6 +148,10 @@ module shallwemove::player_info {
 
   public fun set_public_key(player_info : &mut PlayerInfo, public_key : vector<u8>) {
     player_info.public_key = public_key;
+  }
+
+  public fun set_playing_action(player_info : &mut PlayerInfo, playing_action : u8) {
+    player_info.playing_action = playing_action;
   }
 
   public fun receive_card(player_info : &mut PlayerInfo) {
