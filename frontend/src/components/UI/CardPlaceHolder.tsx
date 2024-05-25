@@ -1,11 +1,11 @@
 import { Box, Typography, styled } from "@mui/material";
 import { Fragment, ReactNode } from "react";
-import { HiddenCard } from "./HiddenCard";
 
 interface CardPlaceHolderProps {
 	value: number;
 	position: "left" | "right";
 	isUser?: boolean;
+	isTurn?: boolean;
 	cards?: ReactNode[];
 }
 
@@ -14,16 +14,17 @@ export const CardPlaceHolder = ({
 	position,
 	cards = [],
 	isUser = false,
+	isTurn = false,
 }: CardPlaceHolderProps) => {
 	return (
 		<Container>
 			{position === "left" && (
 				<Fragment>
-					<UserProfile />
-					<PlaceHolder>
+					<UserProfile isTurn={isTurn} />
+					<PlaceHolder isTurn={isTurn}>
 						<CardWrapper>
-							{cards[0] ?? <HiddenCard />}
-							{cards[1] ?? <HiddenCard />}
+							{cards[0] ?? ""}
+							{cards[1] ?? ""}
 						</CardWrapper>
 						<TotalBetAmount>
 							<Typography color="white" fontSize="16px" fontWeight={700}>
@@ -35,10 +36,10 @@ export const CardPlaceHolder = ({
 			)}
 			{position === "right" && (
 				<Fragment>
-					<PlaceHolder>
+					<PlaceHolder isTurn={isTurn}>
 						<CardWrapper>
-							{cards[0] ?? <HiddenCard />}
-							{cards[1] ?? <HiddenCard />}
+							{cards[0] ?? ""}
+							{cards[1] ?? ""}
 						</CardWrapper>
 						<TotalBetAmount>
 							<Typography color="white" fontSize="16px" fontWeight={700}>
@@ -46,7 +47,7 @@ export const CardPlaceHolder = ({
 							</Typography>
 						</TotalBetAmount>
 					</PlaceHolder>
-					<UserProfile />
+					<UserProfile isTurn={isTurn} />
 				</Fragment>
 			)}
 		</Container>
@@ -59,21 +60,27 @@ const Container = styled(Box)({
 	alignItems: "flex-start",
 });
 
-const UserProfile = styled(Box)({
+interface PlaceHolderProps {
+	isTurn: boolean;
+}
+
+const UserProfile = styled(Box)<PlaceHolderProps>(({ isTurn }) => ({
 	width: 110,
 	height: 100,
+	border: isTurn ? "3px solid #E9DDAE" : "none",
 	backgroundImage: "url('/default-profile.jpg')",
 	backgroundSize: "cover",
 	borderRadius: 8,
-});
+}));
 
-const PlaceHolder = styled(Box)({
+const PlaceHolder = styled(Box)<PlaceHolderProps>(({ isTurn }) => ({
 	position: "relative",
 	backgroundColor: "#273648",
+	border: isTurn ? "3px solid #E9DDAE" : "none",
 	borderRadius: 8,
 	width: 400,
 	height: 200,
-});
+}));
 
 const TotalBetAmount = styled(Box)({
 	position: "absolute",

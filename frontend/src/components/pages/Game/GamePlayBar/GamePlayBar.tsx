@@ -5,14 +5,16 @@ import { CallButton } from "./CallButton";
 import { CheckButton } from "./CheckButton";
 import { FoldButton } from "./FoldButton";
 
+// 배팅 금액 정보 가져오기
+
 export const GamePlayBar = () => {
 	return (
 		<Container>
 			<FoldButton />
-			<BetButton />
+			<BetButton value={1000} />
 			<CheckButton />
-			<CallButton />
-			<RaiseButton />
+			<CallButton value={1000} />
+			<RaiseButton value={1000} />
 		</Container>
 	);
 };

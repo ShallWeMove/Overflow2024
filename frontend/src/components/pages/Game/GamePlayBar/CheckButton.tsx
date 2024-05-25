@@ -12,7 +12,6 @@ export const CheckButton = () => {
 			onClick={handleClick}
 			disabled={disabled}
 			title={ActionType.Check}
-			value={1000}
 			color="grey"
 		/>
 	);
