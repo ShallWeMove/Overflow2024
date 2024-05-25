@@ -102,7 +102,7 @@ module shallwemove::player_seat {
     };
   }
 
-  public fun split_money(player_seat : &mut PlayerSeat, amount : u64, ctx : &mut TxContext) : Coin<SUI> {
+  public fun merge_and_split_money(player_seat : &mut PlayerSeat, amount : u64, ctx : &mut TxContext) : Coin<SUI> {
     let mut i = player_seat.deposit.length();
     let mut money_container = coin::zero<SUI>(ctx);
     while (i > 0) {
