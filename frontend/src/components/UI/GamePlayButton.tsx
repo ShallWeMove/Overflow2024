@@ -4,7 +4,7 @@ interface GamePlayButtonProps {
 	onClick: () => void;
 	disabled: boolean;
 	title: string;
-	value: number;
+	value?: number;
 	color: string;
 }
 
@@ -22,11 +22,21 @@ export const GamePlayButton = ({
 					{title}
 				</Typography>
 			</Button>
+			{value && (
+				<AmountWrapper>
+					<Amount>
+						<Typography color="white" fontWeight={700}>
+							{value} SUI
+						</Typography>
+					</Amount>
+				</AmountWrapper>
+			)}
 		</Container>
 	);
 };
 
 const Container = styled(Box)<{ color: string }>(({ color }) => ({
+	position: "relative",
 	border: `2px solid ${color}`,
 	borderRadius: 4,
 	backgroundColor: "transparent",
@@ -35,3 +45,17 @@ const Container = styled(Box)<{ color: string }>(({ color }) => ({
 	fontWeight: "bold",
 	textAlign: "center",
 }));
+
+const AmountWrapper = styled(Box)({
+	width: "100%",
+	position: "absolute",
+	bottom: 30,
+	display: "flex",
+	justifyContent: "center",
+});
+
+const Amount = styled(Box)({
+	backgroundColor: "black",
+	padding: "2px 12px",
+	borderRadius: "15px",
+});

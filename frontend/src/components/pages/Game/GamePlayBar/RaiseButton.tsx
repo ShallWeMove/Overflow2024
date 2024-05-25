@@ -2,7 +2,11 @@ import { GamePlayButton } from "@/components/UI/GamePlayButton";
 import { ActionType } from "@/api/game";
 // import { action } from "@/api/game";
 
-export const RaiseButton = () => {
+interface RaiseButtonProps {
+	value: number;
+}
+
+export const RaiseButton = ({ value }: RaiseButtonProps) => {
 	const disabled = false;
 	function handleClick() {
 		// action;
@@ -12,7 +16,7 @@ export const RaiseButton = () => {
 			onClick={handleClick}
 			disabled={disabled}
 			title={ActionType.Raise}
-			value={1000}
+			value={value}
 			color="orange"
 		/>
 	);

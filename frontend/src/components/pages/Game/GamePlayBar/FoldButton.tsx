@@ -11,7 +11,6 @@ export const FoldButton = () => {
 			onClick={handleClick}
 			disabled={disabled}
 			title={"FOLD"}
-			value={1000}
 			color="red"
 		/>
 	);
