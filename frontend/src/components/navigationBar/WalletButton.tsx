@@ -5,6 +5,7 @@ import "@suiet/wallet-kit/style.css";
 import { useRouter } from "next/router";
 import { walletAtom } from "@/lib/states";
 import { useSetAtom } from "jotai";
+import { generateAndStoreRSAKeyPair } from "@/lib/rsa";
 
 function WalletButton() {
 	const router = useRouter();
@@ -13,11 +14,11 @@ function WalletButton() {
 
 	useEffect(() => {
 		if (wallet.status === "connected") {
+			generateAndStoreRSAKeyPair();
 			setWallet(wallet);
-			// router.push("/lounge");
 		} else {
-			setWallet(null);
-			// router.push("/");
+			// setWallet(null);
+			// router.push("/lounge");
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [router]);

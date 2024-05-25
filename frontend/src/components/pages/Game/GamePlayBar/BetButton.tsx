@@ -12,6 +12,8 @@ export const BetButton = () => {
 			onClick={handleClick}
 			disabled={disabled}
 			title={ActionType.Bet}
+			value={1000}
+			color="#ffd200"
 		/>
 	);
 };

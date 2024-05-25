@@ -13,19 +13,30 @@ const MODULE = "cardgame";
 
 // enter - called when the player enters the game table
 export const enter = async (wallet: WalletContextState) => {
+	const PUBLIC_KEY = localStorage.getItem("publicKey") ?? "";
+	console.log("wallet: ", wallet);
 	const getCoinsParams: GetCoinsParams = {
 		owner: wallet?.address ?? "",
 	};
-	const money = await client.getCoins(getCoinsParams);
-	console.log("money: ", money);
+	const MONEY = await client.getCoins(getCoinsParams);
+	const coinIds = MONEY.data.map((coin) => coin.coinObjectId);
+	console.log("public key: ", PUBLIC_KEY);
+	console.log("money: ", MONEY);
+
+	if (MONEY.data.length < 1) {
+		return;
+	}
+
 	const txb = new TransactionBlock();
+	const [money] = txb.mergeCoins(coinIds[0], coinIds.slice(1));
+
 	txb.moveCall({
 		target: `${PACKAGE_ID}::${MODULE}::enter`,
 		arguments: [
 			txb.object(CASINO_ID), // casino
 			txb.object(LOUNGE_ID), // lounge
-			// public key
-			// money
+			txb.object(PUBLIC_KEY), // public key
+			money, // money
 		],
 	});
 
@@ -34,6 +45,7 @@ export const enter = async (wallet: WalletContextState) => {
 			transactionBlock: txb,
 		});
 		console.log("enter transaction result: ", res);
+		return res;
 	} catch (e) {
 		console.error("'enter' transaction failed", e);
 	}

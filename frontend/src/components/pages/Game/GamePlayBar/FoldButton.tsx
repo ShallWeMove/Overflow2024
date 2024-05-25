@@ -1,8 +1,7 @@
 import { GamePlayButton } from "@/components/UI/GamePlayButton";
-import { ActionType } from "@/api/game";
 // import { action } from "@/api/game";
 
-export const RaiseButton = () => {
+export const FoldButton = () => {
 	const disabled = false;
 	function handleClick() {
 		// action;
@@ -11,9 +10,9 @@ export const RaiseButton = () => {
 		<GamePlayButton
 			onClick={handleClick}
 			disabled={disabled}
-			title={ActionType.Raise}
+			title={"FOLD"}
 			value={1000}
-			color="orange"
+			color="red"
 		/>
 	);
 };

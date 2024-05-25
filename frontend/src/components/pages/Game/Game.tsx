@@ -1,15 +1,17 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import { Box } from "@mui/material";
+import { Box, styled } from "@mui/material";
 import { getObject } from "@/api/object";
 import { Dealer } from "./Dealer/Dealer";
 import { GamePlayerSpace } from "./GamePlayerSpace/GamePlayerSpace";
+import { UserSpace } from "./UserSpace/UserSpace";
 import { GamePlayBar } from "./GamePlayBar/GamePlayBar";
+import { GameTable } from "./GameTable/GameTable";
 
-const Game = () => {
+export const Game = () => {
 	const router = useRouter();
 	const { objectId } = router.query;
-	const [loading, setLoading] = useState(false);
+	// const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
 		const interval = setInterval(async () => {
@@ -20,25 +22,33 @@ const Game = () => {
 	}, [objectId]);
 
 	return (
-		<Box
-			sx={{
-				position: "relative",
-				display: "flex",
-				flexDirection: "row",
-				justifyContent: "center",
-				alignItems: "center",
-				height: "100vh",
-				overflow: "hidden",
-				backgroundImage: "url('/background.jpg')",
-				backgroundSize: "cover",
-				backgroundPosition: "center",
-			}}
-		>
-			<Dealer />
-			<GamePlayerSpace />
+		<Container>
+			<Wrapper>
+				<GamePlayerSpace position="left" />
+				<GameTable />
+				<GamePlayerSpace position="right" />
+			</Wrapper>
+			<UserSpace value={1000} />
 			<GamePlayBar />
-		</Box>
+		</Container>
 	);
 };
 
-export default Game;
+const Container = styled(Box)({
+	position: "relative",
+	display: "flex",
+	flexDirection: "column",
+	justifyContent: "center",
+	alignItems: "center",
+	height: "100vh",
+	overflow: "hidden",
+	backgroundImage: "url('/background.jpg')",
+	backgroundSize: "cover",
+	backgroundPosition: "center",
+});
+
+const Wrapper = styled(Box)({
+	width: "100%",
+	display: "flex",
+	justifyContent: "space-between",
+});
