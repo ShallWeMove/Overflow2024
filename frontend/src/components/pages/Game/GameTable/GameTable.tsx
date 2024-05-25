@@ -1,6 +1,18 @@
 import { Box, Typography, styled } from "@mui/material";
+import {GameInfo, Player} from "@/components/pages/Game/Game";
+import {useState} from "react";
 
-export const GameTable = () => {
+interface GameTableProps {
+	players: Player[];
+	gameInfo: null | GameInfo;
+}
+
+export const GameTable = ({ players, gameInfo }: GameTableProps) => {
+	const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
+	if (gameInfo?.currentTurnIndex) {
+		setCurrentPlayer(players[gameInfo.currentTurnIndex]);
+	}
+
 	return (
 		<Container>
 			<Table />
@@ -20,6 +32,33 @@ export const GameTable = () => {
 					</Typography>
 					<Typography color="#C1CCDC" fontWeight={700}>
 						0 SUI
+					</Typography>
+				</Wrapper>
+				<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
+				<Wrapper>
+					<Typography color="#C1CCDC" fontWeight={700}>
+						Players
+					</Typography>
+					<Typography color="#C1CCDC" fontWeight={700}>
+						{players.length} Players
+					</Typography>
+				</Wrapper>
+				<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
+				<Wrapper>
+					<Typography color="#C1CCDC" fontWeight={700}>
+						Current Round
+					</Typography>
+					<Typography color="#C1CCDC" fontWeight={700}>
+						{gameInfo?.currentRound} Round
+					</Typography>
+				</Wrapper>
+				<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
+				<Wrapper>
+					<Typography color="#C1CCDC" fontWeight={700}>
+						Current Turn
+					</Typography>
+					<Typography color="#C1CCDC" fontWeight={700}>
+						{currentPlayer?.address}
 					</Typography>
 				</Wrapper>
 			</TotalAmount>

@@ -2,49 +2,52 @@ import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { WalletContextState } from "@suiet/wallet-kit";
 import { client } from "./object";
 import { GetCoinsParams } from "@mysten/sui.js/client";
+import { RSA } from "@/lib/rsa";
 
 const PACKAGE_ID =
-	"0x9aaf5ea1dcda8ec3f23d3e9a583bc770e5d22e59ecf4ffe0889918dd768e50fe";
+	"0x4053a7e19e497b9f6f3bfa9eff1dec36fec1a8d6f29fe613d9ce3b76976d0ca1";
 const CASINO_ID =
-	"0x100ca0103d9d06c76e29e2b114773e2ef23dfadca5b31d211965f432141059b7";
+	"0xb2c9a4652ed140b8592e252a14f9e1baf9e7add0d79a4eeb4c964ebb899f3866";
 const LOUNGE_ID =
-	"0xaad3c53cb7d9d28ac4ed7d9f5e656111295e0aeaa6d6d2c471a29ab1264426a3";
+	"0x9386ebfa4b512b3b66f3845f2be7dc601f697207a1a6b4659c1351becd55bca6";
 const MODULE = "cardgame";
+
+// depositAmount - the amount of chips needed to enter the game
+const depositAmountInMist = 1000000;
+const gasBudgetInMist = 100000000;
 
 // enter - called when the player enters the game table
 export const enter = async (wallet: WalletContextState) => {
-	const PUBLIC_KEY = localStorage.getItem("publicKey") ?? "";
-	console.log("wallet: ", wallet);
-	const getCoinsParams: GetCoinsParams = {
-		owner: wallet?.address ?? "",
-	};
-	const MONEY = await client.getCoins(getCoinsParams);
-	const coinIds = MONEY.data.map((coin) => coin.coinObjectId);
-	console.log("public key: ", PUBLIC_KEY);
-	console.log("money: ", MONEY);
-
-	if (MONEY.data.length < 1) {
-		return;
-	}
-
+	const publicKey = new RSA().getPublicKey();
 	const txb = new TransactionBlock();
-	const [money] = txb.mergeCoins(coinIds[0], coinIds.slice(1));
+
+	txb.setGasBudget(gasBudgetInMist);
+	const [coin] = txb.splitCoins(txb.gas, [txb.pure(depositAmountInMist)]);
 
 	txb.moveCall({
 		target: `${PACKAGE_ID}::${MODULE}::enter`,
 		arguments: [
-			txb.object(CASINO_ID), // casino
-			txb.object(LOUNGE_ID), // lounge
-			txb.object(PUBLIC_KEY), // public key
-			money, // money
+			// casino
+			txb.object(CASINO_ID),
+			// lounge
+			txb.object(LOUNGE_ID),
+			// public key as a string
+			txb.pure(publicKey.toString()),
+			// deposit
+			coin,
 		],
 	});
 
 	try {
 		const res = wallet.signAndExecuteTransactionBlock({
 			transactionBlock: txb,
+			options: {
+				showInput: true,
+				showEffects: true,
+				showEvents: true,
+			}
 		});
-		console.log("enter transaction result: ", res);
+		console.log("'enter' transaction result: ", res);
 		return res;
 	} catch (e) {
 		console.error("'enter' transaction failed", e);
@@ -72,6 +75,44 @@ export const exit = async (wallet: WalletContextState, gameTableId: string) => {
 		console.error("'exit' transaction failed", e);
 	}
 };
+
+// ante - called when the player antes.
+// 	After all players have anted, manager player can start the game.
+export const ante = async (
+	wallet: WalletContextState,
+	gameTableId: string
+) => {
+	const txb = new TransactionBlock();
+
+	txb.setGasBudget(gasBudgetInMist);
+
+	txb.moveCall({
+		target: `${PACKAGE_ID}::${MODULE}::ante`,
+		arguments: [
+			// casino
+			txb.object(CASINO_ID),
+			// lounge
+			txb.object(LOUNGE_ID),
+			// game table
+			txb.object(gameTableId),
+		],
+	});
+
+	try {
+		const res = wallet.signAndExecuteTransactionBlock({
+			transactionBlock: txb,
+			options: {
+				showInput: true,
+				showEffects: true,
+				showEvents: true,
+			}
+		});
+		console.log("'ante' transaction result: ", res);
+		return res;
+	} catch (e) {
+		console.error("'ante' transaction failed", e);
+	}
+}
 
 // start - called when the game starts
 export const start = async (

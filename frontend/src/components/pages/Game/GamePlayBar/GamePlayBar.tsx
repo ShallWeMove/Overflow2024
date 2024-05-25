@@ -4,10 +4,16 @@ import { BetButton } from "./BetButton";
 import { CallButton } from "./CallButton";
 import { CheckButton } from "./CheckButton";
 import { FoldButton } from "./FoldButton";
+import { AnteButton } from "./AnteButton";
 
-export const GamePlayBar = () => {
+interface GamePlayBarProps {
+	gameTableId: string;
+}
+
+export const GamePlayBar = ({gameTableId}: GamePlayBarProps) => {
 	return (
 		<Container>
+			<AnteButton gameTableId={gameTableId} />
 			<FoldButton />
 			<BetButton />
 			<CheckButton />

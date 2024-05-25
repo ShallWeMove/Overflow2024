@@ -8,28 +8,99 @@ import { UserSpace } from "./UserSpace/UserSpace";
 import { GamePlayBar } from "./GamePlayBar/GamePlayBar";
 import { GameTable } from "./GameTable/GameTable";
 
+export interface Player {
+	address: string;
+}
+export interface GameInfo {
+	anteAmount: string;
+	availGameSeats: number;
+	betUnit: string;
+	currentRound: number;
+	currentTurnIndex: number;
+	gamePlayingStatus: number;
+	gameSeats: number;
+	managerPlayer: null | string;
+	maxRound: number;
+	previousTurnIndex: number;
+	winnerPlayer: null | string;
+}
+
 export const Game = () => {
+	const gameInfoRefreshIntervalMs = 1000;
+
 	const router = useRouter();
-	const { objectId } = router.query;
+	const value = router.query.objectId;
+	const query = Array.isArray(value) ? value[0] : value;
+
+	let gameTableId = "";
+	if (query) {
+		gameTableId = query;
+	}
+
+	const [players, setPlayers] = useState<Player[]>([]);
+	const [gameInfo, setGameInfo] = useState<GameInfo | null>(null);
+
 	// const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
 		const interval = setInterval(async () => {
-			const data = await getObject(objectId?.toString() ?? "");
-			console.log("data: ", data);
-		}, 1000);
+			const data = await getObject(gameTableId);
+			if(!data) return;
+
+			if(data.content?.fields?.player_seats) {
+				const playerSeats = data.content.fields.player_seats;
+				let newPlayers: Player[] = [];
+
+				for (let i = 0; i < playerSeats.length; i++) {
+					if (playerSeats[i]?.fields?.player_address) {
+						const newPlayer: Player = {
+							address: playerSeats[i].fields.player_address,
+						}
+						newPlayers.push(newPlayer);
+					}
+				}
+
+				if (players.length !== newPlayers.length) {
+					console.log("newPlayers: ", newPlayers);
+					setPlayers(newPlayers);
+				}
+			}
+
+			if(data.content?.fields?.game_status?.fields?.game_info) {
+				const newGameInfo: GameInfo = {
+					anteAmount: data.content.fields.game_status.fields.game_info.fields.ante_amount,
+					availGameSeats: data.content.fields.game_status.fields.game_info.fields.avail_game_seats,
+					betUnit: data.content.fields.game_status.fields.game_info.fields.bet_unit,
+					currentRound: data.content.fields.game_status.fields.game_info.fields.current_round,
+					currentTurnIndex: data.content.fields.game_status.fields.game_info.fields.current_turn_index,
+					gamePlayingStatus: data.content.fields.game_status.fields.game_info.fields.game_playing_status,
+					gameSeats: data.content.fields.game_status.fields.game_info.fields.game_seats,
+					managerPlayer: data.content.fields.game_status.fields.game_info.fields.manager_player,
+					maxRound: data.content.fields.game_status.fields.game_info.fields.max_round,
+					previousTurnIndex: data.content.fields.game_status.fields.game_info.fields.previous_turn_index,
+					winnerPlayer: data.content.fields.game_status.fields.game_info.fields.winner_player,
+				};
+
+				if ((gameInfo === null) || (gameInfo.currentTurnIndex !== newGameInfo.currentTurnIndex)) {
+					setGameInfo(newGameInfo);
+				}
+			}
+		}, gameInfoRefreshIntervalMs);
 		return () => clearInterval(interval);
-	}, [objectId]);
+	}, [gameTableId]);
 
 	return (
 		<Container>
 			<Wrapper>
 				<GamePlayerSpace position="left" />
-				<GameTable />
+				<GameTable
+					players={players}
+					gameInfo={gameInfo}
+				/>
 				<GamePlayerSpace position="right" />
 			</Wrapper>
 			<UserSpace value={1000} />
-			<GamePlayBar />
+			<GamePlayBar gameTableId={gameTableId} />
 		</Container>
 	);
 };
