@@ -250,6 +250,30 @@ module shallwemove::cardgame {
     return game_table.id()
   }
 
+  // 플레이어 콜 => 마지막 턴의 액션이면 Move에서 알아서 게임 종료해줌
+  #[test_only]
+  public fun action_test(
+    casino: &Casino, 
+    lounge: &mut Lounge,
+    game_table_id: ID,
+    action_type: u8, // ante, check, bet, call, raise
+    chip_count: u64, // 몇 개의 칩을 베팅할지 (칩 하나가 ? SUI일지는 GameTable마다 다르다)
+    ctx: &mut TxContext,
+  ) : ID {
+    assert!(casino.id() == lounge.casino_id(), 403);
+    let lounge_id = lounge.id();
+    let game_table = lounge.borrow_mut_game_table(game_table_id);
+    assert!(lounge_id == game_table.lounge_id(), 403);
+
+    // game이 현재 IN_GAME 일 때만 가능
+    assert!(game_table.game_status().game_playing_status() == game_status::CONST_IN_GAME(), 403);
+
+    game_table.action(action_type, chip_count, ctx);
+    debug::print(game_table);
+      
+    return game_table.id()
+  }
+
   // 중도 포기(기권)
   entry fun fold(
     casino: &Casino, 
