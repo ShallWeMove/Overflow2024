@@ -482,6 +482,14 @@ module shallwemove::game_table {
     };
   }
 
+  fun bet(game_table : &mut GameTable, ctx : &mut TxContext) {
+    // action이 BET이면 다음 진행
+      // bet_unit 만큼의 금액을 베팅한다.
+      // player action 은 BET
+      // 그리고 다음 턴
+
+  }
+
   public fun action(game_table : &mut GameTable, action_type : u8, chip_count : u64, ctx : &mut TxContext) {
     // 첫 베팅인가? => current turn index 랑 previous turn index 랑 같은가?
     if (game_table.game_status.current_turn_index() == game_table.game_status.previous_turn_index()){
@@ -522,12 +530,8 @@ module shallwemove::game_table {
       game_table.check(ctx);
     };
 
-    // action이 BET이면 다음 진행
-      // bet_unit 만큼의 금액을 베팅한다.
-      // player action 은 BET
-      // 그리고 다음 턴
     if (action_type == player_info::CONST_BET()) {
-      // game_table.bet(ctx);
+      game_table.bet(ctx);
     };
 
     // action이 CALL이면 다음 진행
