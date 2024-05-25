@@ -79,7 +79,7 @@ module shallwemove::cardgame {
       let mut available_game_table_id = lounge.available_game_table_id();
       assert!(available_game_table_id != option::none());
 
-      let avail_game_table = lounge.borrow_mut_game_table(option::extract(&mut available_game_table_id));
+      let avail_game_table = lounge.borrow_mut_game_table(available_game_table_id.extract());
 
       // game이 현재 PRE_GAME 일 때만 가능
       assert!(avail_game_table.game_status().game_playing_status() == game_status::CONST_PRE_GAME());
