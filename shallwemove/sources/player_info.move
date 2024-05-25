@@ -107,6 +107,8 @@ module shallwemove::player_info {
 
   public fun playing_status(player_info : &PlayerInfo) : u8 {player_info.playing_status}
 
+  public fun playing_action(player_info : &PlayerInfo) : u8 {player_info.playing_action}
+
   public fun set_playing_status(player_info : &mut PlayerInfo, playing_status : u8) {
     player_info.playing_status = playing_status;
   }
