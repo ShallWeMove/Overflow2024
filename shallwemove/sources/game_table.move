@@ -274,6 +274,45 @@ module shallwemove::game_table {
     };
   }
 
+  public fun next_turn(game_table : &mut GameTable, ctx : &mut TxContext) {
+    // next_turn 할 때 action이 FOLD거나 EXIT이면 previous_turn_index 안 바꿈
+    let player_seat_index = game_table.find_player_seat_index(ctx);
+    let player_info = game_table.game_status.player_infos().borrow(player_seat_index);
+
+    // 빈자리가 아닌 player가 있는 다음 player_seat index 찾아내기
+    let mut i = player_seat_index as u64;
+    if (player_info.playing_action() == player_info::CONST_FOLD() || player_info.playing_action() == player_info::CONST_EXIT()) {
+
+    } else {
+      let current_turn_index = game_table.game_status.current_turn_index();
+      game_table.game_status.set_previous_turn(current_turn_index); 
+    };
+    loop {
+      if (i == game_table.game_status.player_infos().length()) {
+        i = 0;
+      };
+
+      // 만약 아무도 없어서 다시 돌아오면 break 즉, next turn 못하고 다시 제자리로
+      if (i == game_table.game_status.current_turn_index() as u64) {
+        break
+      };
+
+      let player_seat = game_table.game_status.player_infos_mut().borrow_mut(i);
+      if (player_seat.player_address() == option::none<address>()) {
+        i = i + 1;
+        continue
+      };
+
+      // if (player_address == player_address_of_seat) {
+      if (player_seat.player_address() != option::none<address>()) {
+        break
+      };
+
+      i = i + 1;
+    };
+    game_table.game_status.set_current_turn(i as u8);
+  }
+
 
   fun exit_player(game_table : &mut GameTable, player_seat_index : u64, ctx : &mut TxContext) {
     // player가 해당 게임의 manager_player이면 다음으로 넘겨주거나 마지막 유저면 option::none()
@@ -281,7 +320,7 @@ module shallwemove::game_table {
     
     // 게임 중인가?? 그리고 지금 exit 하는 유저가 current turn인가?? -> next turn
     if (game_table.game_status.game_playing_status() == game_status::CONST_IN_GAME() && game_table.game_status.is_current_turn(ctx)) {
-      game_table.game_status.next_turn();
+      game_table.next_turn(ctx);
     };
 
     // 만약 게임 중이고 남은 플레이어가 1명이라 게임이 불가하면
@@ -474,13 +513,13 @@ module shallwemove::game_table {
     player_info.set_playing_action(player_info::CONST_CHECK());
 
     if (!game_table.is_all_player_check()) {
-      game_table.game_status.next_turn();
+      game_table.next_turn(ctx);
       return
     };
 
     if (game_table.is_game_able_to_continue()){
       game_table.draw_card_to_all_player();
-      game_table.game_status.next_turn();
+      game_table.next_turn(ctx);
       game_table.game_status.next_round();
       game_table.reset_all_player_playing_action();
       let current_turn_index = game_table.game_status.current_turn_index();
@@ -501,7 +540,7 @@ module shallwemove::game_table {
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
     player_info.set_playing_action(player_info::CONST_BET());
 
-    game_table.game_status.next_turn();
+    game_table.next_turn(ctx);
   }
 
   fun is_all_player_bet_amount_same(game_table : &GameTable) : bool {
@@ -548,15 +587,18 @@ module shallwemove::game_table {
     let player_seat_index = game_table.find_player_seat_index(ctx);
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
     player_info.set_playing_action(player_info::CONST_CALL());
+
+    let bet_unit = game_table.game_status.bet_unit();
+    game_table.send_money(player_seat_index,bet_unit , ctx);
     
     if (!game_table.is_all_player_bet_amount_same()) {
-      game_table.game_status.next_turn();
+      game_table.next_turn(ctx);
       return
     };
 
     if (game_table.is_game_able_to_continue()){
       game_table.draw_card_to_all_player();
-      game_table.game_status.next_turn();
+      game_table.next_turn(ctx);
       game_table.game_status.next_round();
       game_table.reset_all_player_playing_action();
       let current_turn_index = game_table.game_status.current_turn_index();
