@@ -2,8 +2,6 @@ import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import WalletButton from "./WalletButton";
-import card from "../../../public/cards/card.png";
-import Image from "next/image";
 
 const Navbar = () => {
 	return (
@@ -20,13 +18,6 @@ const Navbar = () => {
 			}}
 		>
 			<Toolbar>
-				<a href="/">
-					<Image
-						src={card}
-						alt="card"
-						style={{ height: "3.68284rem", width: "3.68284rem" }}
-					/>
-				</a>
 				<Typography
 					variant="h3"
 					component="div"

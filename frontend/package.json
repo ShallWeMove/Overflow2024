@@ -16,10 +16,12 @@
     "@mysten/dapp-kit": "^0.13.1",
     "@mysten/sui.js": "^0.51.2",
     "@suiet/wallet-kit": "^0.2.24",
+    "framer-motion": "^11.2.6",
     "jotai": "^2.8.0",
     "next": "14.2.3",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-spring": "^9.7.3"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

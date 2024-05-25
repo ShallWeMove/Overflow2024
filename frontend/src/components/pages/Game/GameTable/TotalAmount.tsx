@@ -1,0 +1,140 @@
+import {Box, styled, Typography} from "@mui/material";
+import {animated, useSpring} from "react-spring";
+import {GameInfo, GameStatus, Player} from "@/components/pages/Game/Game";
+import {useState} from "react";
+
+interface TotalAmountProps {
+	totalBetAmount: number | undefined;
+	callAmount: number | undefined;
+	players: Player[];
+	gameInfo: null | GameInfo;
+}
+
+export const TotalAmount = ({
+	players,
+	gameInfo,
+	totalBetAmount,
+	callAmount,
+}: TotalAmountProps) => {
+	const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
+	if (gameInfo?.currentTurnIndex) {
+		setCurrentPlayer(players[gameInfo.currentTurnIndex]);
+	}
+
+	return (
+		<Container>
+			<Wrapper>
+				<Typography color="#C1CCDC" fontWeight={700}>
+					Total
+				</Typography>
+				<Typography
+					color="#C1CCDC"
+					fontWeight={700}
+					sx={{ display: "flex", gap: 0.5 }}
+				>
+					<AnimatedSUI n={totalBetAmount?.toString() ?? "0"} />
+					SUI
+				</Typography>
+			</Wrapper>
+			<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
+			<Wrapper>
+				<Typography color="#C1CCDC" fontWeight={700}>
+					Call
+				</Typography>
+				<Typography
+					color="#C1CCDC"
+					fontWeight={700}
+					sx={{ display: "flex", gap: 0.5 }}
+				>
+					<AnimatedSUI n={callAmount?.toString() ?? "0"} />
+					SUI
+				</Typography>
+			</Wrapper>
+			<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
+			<Wrapper>
+				<Typography color="#C1CCDC" fontWeight={700}>
+					Players
+				</Typography>
+				<Typography
+					color="#C1CCDC"
+					fontWeight={700}
+					sx={{ display: "flex", gap: 0.5 }}
+				>
+					{players.length} Players
+				</Typography>
+			</Wrapper>
+			<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
+			<Wrapper>
+				<Typography color="#C1CCDC" fontWeight={700}>
+					Game Status
+				</Typography>
+				<Typography
+					color="#C1CCDC"
+					fontWeight={700}
+					sx={{ display: "flex", gap: 0.5 }}
+				>
+					{gameInfo?.gamePlayingStatus === GameStatus.PRE_GAME ? "Pre Game" : gameInfo?.gamePlayingStatus === GameStatus.IN_GAME ? "In Game" : "Game Finished"}
+				</Typography>
+			</Wrapper>
+			<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
+			<Wrapper>
+				<Typography color="#C1CCDC" fontWeight={700}>
+					Current Turn
+				</Typography>
+				<Typography
+					color="#C1CCDC"
+					fontWeight={700}
+					sx={{ display: "flex", gap: 0.5 }}
+				>
+					{currentPlayer?.address}
+				</Typography>
+			</Wrapper>
+		</Container>
+	);
+};
+
+const Container = styled(Box)({
+	display: "flex",
+	flexDirection: "column",
+	border: "2px solid #C1CCDC",
+	borderRadius: 8,
+	width: 400,
+	height: 80,
+});
+
+const Wrapper = styled(Box)({
+	display: "flex",
+	padding: 8,
+	alignItems: "center",
+	justifyContent: "space-between",
+	flexGrow: 1,
+});
+
+interface AnimatedProps {
+	n: string;
+}
+
+const AnimatedSUI = ({ n }: AnimatedProps) => {
+	const cleanedNumber = n.replace(/,/g, "");
+	const numberValue = parseFloat(cleanedNumber);
+
+	const { number } = useSpring({
+		from: { number: 0 },
+		to: { number: isNaN(numberValue) ? 0 : numberValue },
+		delay: 200,
+		config: { mass: 1, tension: 20, friction: 10, duration: 1000 },
+	});
+
+	return (
+		<animated.div
+			style={{
+				fontSize: "14px",
+				fontWeight: 700,
+				color: "#C1CCDC",
+				marginTop: -1,
+			}}
+		>
+			{number.to((value) => Math.floor(value).toLocaleString())}
+		</animated.div>
+	);
+};

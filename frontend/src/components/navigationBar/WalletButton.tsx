@@ -2,12 +2,10 @@ import { useEffect } from "react";
 import { useWallet } from "@suiet/wallet-kit";
 import { ConnectButton, ErrorCode } from "@suiet/wallet-kit";
 import "@suiet/wallet-kit/style.css";
-import { useRouter } from "next/router";
 import { walletAtom } from "@/lib/states";
 import { useSetAtom } from "jotai";
 
 function WalletButton() {
-	const router = useRouter();
 	const wallet = useWallet();
 	const setWallet = useSetAtom(walletAtom);
 
