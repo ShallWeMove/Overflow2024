@@ -491,6 +491,9 @@ module shallwemove::game_table {
   }
 
   public fun action(game_table : &mut GameTable, action_type : u8, chip_count : u64, ctx : &mut TxContext) {
+    // 현재 턴인 player만 실행 가능
+    assert!(game_table.game_status().is_current_turn(ctx), 403);
+    
     // 첫 베팅인가? => current turn index 랑 previous turn index 랑 같은가?
     if (game_table.game_status.current_turn_index() == game_table.game_status.previous_turn_index()){
       // 한 라운드의 최초의 턴일 경우 CHECK or BET or FOLD 할 수 있음

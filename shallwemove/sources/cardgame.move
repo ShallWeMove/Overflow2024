@@ -242,9 +242,6 @@ module shallwemove::cardgame {
     // game이 현재 IN_GAME 일 때만 가능
     assert!(game_table.game_status().game_playing_status() == game_status::CONST_IN_GAME(), 403);
 
-    // 현재 턴인 player만 실행 가능
-    assert!(game_table.game_status().is_current_turn(ctx), 403);
-
     game_table.action(action_type, chip_count, ctx);
       
     return game_table.id()
