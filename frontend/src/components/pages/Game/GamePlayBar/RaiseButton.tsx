@@ -15,7 +15,7 @@ export const RaiseButton = ({ value }: RaiseButtonProps) => {
 		<GamePlayButton
 			onClick={handleClick}
 			disabled={disabled}
-			title={ActionType.Raise}
+			title={ActionType.RAISE}
 			value={value}
 			color="orange"
 		/>

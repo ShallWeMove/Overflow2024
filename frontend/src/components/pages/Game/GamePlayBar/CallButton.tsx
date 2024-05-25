@@ -15,7 +15,7 @@ export const CallButton = ({ value }: CallButtonProps) => {
 		<GamePlayButton
 			onClick={handleClick}
 			disabled={disabled}
-			title={ActionType.Call}
+			title={ActionType.CALL}
 			value={value}
 			color="green"
 		/>

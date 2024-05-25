@@ -16,7 +16,7 @@ export const BetButton = ({ value }: BetButtonProps) => {
 		<GamePlayButton
 			onClick={handleClick}
 			disabled={disabled}
-			title={ActionType.Bet}
+			title={ActionType.BET}
 			value={value}
 			color="#ffd200"
 		/>
