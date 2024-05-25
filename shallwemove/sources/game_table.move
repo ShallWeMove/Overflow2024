@@ -637,6 +637,34 @@ module shallwemove::game_table {
 
   }
 
+  fun fold(game_table : &mut GameTable, ctx : &mut TxContext) {
+    // action이 FOLD이면 다음 진행
+      // player action 은 FOLD
+      // FOLD를 하고 남은 PLAYING 중인 player가 한 명이라 게임 진행이 불가한가?
+        // 아니라면 다음 질문
+        // 맞다면
+          // 남은 사람이 이기게 되는 걸로 게임 종료
+      // FOLD를 하고 남은 PLAYING 중인 모든 player가 CHECK를 했는가?
+        // 아니라면 다음 질문
+        // 맞다면
+          // 게임을 더 진행할 수 있는가? -> 남아있는 사람들은 카드를 더 받는다
+            // 그리고 다음 라운드, 다음 턴
+            // 모든 player의 playing action은 NONE으로 초기화
+            // 그리고 previous turn은 current turn과 동일하게 초기화
+          // 게임을 더 진행할 수 없는가? -> 남아있는 사람들은 카드를 오픈한다
+      // FOLD를 하고 남은 PLAYING 중인 모든 플레이어의 베팅 총액이 동일해 졌는가?
+        // 아니라면 다음 턴
+        // 맞다면
+          // 게임을 더 진행할 수 있는가? -> 남아있는 사람들은 카드를 더 받는다
+            // 그리고 다음 라운드, 다음 턴
+            // 모든 player의 playing action은 NONE으로 초기화
+            // 그리고 previous turn은 current turn과 동일하게 초기화
+          // 게임을 더 진행할 수 없는가? -> 남아있는 사람들은 카드를 오픈한다
+      // playing_status 가 GAME_END가 되고, 카드를 반납한다.
+      // 그리고 다음 턴
+  }
+
+
   public fun action(game_table : &mut GameTable, action_type : u8, raise_chip_count : u64, ctx : &mut TxContext) {
     // 현재 턴인 player만 실행 가능
     assert!(game_table.game_status().is_current_turn(ctx), 403);
@@ -692,32 +720,8 @@ module shallwemove::game_table {
       game_table.raise(raise_chip_count, ctx);
     };
 
-    // action이 FOLD이면 다음 진행
-      // player action 은 FOLD
-      // FOLD를 하고 남은 PLAYING 중인 player가 한 명이라 게임 진행이 불가한가?
-        // 아니라면 다음 질문
-        // 맞다면
-          // 남은 사람이 이기게 되는 걸로 게임 종료
-      // FOLD를 하고 남은 PLAYING 중인 모든 player가 CHECK를 했는가?
-        // 아니라면 다음 질문
-        // 맞다면
-          // 게임을 더 진행할 수 있는가? -> 남아있는 사람들은 카드를 더 받는다
-            // 그리고 다음 라운드, 다음 턴
-            // 모든 player의 playing action은 NONE으로 초기화
-            // 그리고 previous turn은 current turn과 동일하게 초기화
-          // 게임을 더 진행할 수 없는가? -> 남아있는 사람들은 카드를 오픈한다
-      // FOLD를 하고 남은 PLAYING 중인 모든 플레이어의 베팅 총액이 동일해 졌는가?
-        // 아니라면 다음 턴
-        // 맞다면
-          // 게임을 더 진행할 수 있는가? -> 남아있는 사람들은 카드를 더 받는다
-            // 그리고 다음 라운드, 다음 턴
-            // 모든 player의 playing action은 NONE으로 초기화
-            // 그리고 previous turn은 current turn과 동일하게 초기화
-          // 게임을 더 진행할 수 없는가? -> 남아있는 사람들은 카드를 오픈한다
-      // playing_status 가 GAME_END가 되고, 카드를 반납한다.
-      // 그리고 다음 턴
     if (action_type == player_info::CONST_FOLD()) {
-
+      game_table.fold(ctx);
     };
   }
 
