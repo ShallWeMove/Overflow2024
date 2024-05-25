@@ -413,29 +413,89 @@ module shallwemove::game_table {
   }
 
   public fun action(game_table : &mut GameTable, action_type : u8, chip_count : u64, ctx : &mut TxContext) {
-    // 첫 베팅인가? -> current turn index 랑 previous turn index 랑 같은가?
+    // 첫 베팅인가? => current turn index 랑 previous turn index 랑 같은가?
     if (game_table.game_status.current_turn_index() == game_table.game_status.previous_turn_index()){
       // 한 라운드의 최초의 턴일 경우 CHECK or BET or FOLD 할 수 있음
-      
+      // 최초 턴 -> CALL, RAISE 불가
+      assert!(action_type == player_info::CONST_CALL(), 403);
+      assert!(action_type == player_info::CONST_RAISE(), 403);
     };
 
-    // 이전 베팅이 CHECK인가? 
-    // CHECK 다음에는 CHECK or FOLD(이건 action에서 커버 치는게 아님) 할 수 있음
+    // previous turn index의 베팅이 CHECK인가? 
+    // CHECK 다음에는 CHECK or BET or FOLD(이건 action에서 커버 치는게 아님) 할 수 있음
+      // CHECK 다음에는 CALL, RAISE 불가
+    if (game_table.game_status.player_infos().borrow(game_table.game_status.previous_turn_index() as u64).playing_action() == player_info::CONST_CHECK()) {
+      assert!(action_type == player_info::CONST_CALL(), 403);
+      assert!(action_type == player_info::CONST_RAISE(), 403);
+    };
 
-    // 이전 베팅이 BET인가? 
+    // previous turn index의 베팅이 BET인가? 
     // BET 다음 부터는 CALL or RAISE or FOLD 할 수 있음
       // RAISE는 CALL 만큼 베팅 금액에 추가 베팅을 하는 거임
+      // BET 다음 부터는 CHECK, BET 불가
+    if (game_table.game_status.player_infos().borrow(game_table.game_status.previous_turn_index() as u64).playing_action() == player_info::CONST_BET()) {
+      assert!(action_type == player_info::CONST_CHECK(), 403);
+      assert!(action_type == player_info::CONST_BET(), 403);
 
-    // 이전 베팅이 CALL인가? 
+    };
+
+    // previous turn index의 베팅이 CALL인가? 
     // CALL 다음 부터는 CALL or RAISE or FOLD 할 수 있음
+      // CALL 다음 부터는 CHECK, BET 불가
+    if (game_table.game_status.player_infos().borrow(game_table.game_status.previous_turn_index() as u64).playing_action() == player_info::CONST_CALL()) {
+      assert!(action_type == player_info::CONST_CHECK(), 403);
+      assert!(action_type == player_info::CONST_BET(), 403);
 
-    // 베팅을 하고 나니 모든 베팅 총액이 동일해 졌는가?
-      // 게임을 더 진행할 수 있는가? -> 남아있는 사람들은 카드를 더 받는다
-      // 게임을 더 진행할 수 없는가? -> 남아있는 사람들은 카드를 오픈한다
+    };
 
-    // 모든 플레이어의 총 베팅 금액이 동일해진다면 다음 라운드로 돌아감
-    // 매 action 마다 체크해주면 좋을 것 같다.
+    // 모든 검토 과정이 끝나고 결국 실제 action을 여기서 진행
 
+    // action이 CHECK이면 다음 진행
+      // 추가 베팅 없다.
+      // CHECK 후 PLAYING 중인 모든 player가 CHECK를 했는가?
+        // 아니라면 다음 턴
+        // 맞다면
+          // 게임을 더 진행할 수 있는가? -> 남아있는 사람들은 카드를 더 받는다
+            // 그리고 다음 턴
+            // 그리고 previous turn은 current turn과 동일하게 초기화
+          // 게임을 더 진행할 수 없는가? -> 남아있는 사람들은 카드를 오픈한다
+    if (action_type == player_info::CONST_CHECK()) {
+
+    };
+
+    // action이 BET이면 다음 진행
+      // bet_unit 만큼의 금액을 베팅한다.
+      // 그리고 다음 턴
+    if (action_type == player_info::CONST_BET()) {
+
+    };
+
+    // action이 CALL이면 다음 진행
+      // 현재 플레이어의 총 베팅 금액을 직전 플레이어의 총 베팅 금액과 동일하게 맞춘다.
+      // CALL을 하고 PLAYING 중인 모든 플레이어의 베팅 총액이 동일해 졌는가?
+        // 아니라면 다음 턴
+        // 맞다면
+          // 게임을 더 진행할 수 있는가? -> 남아있는 사람들은 카드를 더 받는다
+            // 그리고 다음 턴
+            // 그리고 previous turn은 current turn과 동일하게 초기화
+          // 게임을 더 진행할 수 없는가? -> 남아있는 사람들은 카드를 오픈한다
+    if (action_type == player_info::CONST_CALL()) {
+
+    };
+
+    // action이 RAISE이면 다음 진행
+      // 현재 플레이어의 총 베팅 금액을 직전 플레이어의 총 베팅 금액과 동일하게 맞춘다.
+      // 추가로 chip_count X bet_unit 만큼 추가 베팅을 한다.
+      // 그리고 다음 턴
+    if (action_type == player_info::CONST_RAISE()) {
+
+    };
+
+    // action이 FOLD이면 다음 진행
+      // playing_status 가 GAME_END가 되고, 카드를 반납한다.
+    if (action_type == player_info::CONST_FOLD()) {
+
+    };
   }
 
   // ============================================
