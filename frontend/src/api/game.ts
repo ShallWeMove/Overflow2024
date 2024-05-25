@@ -173,7 +173,7 @@ export const action = async (
 			txb.object(LOUNGE_ID), // lounge
 			txb.pure(gameTableId), // game table id
 			txb.pure(convertActionTypeToInt(actionType)), // action type
-			txb.pure(withNewCard), // with new card
+			// txb.pure(withNewCard), // with new card
 			txb.pure(chipCount), // chip count
 		],
 	});
