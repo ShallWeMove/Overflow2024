@@ -28,6 +28,7 @@ module shallwemove::player_info {
   const CALL : u8 = 23;
   const RAISE : u8 = 24;
   const FOLD : u8 = 25;
+  const EXIT : u8 = 26;
 
   // ============================================
   // ============== STRUCTS =====================
@@ -95,6 +96,9 @@ module shallwemove::player_info {
   }
   public fun CONST_FOLD() : u8 {
     FOLD
+  }
+  public fun CONST_EXIT() : u8 {
+    EXIT
   }
 
   // ===================== Methods ===============================

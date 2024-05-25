@@ -138,14 +138,15 @@ module shallwemove::cardgame {
   entry fun ante(
     casino: &Casino,
     lounge: &mut Lounge,
-    game_table: &GameTable,
+    game_table_id: ID,
     ctx: &mut TxContext,
   ) : ID {
     assert!(casino.id() == lounge.casino_id(), 403);
-    assert!(lounge.id() == game_table.lounge_id(), 403);
 
-    let game_table = lounge.borrow_mut_game_table(game_table.id());
-    
+    let lounge_id = lounge.id();
+    let game_table = lounge.borrow_mut_game_table(game_table_id);
+    assert!(lounge_id == game_table.lounge_id(), 403);
+
     // game이 현재 PRE_GAME 일 때만 가능
     assert!(game_table.game_status().game_playing_status() == game_status::CONST_PRE_GAME(), 403);
 
@@ -179,13 +180,13 @@ module shallwemove::cardgame {
   entry fun start(
     casino: &Casino, 
     lounge: &mut Lounge,
-    game_table: &GameTable, 
+    game_table_id: ID,
     ctx: &mut TxContext,
   ) : ID {
     assert!(casino.id() == lounge.casino_id(), 403);
-    assert!(lounge.id() == game_table.lounge_id(), 403);
-    
-    let game_table = lounge.borrow_mut_game_table(game_table.id());
+    let lounge_id = lounge.id();
+    let game_table = lounge.borrow_mut_game_table(game_table_id);
+    assert!(lounge_id == game_table.lounge_id(), 403);
 
     // game이 현재 PRE_GAME 일 때만 가능
     assert!(game_table.game_status().game_playing_status() == game_status::CONST_PRE_GAME(), 403);
@@ -227,7 +228,8 @@ module shallwemove::cardgame {
   entry fun action(
     casino: &Casino, 
     lounge: &mut Lounge,
-    game_table: &GameTable,
+    // game_table: &GameTable,
+    game_table_id: ID,
     // action_type: ActionType, // ante(요건 없애야 할 듯), check, bet, call, raise
     action_type: u8, // ante, check, bet, call, raise
     with_new_card: bool, // 새 카드를 받을지 
@@ -235,9 +237,9 @@ module shallwemove::cardgame {
     ctx: &mut TxContext,
   ) : ID {
     assert!(casino.id() == lounge.casino_id(), 403);
-    assert!(lounge.id() == game_table.lounge_id(), 403);
-
-    let game_table = lounge.borrow_mut_game_table(game_table.id());
+    let lounge_id = lounge.id();
+    let game_table = lounge.borrow_mut_game_table(game_table_id);
+    assert!(lounge_id == game_table.lounge_id(), 403);
 
     // game이 현재 IN_GAME 일 때만 가능
     assert!(game_table.game_status().game_playing_status() == game_status::CONST_IN_GAME(), 403);
@@ -251,13 +253,14 @@ module shallwemove::cardgame {
   entry fun fold(
     casino: &Casino, 
     lounge: &mut Lounge,
-    game_table: &GameTable,
+    // game_table: &GameTable,
+    game_table_id: ID,
     ctx: &mut TxContext,
   ) : ID {
     assert!(casino.id() == lounge.casino_id(), 403);
-    assert!(lounge.id() == game_table.lounge_id(), 403);
-
-    let game_table = lounge.borrow_mut_game_table(game_table.id());
+    let lounge_id = lounge.id();
+    let game_table = lounge.borrow_mut_game_table(game_table_id);
+    assert!(lounge_id == game_table.lounge_id(), 403);
 
     // game이 현재 IN_GAME 일 때만 가능
     assert!(game_table.game_status().game_playing_status() == game_status::CONST_IN_GAME(), 403);
@@ -274,13 +277,14 @@ module shallwemove::cardgame {
   entry fun settle_up(
     casino: &Casino, 
     lounge: &mut Lounge,
-    game_table: &GameTable,
+    // game_table: &GameTable,
+    game_table_id: ID,
     ctx: &mut TxContext,
   ) : ID {
     assert!(casino.id() == lounge.casino_id(), 403);
-    assert!(lounge.id() == game_table.lounge_id(), 403);
-
-    let game_table = lounge.borrow_mut_game_table(game_table.id());
+    let lounge_id = lounge.id();
+    let game_table = lounge.borrow_mut_game_table(game_table_id);
+    assert!(lounge_id == game_table.lounge_id(), 403);
 
     // game이 현재 GAME_FINISHED 일 때만 가능
     assert!(game_table.game_status().game_playing_status() == game_status::CONST_GAME_FINISHED(), 403);
