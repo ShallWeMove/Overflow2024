@@ -673,16 +673,16 @@ module shallwemove::game_table {
     if (game_table.game_status.current_turn_index() == game_table.game_status.previous_turn_index()){
       // 한 라운드의 최초의 턴일 경우 CHECK or BET or FOLD 할 수 있음
       // 최초 턴 -> CALL, RAISE 불가
-      assert!(action_type == player_info::CONST_CALL(), 403);
-      assert!(action_type == player_info::CONST_RAISE(), 403);
+      assert!(action_type != player_info::CONST_CALL(), 403);
+      assert!(action_type != player_info::CONST_RAISE(), 403);
     };
 
     // previous turn index의 베팅이 CHECK인가? 
     // CHECK 다음에는 CHECK or BET or FOLD(이건 action에서 커버 치는게 아님) 할 수 있음
       // CHECK 다음에는 CALL, RAISE 불가
     if (game_table.game_status.player_infos().borrow(game_table.game_status.previous_turn_index() as u64).playing_action() == player_info::CONST_CHECK()) {
-      assert!(action_type == player_info::CONST_CALL(), 403);
-      assert!(action_type == player_info::CONST_RAISE(), 403);
+      assert!(action_type != player_info::CONST_CALL(), 403);
+      assert!(action_type != player_info::CONST_RAISE(), 403);
     };
 
     // previous turn index의 베팅이 BET인가? 
@@ -690,16 +690,16 @@ module shallwemove::game_table {
       // RAISE는 CALL 만큼 베팅 금액에 추가 베팅을 하는 거임
       // BET 다음 부터는 CHECK, BET 불가
     if (game_table.game_status.player_infos().borrow(game_table.game_status.previous_turn_index() as u64).playing_action() == player_info::CONST_BET()) {
-      assert!(action_type == player_info::CONST_CHECK(), 403);
-      assert!(action_type == player_info::CONST_BET(), 403);
+      assert!(action_type != player_info::CONST_CHECK(), 403);
+      assert!(action_type != player_info::CONST_BET(), 403);
     };
 
     // previous turn index의 베팅이 CALL인가? 
     // CALL 다음 부터는 CALL or RAISE or FOLD 할 수 있음
       // CALL 다음 부터는 CHECK, BET 불가
     if (game_table.game_status.player_infos().borrow(game_table.game_status.previous_turn_index() as u64).playing_action() == player_info::CONST_CALL()) {
-      assert!(action_type == player_info::CONST_CHECK(), 403);
-      assert!(action_type == player_info::CONST_BET(), 403);
+      assert!(action_type != player_info::CONST_CHECK(), 403);
+      assert!(action_type != player_info::CONST_BET(), 403);
     };
 
     // 모든 검토 과정이 끝나고 결국 실제 action을 여기서 진행
