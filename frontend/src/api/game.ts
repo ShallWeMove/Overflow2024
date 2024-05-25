@@ -7,9 +7,9 @@ import { RSA } from "@/lib/rsa";
 const PACKAGE_ID =
 	"0x94ccb3f97236f52229a8d09d270f12334780e2a3885b9593f4498a9f24e06ea2";
 const CASINO_ID =
-	"0xeeebd8770fce4a854b5818286c4b88872199fa292ec368006bdbfe2b00c2aee9";
+	"0x710b67fc7d0a20870d3c895e164a2170b3a67cf0658ff87b524b6b54440eb7b4";
 const LOUNGE_ID =
-	"0x80b5557536271d75a0adb89cc46152ed974e78151f8b4fc69633dfb82590d96e";
+	"0xffbc0faf2519428f315900d3b213c8b2cf10e109dee7323bb3497193233a685c";
 const MODULE = "cardgame";
 
 export const GAME_TABLE_TYPE = `${PACKAGE_ID}::game_table::GameTable`
@@ -170,9 +170,10 @@ export const action = async (
 		target: `${PACKAGE_ID}::${MODULE}::action`,
 		arguments: [
 			txb.object(CASINO_ID), // casino
-			txb.object(gameTableId), // game table
+			txb.object(LOUNGE_ID), // lounge
+			txb.pure(gameTableId), // game table id
 			txb.pure(convertActionTypeToInt(actionType)), // action type
-			txb.pure(withNewCard), // with new card
+			// txb.pure(withNewCard), // with new card
 			txb.pure(chipCount), // chip count
 		],
 	});
@@ -190,26 +191,26 @@ export const action = async (
 };
 
 export enum ActionType {
-	Ante = "ANTE",
-	Bet = "BET",
-	Raise = "RAISE",
-	Call = "CALL",
-	Check = "CHECK",
+	BET = "BET",
+	CHECK = "CHECK",
+	CALL = "CALL",
+	RAISE = "RAISE",
+	FOLD = "FOLD",
 }
 
 const convertActionTypeToInt = (actionType: ActionType): number => {
 	switch (actionType) {
 		// TODO: sync each number with the contract
-		case ActionType.Ante:
-			return 0;
-		case ActionType.Bet:
-			return 1;
-		case ActionType.Call:
-			return 2;
-		case ActionType.Raise:
-			return 3;
-		case ActionType.Check:
-			return 4;
+		case ActionType.BET:
+			return 21;
+		case ActionType.CHECK:
+			return 22;
+		case ActionType.CALL:
+			return 23;
+		case ActionType.RAISE:
+			return 24;
+		case ActionType.FOLD:
+			return 25;
 		default:
 			throw new Error("Invalid action type");
 	}

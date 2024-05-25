@@ -17,7 +17,7 @@ export const GamePlayBar = ({gameTableId}: GamePlayBarProps) => {
 			<StartButton gameTableId={gameTableId} />
 			<AnteButton gameTableId={gameTableId} />
 			<FoldButton />
-			<BetButton value={1000} />
+			<BetButton gameTableId={gameTableId} value={1000} />
 			<CheckButton />
 			<CallButton value={1000} />
 			<RaiseButton value={1000} />

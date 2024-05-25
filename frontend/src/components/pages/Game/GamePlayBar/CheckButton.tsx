@@ -11,7 +11,7 @@ export const CheckButton = () => {
 		<GamePlayButton
 			onClick={handleClick}
 			disabled={disabled}
-			title={ActionType.Check}
+			title={ActionType.CHECK}
 			color="grey"
 		/>
 	);
