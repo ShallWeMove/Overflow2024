@@ -1,0 +1,19 @@
+import { GamePlayButton } from "@/components/UI/GamePlayButton";
+import { ActionType } from "@/api/game";
+// import { action } from "@/api/game";
+
+export const CallButton = () => {
+	const disabled = false;
+	function handleClick() {
+		// action;
+	}
+	return (
+		<GamePlayButton
+			onClick={handleClick}
+			disabled={disabled}
+			title={ActionType.Call}
+			value={1000}
+			color="green"
+		/>
+	);
+};
