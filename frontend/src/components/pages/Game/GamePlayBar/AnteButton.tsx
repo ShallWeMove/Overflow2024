@@ -17,6 +17,11 @@ export const AnteButton = ({gameTableId}: AnteButtonProps) => {
                 wallet,
                 gameTableId,
             )
+
+            if (response?.effects?.status?.status === "failure") {
+                alert("Failed to ante")
+            }
+
             console.log("ante response: ", response)
         }   catch (error) {
             console.error('Failed to ante:', error);
