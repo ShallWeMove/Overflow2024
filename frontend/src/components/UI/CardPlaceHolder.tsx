@@ -65,8 +65,8 @@ interface PlaceHolderProps {
 }
 
 const UserProfile = styled(Box)<PlaceHolderProps>(({ isTurn }) => ({
-	width: 110,
-	height: 100,
+	width: 90,
+	height: 80,
 	border: isTurn ? "3px solid #E9DDAE" : "none",
 	backgroundImage: "url('/default-profile.jpg')",
 	backgroundSize: "cover",
@@ -78,7 +78,7 @@ const PlaceHolder = styled(Box)<PlaceHolderProps>(({ isTurn }) => ({
 	backgroundColor: "#273648",
 	border: isTurn ? "3px solid #E9DDAE" : "none",
 	borderRadius: 8,
-	width: 400,
+	width: 375,
 	height: 200,
 }));
 

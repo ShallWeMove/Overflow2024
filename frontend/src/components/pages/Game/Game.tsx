@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import { Box, styled } from "@mui/material";
+import { Box, Grid, styled } from "@mui/material";
 import { getObject } from "@/api/object";
 import { GamePlayerSpace } from "./GamePlayerSpace/GamePlayerSpace";
 import { UserSpace } from "./UserSpace/UserSpace";
@@ -37,10 +37,22 @@ export const Game = () => {
 
 	return (
 		<Container>
-			<Wrapper>
-				<GamePlayerSpace position="left" />
-				<GameTable />
-				<GamePlayerSpace position="right" />
+			<Wrapper container>
+				<Grid xs={4}>
+					<GamePlayerSpace position="left" />
+				</Grid>
+				<Grid
+					xs={4}
+					sx={{
+						display: "flex",
+						justifyContent: "center",
+					}}
+				>
+					<GameTable />
+				</Grid>
+				<Grid xs={4}>
+					<GamePlayerSpace position="right" />
+				</Grid>
 			</Wrapper>
 			<UserSpace value={1000} />
 			<GamePlayBar gameTableId={gameTableId} />
@@ -61,7 +73,7 @@ const Container = styled(Box)({
 	backgroundPosition: "center",
 });
 
-const Wrapper = styled(Box)({
+const Wrapper = styled(Grid)({
 	width: "100%",
 	display: "flex",
 	justifyContent: "space-between",
