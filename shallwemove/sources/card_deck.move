@@ -4,6 +4,7 @@ module shallwemove::card_deck {
 
   use shallwemove::utils;
   use shallwemove::game_status::{Self, GameStatus};
+  use sui::random::{Self, Random};
   
   // ============================================
   // ============== STRUCTS =====================
@@ -36,18 +37,19 @@ module shallwemove::card_deck {
 
   fun id(card_deck : &CardDeck) : ID {object::id(card_deck)}
 
-  public fun fill_cards(card_deck : &mut CardDeck, game_status : &mut GameStatus, public_key : vector<u8>, ctx : &mut TxContext) {
+  public fun fill_cards(card_deck : &mut CardDeck, game_status : &mut GameStatus, public_key : vector<u8>, r: &Random, ctx : &mut TxContext) {
     // 여기에 encrypt 하고 shuffle 하는 로직이 들어가야 함
     let fifty_two_numbers_array = utils::get_fifty_two_numbers_array();
-    let shuffled_fifty_two_numbers_array = utils::shuffle(fifty_two_numbers_array);
-    let mut encrypted_fifty_two_numbers_array = utils::encrypt(shuffled_fifty_two_numbers_array, public_key);
+    let mut encrypted = utils::encrypt(fifty_two_numbers_array, public_key);
+    let shuffled_encrypted = utils::shuffle(&mut encrypted, r, ctx);
+    let immutable_shuffled_encrypted = &*shuffled_encrypted; // immutable object로 변경하기 위함. mutable 그대로 쓰면 에러 발생.
 
-    let mut i = encrypted_fifty_two_numbers_array.length();
+    let mut i = shuffled_encrypted.length();
     while (i > 0) {
       let card = Card {
         id : object::new(ctx),
         index : (i as u8),
-        card_number : encrypted_fifty_two_numbers_array.pop_back()
+        card_number : *immutable_shuffled_encrypted.borrow(i)
       };
 
       card_deck.avail_cards.push_back(card);

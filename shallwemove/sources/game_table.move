@@ -14,6 +14,7 @@ module shallwemove::game_table {
   use std::debug;
   use std::vector::{Self};
   use sui::dynamic_object_field;
+  use sui::random::{Self, Random};
 
 
   // ============================================
@@ -45,13 +46,14 @@ module shallwemove::game_table {
     ante_amount : u64, 
     bet_unit : u64, 
     game_seats : u8, 
+    r: &Random,
     ctx : &mut TxContext) : GameTable {
 
     let mut game_status = game_status::new(max_round, ante_amount, bet_unit, game_seats);
     let money_box = money_box::new(ctx);
     let mut card_deck = card_deck::new(public_key, ctx);
 
-    card_deck.fill_cards(&mut game_status, public_key, ctx);
+    card_deck.fill_cards(&mut game_status, public_key, r, ctx);
 
     let mut game_table = GameTable {
       id : object::new(ctx),
