@@ -13,4 +13,6 @@ RUN pnpm install
 
 COPY . .
 
+RUN pnpm run build
+
 CMD ["pnpm", "run", "start"]
