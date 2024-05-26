@@ -17,10 +17,14 @@ export const StartButton = ({gameTableId}: StartButtonProps) => {
                 wallet,
                 gameTableId,
             )
+
+            if (response?.effects?.status?.status === "failure") {
+                alert("Failed to start")
+            }
+
             console.log("start response: ", response)
-            // TODO: response.effects.status.status === "success" OR "failure"에 따라 성공/에러 처리하기
         }   catch (error) {
-            console.error('Failed to ante:', error);
+            console.error('Failed to start:', error);
         }
     }
     return (

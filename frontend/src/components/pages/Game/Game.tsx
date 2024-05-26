@@ -85,6 +85,7 @@ export const Game = () => {
 			}
 
 			if(data.content?.fields?.game_status?.fields?.game_info) {
+				console.log("data :", data.content?.fields?.game_status);
 				const newGameInfo: GameInfo = {
 					anteAmount: data.content.fields.game_status.fields.game_info.fields.ante_amount,
 					availGameSeats: data.content.fields.game_status.fields.game_info.fields.avail_game_seats,
@@ -100,7 +101,7 @@ export const Game = () => {
 				};
 
 				if ((gameInfo === null) || (gameInfo.currentTurnIndex !== newGameInfo.currentTurnIndex)) {
-					console.log("gameInfo:", newGameInfo)
+					// console.log("gameInfo:", newGameInfo)
 					setGameInfo(newGameInfo);
 				}
 			}
