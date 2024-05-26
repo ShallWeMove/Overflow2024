@@ -72,3 +72,10 @@ export const tableAtom = atom((get) => {
 		currentPlayerAddress,
 	};
 });
+
+// 유저 정보 가져오기
+export const playersDataAtom = atom((get) => {
+	const gameTable = get(gameTableAtom);
+
+	return gameTable?.fields.playerSeats;
+});
