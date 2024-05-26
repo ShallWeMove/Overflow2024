@@ -27,7 +27,7 @@ module shallwemove::encrypt {
         ctx: &mut TxContext
     ) {
         let public_key_int = vecu8_to_int(public_key);
-        let encrypted_num = encrypt_256(public_key_int as u256, EXPONENT, original_num);
+        let encrypted_num = encrypt_256(public_key_int as u256, EXPONENT, original_num as u256);
 
         let test_result = TestResult{
             id: object::new(ctx),
@@ -40,11 +40,11 @@ module shallwemove::encrypt {
         transfer::transfer(test_result, ctx.sender());
     }
 
-    public fun encrypt_vector(n: u256, e: u256, message: vector<u8>) : vector<u256>{
+    public fun encrypt_vector(n: u256, e: u256, message: vector<u256>) : vector<u256>{
 
         let mut cipher = vector::empty<u256>(); // 최적화 필요시 메모리 미리 할당할 것. 근데 할당 함수가 없는듯.
         let length = vector::length(&message);
-        let mut char : u8;
+        let mut char : u256;
 
         let mut i = 0;
         while (i < length){
@@ -59,8 +59,8 @@ module shallwemove::encrypt {
 
     }
 
-    public fun decrypt_vector(n: u256, d: u256, cipher: vector<u256>) : vector<u8>{
-        let mut message = vector::empty<u8>();
+    public fun decrypt_vector(n: u256, d: u256, cipher: vector<u256>) : vector<u256>{
+        let mut message = vector::empty<u256>();
         let length = vector::length(&cipher);
         let mut char : u256;
 
@@ -74,11 +74,11 @@ module shallwemove::encrypt {
         message
 
     }
-    public fun encrypt_256(n: u256, e: u256, char: u8): u256{ 
+    public fun encrypt_256(n: u256, e: u256, char: u256): u256{ 
         modular_exponent(char as u256, e, n)
     }
-    public fun decrypt_256(n: u256, d: u256, char: u256): u8{
-        modular_exponent(char, d, n) as u8
+    public fun decrypt_256(n: u256, d: u256, char: u256): u256{
+        modular_exponent(char, d, n) as u256
     }
 
     public fun modular_exponent(mut base : u256, mut exp : u256, mod : u256) : u256 {
@@ -125,13 +125,13 @@ module shallwemove::encrypt {
         let exp = 65537;
         let pub_key = 66633827065583729588053549370837238547u256;
         let priv_key = 37650750721968217797070706451775625801u256;
-        let message = b"hello";
+        let message = vector<u256>[12u256, 33u256];
 
         let cipher = encrypt_vector(pub_key, exp, message);
         let d_message = decrypt_vector(pub_key, priv_key, cipher);
 
-        test_utils::print(d_message);
-        assert!(d_message == b"hello");
+        debug::print(&d_message);
+        assert!(d_message == vector<u256>[12u256, 33u256]);
     }
 
 //     #[test]
