@@ -5,14 +5,14 @@ import { GetCoinsParams } from "@mysten/sui.js/client";
 import { RSA } from "@/lib/rsa";
 
 const PACKAGE_ID =
-	"0x94ccb3f97236f52229a8d09d270f12334780e2a3885b9593f4498a9f24e06ea2";
+	"0xb739de94efd0b3b94d68933dc5127dade00852d317431c9ac58e2e335f6b06f6";
 const CASINO_ID =
-	"0x710b67fc7d0a20870d3c895e164a2170b3a67cf0658ff87b524b6b54440eb7b4";
+	"0x60001ec6301371ced4b7f2886bf54de4bef33d27c61797073554a3d100e30914";
 const LOUNGE_ID =
-	"0xffbc0faf2519428f315900d3b213c8b2cf10e109dee7323bb3497193233a685c";
+	"0x8988ebd45f7c26d468f89ece6c0220c1a6ed014310f91d5264b50fc79230f077";
 const MODULE = "cardgame";
 
-export const GAME_TABLE_TYPE = `${PACKAGE_ID}::game_table::GameTable`
+export const GAME_TABLE_TYPE = `${PACKAGE_ID}::game_table::GameTable`;
 
 // depositAmount - the amount of chips needed to enter the game
 const depositAmountInMist = 1000000;
@@ -48,7 +48,7 @@ export const enter = async (wallet: WalletContextState) => {
 				showEffects: true,
 				showEvents: true,
 				showObjectChanges: true,
-			}
+			},
 		});
 		console.log("'enter' transaction result: ", res);
 		return res;
@@ -81,10 +81,7 @@ export const exit = async (wallet: WalletContextState, gameTableId: string) => {
 
 // ante - called when the player antes.
 // 	After all players have anted, manager player can start the game.
-export const ante = async (
-	wallet: WalletContextState,
-	gameTableId: string
-) => {
+export const ante = async (wallet: WalletContextState, gameTableId: string) => {
 	const txb = new TransactionBlock();
 
 	txb.setGasBudget(gasBudgetInMist);
@@ -109,14 +106,14 @@ export const ante = async (
 				showEffects: true,
 				showEvents: true,
 				showObjectChanges: true,
-			}
+			},
 		});
 		console.log("'ante' transaction result: ", res);
 		return res;
 	} catch (e) {
 		console.error("'ante' transaction failed", e);
 	}
-}
+};
 
 // start - called when the game starts
 export const start = async (
@@ -147,7 +144,7 @@ export const start = async (
 				showEffects: true,
 				showEvents: true,
 				showObjectChanges: true,
-			}
+			},
 		});
 		console.log("'start' transaction result: ", res);
 		return res;
