@@ -1,0 +1,19 @@
+version: "3.8"
+services:
+  next:
+    build:
+      context: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+  nginx:
+    build:
+      context: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - next
