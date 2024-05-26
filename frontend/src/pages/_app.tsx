@@ -1,7 +1,7 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { ThemeProvider } from "@mui/material/styles";
-import { useMode } from "./theme";
+import { theme } from "@/theme";
 import { CssBaseline, Box } from "@mui/material";
 import { WalletProvider, SuiDevnetChain } from "@suiet/wallet-kit";
 import Navbar from "@/components/navigationBar/Navbar";
@@ -14,7 +14,6 @@ export default function App({ Component, pageProps }: AppProps) {
 		rpcUrl: "https://sui-testnet.nodeinfra.com",
 	};
 
-	const [theme] = useMode();
 	return (
 		<JotaiProvider>
 			<ThemeProvider theme={theme}>
