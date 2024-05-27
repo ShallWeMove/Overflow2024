@@ -57,6 +57,11 @@ export const CardPlaceHolder = ({
 						convertIntToActionType(playerInfo?.fields.playingAction)
 					}
 				></StatusBadge>
+				<Typography>
+					{playerData && playerData.fields.playerAddress?.slice(0, 5)}
+					{playerData?.fields.playerAddress && "..."}
+					{playerData && playerData.fields.playerAddress?.slice(-6, -1)}
+				</Typography>
 			</UserProfileWrapper>
 			<PlaceHolder isTurn={isTurn} onClick={handleClick}>
 				<CardWrapper>
