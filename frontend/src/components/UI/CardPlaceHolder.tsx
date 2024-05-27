@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Box, Button, Typography, styled } from "@mui/material";
-import { Fragment, ReactNode } from "react";
+import { ReactNode } from "react";
 import { PlayerInfo, PlayerSeat } from "@/lib/types";
 import { PlayerInfoPopover } from "./PlayerInfoPopover";
 import { StatusBadge } from "../pages/Game/GamePlayerSpace/StatusBadge";
@@ -9,7 +9,6 @@ import { convertIntToPlayingStatusType } from "@/api/game";
 
 interface CardPlaceHolderProps {
 	value: number;
-	position: "left" | "right";
 	isUser?: boolean;
 	isTurn?: boolean;
 	cards?: ReactNode[];
@@ -19,12 +18,10 @@ interface CardPlaceHolderProps {
 
 export const CardPlaceHolder = ({
 	value,
-	position,
 	cards = [],
-	isUser = false,
 	isTurn = false,
 	playerData,
-	playerInfo
+	playerInfo,
 }: CardPlaceHolderProps) => {
 	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
@@ -42,42 +39,33 @@ export const CardPlaceHolder = ({
 
 	return (
 		<Container>
-			{position === "left" && (
-				<Fragment>
-					<UserProfileWrapper>
-						<StatusBadge value={playerInfo?.fields.playingStatus && convertIntToPlayingStatusType(playerInfo?.fields.playingStatus)}></StatusBadge>
-						<StatusBadge value={playerInfo?.fields.playingAction && convertIntToActionType(playerInfo?.fields.playingAction)}></StatusBadge>
-						<UserProfile isTurn={isTurn} />
-					</UserProfileWrapper>
-					<PlaceHolder isTurn={isTurn} onClick={handleClick}>
-						<CardWrapper>
-							{cards[0] ?? ""}
-							{cards[1] ?? ""}
-						</CardWrapper>
-						<TotalBetAmount>
-							<Typography color="white" fontSize="16px" fontWeight={700}>
-								{value} SUI
-							</Typography>
-						</TotalBetAmount>
-					</PlaceHolder>
-				</Fragment>
-			)}
-			{position === "right" && (
-				<Fragment>
-					<PlaceHolder isTurn={isTurn}>
-						<CardWrapper>
-							{cards[0] ?? ""}
-							{cards[1] ?? ""}
-						</CardWrapper>
-						<TotalBetAmount>
-							<Typography color="white" fontSize="16px" fontWeight={700}>
-								{value} SUI
-							</Typography>
-						</TotalBetAmount>
-					</PlaceHolder>
-					<UserProfile isTurn={isTurn} />
-				</Fragment>
-			)}
+			<UserProfileWrapper>
+				<UserProfile isTurn={isTurn} />
+				<StatusBadge
+					value={
+						playerInfo?.fields.playingStatus &&
+						convertIntToPlayingStatusType(playerInfo?.fields.playingStatus)
+					}
+					left={true}
+				></StatusBadge>
+				<StatusBadge
+					value={
+						playerInfo?.fields.playingAction &&
+						convertIntToActionType(playerInfo?.fields.playingAction)
+					}
+				></StatusBadge>
+			</UserProfileWrapper>
+			<PlaceHolder isTurn={isTurn} onClick={handleClick}>
+				<CardWrapper>
+					{cards[0] ?? ""}
+					{cards[1] ?? ""}
+				</CardWrapper>
+				<TotalBetAmount>
+					<Typography color="white" fontSize="16px" fontWeight={700}>
+						{value} SUI
+					</Typography>
+				</TotalBetAmount>
+			</PlaceHolder>
 			<PlayerInfoPopover
 				open={Boolean(anchorEl)}
 				anchorEl={anchorEl}
@@ -112,7 +100,7 @@ const PlaceHolder = styled(Button)<PlaceHolderProps>(({ isTurn }) => ({
 	backgroundColor: "#273648",
 	border: isTurn ? "3px solid #E9DDAE" : "none",
 	borderRadius: 8,
-	width: 375,
+	width: 350,
 	height: 200,
 }));
 
@@ -137,6 +125,7 @@ const CardWrapper = styled(Box)({
 });
 
 const UserProfileWrapper = styled(Box)({
+	position: "relative",
 	display: "flex",
-	flexDirection: "column"
-})
+	flexDirection: "column",
+});

@@ -16,21 +16,29 @@ export const PlayerInfoPopover = ({
 }: PlayerInfoPopoverProps) => {
 	const id = open ? "player-info-popover" : undefined;
 
-	//TODO popover 안보임 해결
-
-	if (open) {
-		console.log("playerData: ", playerData);
-	}
 	return (
 		<Popover id={id} open={open} anchorEl={anchorEl} onClose={onClose}>
-			<Box>
+			<Container>
 				<Typography color="white" fontSize="14px" fontWeight={700}>
-					balance: {playerData?.fields.deposit[0]?.fields.balance ?? 0}
+					address: {playerData?.fields.deposit[0]?.fields.id.id ?? ""}
 				</Typography>
 				<Typography color="white" fontSize="14px" fontWeight={700}>
 					public key: {playerData?.fields.publicKey}
 				</Typography>
-			</Box>
+				<Typography color="white" fontSize="14px" fontWeight={700}>
+					playing action: {playerData?.fields.publicKey}
+				</Typography>
+				<Typography color="white" fontSize="14px" fontWeight={700}>
+					deposit: {playerData?.fields.deposit[0]?.fields.balance ?? 0}
+				</Typography>
+			</Container>
 		</Popover>
 	);
 };
+
+const Container = styled(Box)({
+	padding: 16,
+	display: "flex",
+	flexDirection: "column",
+	backgroundColor: "#273648",
+});
