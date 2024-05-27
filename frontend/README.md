@@ -1,40 +1,96 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Shall We Move: Multiplayer Blackjack on Sui Blockchain
 
-## Getting Started
+Welcome to Shall We Move, a fully on-chain multiplayer Blackjack game implemented on the Sui blockchain. This project leverages the unique features of the Sui blockchain to provide secure, transparent, and decentralized gameplay.
 
-First, run the development server:
+![Shall We Move Landing Page](images/landing.jpg)
+
+Dive into the game interface, designed to offer a seamless and engaging Blackjack experience with real-time multiplayer support.
+
+![Shall We Move Game Page](images/game.jpg)
+
+
+
+# Table of Contents
+
+- [Overview](#overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Get Started](#get-started)
+- [Usage](#usage)
+- [Smart Contracts](#smart-contracts)
+- [Contributing](#contributing)
+- [License](#license)
+
+# Overview
+
+Shall We Move is a decentralized application (dApp) that brings the classic game of Blackjack to the Sui blockchain. All game functionalities, including card dealing, shuffling, and hiding are executed on-chain using encryption and randomness to ensure fairness and transparency.
+
+# Features
+
+- **Multiplayer Support**: Play Blackjack with multiple players in real-time.
+- **On-Chain Execution**: All game logic runs on the Sui blockchain, ensuring transparency and security.
+- **Encryption**: Cards are encrypted to keep them hidden from other players.
+- **Randomness**: Cards are dealt randomly to ensure fair play.
+- **Next.js + Typescript Frontend**: A modern, responsive web interface for seamless gameplay.
+
+# Tech Stack
+
+- **Frontend**: Next.js, Typescript
+- **Blockchain**: Sui
+- **Smart Contracts**: Move language
+
+# Get Started
+
+To run the project locally, follow these steps:
+
+## Prerequisites
+
+- Node.js (v18.x or later)
+- pnpm
+- Sui Blockchain node (or access to a Sui node)
+
+## Clone the Repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/shallwemove.git
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Smart Contracts
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+### Publish the Smart Contracts
+you should see the package address in the output after running the command below.
+```bash
+cd shallwemove
+sui publish
+```
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+### Create your Casino & Lounge on the Sui Blockchain
+you should see the casino and lounge addresses in the output after running the command above. Use these addresses to create your casino and lounge on the Sui blockchain.
+```bash
+sui move create-casino
+sui move create-lounge
+```
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+## Frontend
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+### Set Environment Variables
+- package address
+- casino address
+- lounge address
 
-## Learn More
+`cd frontend` and create a `.env.local` file with the following content:
+```
+PACKAGE_ADDRESS=0x1234567890
+CASINO_ADDRESS=0x1234567890
+LOUNGE_ADDRESS=0x1234567890
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Install Dependencies
+```bash
+pnpm install
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+### Start the Development Server
+```bash
+pnpm dev
+```
