@@ -10,7 +10,7 @@ const LOUNGE_ID =
 	"0x5c22b036e5b0c9d90abe5dd287fb31c71bf440d1c220d40a51534bff23051b35";
 const MODULE = "cardgame";
 
-export const GAME_TABLE_TYPE = `${PACKAGE_ID}::game_table::GameTable`
+export const GAME_TABLE_TYPE = `${PACKAGE_ID}::game_table::GameTable`;
 
 // depositAmount - the amount of chips needed to enter the game
 const depositAmountInMist = 1000000;
@@ -46,7 +46,7 @@ export const enter = async (wallet: WalletContextState) => {
 				showEffects: true,
 				showEvents: true,
 				showObjectChanges: true,
-			}
+			},
 		});
 		console.log("'enter' transaction result: ", res);
 		return res;
@@ -79,10 +79,7 @@ export const exit = async (wallet: WalletContextState, gameTableId: string) => {
 
 // ante - called when the player antes.
 // 	After all players have anted, manager player can start the game.
-export const ante = async (
-	wallet: WalletContextState,
-	gameTableId: string
-) => {
+export const ante = async (wallet: WalletContextState, gameTableId: string) => {
 	const txb = new TransactionBlock();
 
 	txb.setGasBudget(gasBudgetInMist);
@@ -107,14 +104,14 @@ export const ante = async (
 				showEffects: true,
 				showEvents: true,
 				showObjectChanges: true,
-			}
+			},
 		});
 		console.log("'ante' transaction result: ", res);
 		return res;
 	} catch (e) {
 		console.error("'ante' transaction failed", e);
 	}
-}
+};
 
 // start - called when the game starts
 export const start = async (
@@ -145,7 +142,7 @@ export const start = async (
 				showEffects: true,
 				showEvents: true,
 				showObjectChanges: true,
-			}
+			},
 		});
 		console.log("'start' transaction result: ", res);
 		return res;

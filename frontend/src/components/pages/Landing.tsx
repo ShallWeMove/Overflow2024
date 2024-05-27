@@ -1,35 +1,37 @@
 import React from "react";
-import {Box, Button} from "@mui/material";
+import { Box, Button } from "@mui/material";
 import Image from "next/image";
 import backgroundImage from "../../../public/bg_landing.jpg";
-import {useRouter} from "next/router";
-import {enter, GAME_TABLE_TYPE} from "@/api/game";
-import {useAtomValue} from "jotai/index";
-import {walletAtom} from "@/lib/states";
+import { useRouter } from "next/router";
+import { enter, GAME_TABLE_TYPE } from "@/api/game";
+import { useAtomValue } from "jotai/index";
+import { walletAtom } from "@/lib/states";
 
 const Landing = () => {
 	const router = useRouter();
 	const wallet = useAtomValue(walletAtom);
 
 	const enterGame = async () => {
+		console.log("wallet: ", wallet);
 		try {
 			const response = await enter(wallet);
 
 			if (response?.objectChanges) {
 				for (let i = 0; i < response.objectChanges?.length; i++) {
 					const objectChange = response.objectChanges[i];
-					if ((objectChange.type === "mutated") && (objectChange.objectType === GAME_TABLE_TYPE)) {
+					if (
+						objectChange.type === "mutated" &&
+						objectChange.objectType === GAME_TABLE_TYPE
+					) {
 						const gameTableId = objectChange.objectId;
 						await router.push(`/game/${gameTableId}`);
 					}
 				}
 			}
-
 		} catch (error) {
-			console.error('Failed to enter the game:', error);
+			console.error("Failed to enter the game:", error);
 		}
 	};
-
 
 	return (
 		<Box

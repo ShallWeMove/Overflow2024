@@ -1,54 +1,45 @@
-import {Box, styled, Typography} from "@mui/material";
-import {animated, useSpring} from "react-spring";
-import {GameInfo, GameStatus, Player} from "@/components/pages/Game/Game";
-import {useState} from "react";
+import { Box, styled, Typography } from "@mui/material";
+import { animated, useSpring } from "react-spring";
 
 interface TotalAmountProps {
 	totalBetAmount: number | undefined;
 	callAmount: number | undefined;
-	players: Player[];
-	gameInfo: null | GameInfo;
+	players: number;
+	gameStatus: number;
+	currentPlayerAddress: string;
 }
 
 export const TotalAmount = ({
-	players,
-	gameInfo,
 	totalBetAmount,
 	callAmount,
+	players,
+	gameStatus,
+	currentPlayerAddress,
 }: TotalAmountProps) => {
-	const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
-	if (gameInfo?.currentTurnIndex) {
-		setCurrentPlayer(players[gameInfo.currentTurnIndex]);
-	}
-
 	return (
 		<Container>
 			<Wrapper>
 				<Typography color="#C1CCDC" fontWeight={700}>
 					Total
 				</Typography>
-				<Typography
-					color="#C1CCDC"
-					fontWeight={700}
-					sx={{ display: "flex", gap: 0.5 }}
-				>
+				<Box sx={{ display: "flex", gap: 0.5 }}>
 					<AnimatedSUI n={totalBetAmount?.toString() ?? "0"} />
-					SUI
-				</Typography>
+					<Typography color="#C1CCDC" fontWeight={700}>
+						SUI
+					</Typography>
+				</Box>
 			</Wrapper>
 			<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
 			<Wrapper>
 				<Typography color="#C1CCDC" fontWeight={700}>
 					Call
 				</Typography>
-				<Typography
-					color="#C1CCDC"
-					fontWeight={700}
-					sx={{ display: "flex", gap: 0.5 }}
-				>
+				<Box sx={{ display: "flex", gap: 0.5 }}>
 					<AnimatedSUI n={callAmount?.toString() ?? "0"} />
-					SUI
-				</Typography>
+					<Typography color="#C1CCDC" fontWeight={700}>
+						SUI
+					</Typography>
+				</Box>
 			</Wrapper>
 			<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
 			<Wrapper>
@@ -60,7 +51,7 @@ export const TotalAmount = ({
 					fontWeight={700}
 					sx={{ display: "flex", gap: 0.5 }}
 				>
-					{players.length} Players
+					{players} Players
 				</Typography>
 			</Wrapper>
 			<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
@@ -73,7 +64,11 @@ export const TotalAmount = ({
 					fontWeight={700}
 					sx={{ display: "flex", gap: 0.5 }}
 				>
-					{gameInfo?.gamePlayingStatus === GameStatus.PRE_GAME ? "Pre Game" : gameInfo?.gamePlayingStatus === GameStatus.IN_GAME ? "In Game" : "Game Finished"}
+					{gameStatus === 0
+						? "Pre Game"
+						: gameStatus === 1
+						? "In Game"
+						: "Game Finished"}
 				</Typography>
 			</Wrapper>
 			<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
@@ -84,9 +79,13 @@ export const TotalAmount = ({
 				<Typography
 					color="#C1CCDC"
 					fontWeight={700}
-					sx={{ display: "flex", gap: 0.5 }}
+					sx={{
+						display: "flex",
+						gap: 0.5,
+						overflowWrap: "anywhere",
+					}}
 				>
-					{currentPlayer?.address}
+					{currentPlayerAddress}
 				</Typography>
 			</Wrapper>
 		</Container>

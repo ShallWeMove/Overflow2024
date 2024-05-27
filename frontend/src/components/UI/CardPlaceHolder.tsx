@@ -1,5 +1,8 @@
-import { Box, Typography, styled } from "@mui/material";
+import React, { useState } from "react";
+import { Box, Button, Typography, styled } from "@mui/material";
 import { Fragment, ReactNode } from "react";
+import { PlayerSeat } from "@/lib/types";
+import { PlayerInfoPopover } from "./PlayerInfoPopover";
 
 interface CardPlaceHolderProps {
 	value: number;
@@ -7,6 +10,7 @@ interface CardPlaceHolderProps {
 	isUser?: boolean;
 	isTurn?: boolean;
 	cards?: ReactNode[];
+	playerData?: PlayerSeat;
 }
 
 export const CardPlaceHolder = ({
@@ -15,13 +19,28 @@ export const CardPlaceHolder = ({
 	cards = [],
 	isUser = false,
 	isTurn = false,
+	playerData,
 }: CardPlaceHolderProps) => {
+	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+
+	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+		if (playerData) {
+			setAnchorEl(event.currentTarget);
+		}
+	};
+
+	const handleClose = () => {
+		setAnchorEl(null);
+	};
+
+	//TODO playerData 오류 해결
+
 	return (
 		<Container>
 			{position === "left" && (
 				<Fragment>
 					<UserProfile isTurn={isTurn} />
-					<PlaceHolder isTurn={isTurn}>
+					<PlaceHolder isTurn={isTurn} onClick={handleClick}>
 						<CardWrapper>
 							{cards[0] ?? ""}
 							{cards[1] ?? ""}
@@ -50,6 +69,12 @@ export const CardPlaceHolder = ({
 					<UserProfile isTurn={isTurn} />
 				</Fragment>
 			)}
+			<PlayerInfoPopover
+				open={Boolean(anchorEl)}
+				anchorEl={anchorEl}
+				onClose={handleClose}
+				playerData={playerData}
+			/>
 		</Container>
 	);
 };
@@ -65,20 +90,20 @@ interface PlaceHolderProps {
 }
 
 const UserProfile = styled(Box)<PlaceHolderProps>(({ isTurn }) => ({
-	width: 110,
-	height: 100,
+	width: 90,
+	height: 80,
 	border: isTurn ? "3px solid #E9DDAE" : "none",
 	backgroundImage: "url('/default-profile.jpg')",
 	backgroundSize: "cover",
 	borderRadius: 8,
 }));
 
-const PlaceHolder = styled(Box)<PlaceHolderProps>(({ isTurn }) => ({
+const PlaceHolder = styled(Button)<PlaceHolderProps>(({ isTurn }) => ({
 	position: "relative",
 	backgroundColor: "#273648",
 	border: isTurn ? "3px solid #E9DDAE" : "none",
 	borderRadius: 8,
-	width: 400,
+	width: 375,
 	height: 200,
 }));
 
@@ -99,5 +124,5 @@ const CardWrapper = styled(Box)({
 	display: "flex",
 	justifyContent: "center",
 	gap: 6,
-	padding: 6,
+	marginTop: -36,
 });

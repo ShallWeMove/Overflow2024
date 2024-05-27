@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 export const FlippedCard = () => {
-	return <Image src="/cards/card.png" alt="card" width={110} height={150} />;
+	return <Image src="/cards/card.png" alt="card" width={108} height={146} />;
 };
 
 export const SpadeA = () => {

@@ -1,90 +1,123 @@
 export type Casino = {
-	id: string;
-	admin: string;
-	publicKey: string[];
+	fields: {
+		id: string;
+		admin: string;
+		publicKey: string[];
+	};
 };
 
 export type Lounge = {
-	id: string;
-	casinoId: string;
-	maxRound: number;
-	gameTables: string[];
+	fields: {
+		id: string;
+		casinoId: string;
+		maxRound: number;
+		gameTables: string[];
+	};
 };
 
 export type GameTable = {
-	id: string;
-	loungeId: string;
-	gameStatus: GameStatus;
-	moneyBox: MoneyBox;
-	cardDeck: CardDeck | null;
-	usedCardDecks: string[];
-	playerSeats: PlayerSeat[];
+	fields: {
+		id: string;
+		loungeId: string;
+		gameStatus: GameStatus;
+		moneyBox: MoneyBox;
+		cardDeck: CardDeck | null;
+		usedCardDecks: string[];
+		playerSeats: PlayerSeat[];
+	};
 };
 
 export type GameStatus = {
-	gameInfo: GameInfo;
-	moneyBoxInfo: MoneyBoxInfo;
-	cardInfo: CardInfo;
-	playerInfos: PlayerInfo[];
+	fields: {
+		gameInfo: GameInfo;
+		moneyBoxInfo: MoneyBoxInfo;
+		cardInfo: CardInfo;
+		playerInfos: PlayerInfo[];
+	};
 };
 
 export type MoneyBox = {
-	id: number;
-	money: any[];
+	fields: {
+		id: number;
+		money: Coin[];
+	};
 };
 
 export type CardDeck = {
-	id: string;
-	availCards: Card[];
-	usedCards: Card[];
+	fields: {
+		id: string;
+		availCards: Card[];
+		usedCards: Card[];
+	};
 };
 
 export type PlayerSeat = {
-	id: string;
-	index: number;
-	playerAddress?: string;
-	publicKey: Uint8Array;
-	cards: Card[];
-	deposit: any[];
+	fields: {
+		id: string;
+		index: number;
+		playerAddress?: string;
+		publicKey: Uint8Array;
+		cards: Card[];
+		deposit: Coin[];
+	};
 };
 
 export type Card = {
-	id: string;
-	index: number;
-	cardNumber: number;
+	fields: {
+		id: string;
+		index: number;
+		cardNumber: number;
+	};
 };
 
 export type GameInfo = {
-	gamePlayingStatus: number;
-	managerPlayer?: string;
-	maxRound: number;
-	currentRound: number;
-	currentTurnIndex: number;
-	previousTurnIndex: number;
-	winnerPlayer?: string;
-	anteAmount: bigint;
-	betUnit: bigint;
-	gameSeats: number;
-	availGameSeats: number;
+	fields: {
+		gamePlayingStatus: number;
+		managerPlayer?: string;
+		maxRound: number;
+		currentRound: number;
+		currentTurnIndex: number;
+		previousTurnIndex: number;
+		winnerPlayer?: string;
+		anteAmount: bigint;
+		betUnit: bigint;
+		gameSeats: number;
+		availGameSeats: number;
+	};
 };
 
 export type MoneyBoxInfo = {
-	totalBetAmount: bigint;
+	fields: {
+		totalBetAmount: bigint;
+	};
 };
 
 export type CardInfo = {
-	numberOfAvailCards: number;
-	numberOfUsedCards: number;
+	fields: {
+		numberOfAvailCards: number;
+		numberOfUsedCards: number;
+	};
 };
 
 export type PlayerInfo = {
-	index: number;
-	playerAddress?: string;
-	publicKey: Uint8Array;
-	deposit: bigint;
-	playingStatus: number;
-	playingAction: number;
-	numberOfHoldingCards: number;
-	previousBetAmount: bigint;
-	totalBetAmount: bigint;
+	fields: {
+		index: number;
+		playerAddress?: string;
+		publicKey: Uint8Array;
+		deposit: bigint;
+		playingStatus: number;
+		playingAction: number;
+		numberOfHoldingCards: number;
+		previousBetAmount: bigint;
+		totalBetAmount: bigint;
+	};
+};
+
+export type Coin = {
+	fields: {
+		balance: string;
+		id: {
+			id: string;
+		};
+	};
 };
