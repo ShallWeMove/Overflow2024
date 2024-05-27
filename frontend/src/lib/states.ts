@@ -12,7 +12,8 @@ export const gameTableAtom = atom<GameTable | null>(null);
 // 내 index 가져오기
 export const myIndexAtom = atom((get) => {
 	const gameTable = get(gameTableAtom);
-	const userWalletAddress = get(walletAtom).address;
+	const userWalletAddress = get(walletAtom) != null ? get(walletAtom).address : null;
+
 
 	const playerInfo = gameTable?.fields.gameStatus.fields.playerInfos.find(
 		(playerInfo) => playerInfo.fields.playerAddress === userWalletAddress
