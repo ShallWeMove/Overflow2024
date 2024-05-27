@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Button, Typography, styled } from "@mui/material";
+import { Box, Button, Typography, styled, Grid } from "@mui/material";
 import { PlayerInfo, PlayerSeat } from "@/lib/types";
 import { PlayerInfoPopover } from "./PlayerInfoPopover";
 import { StatusBadge } from "../pages/Game/GamePlayerSpace/StatusBadge";
@@ -60,8 +60,12 @@ export const CardPlaceHolder = ({
 			</UserProfileWrapper>
 			<PlaceHolder isTurn={isTurn} onClick={handleClick}>
 				<CardWrapper>
-					{playerData && playerData.fields.cards && playerData.fields.cards.map((card)=>{
-						return convertCardNumberToCardImage(card.fields.cardNumber) ?? "";
+					{playerData && playerData.fields.cards && playerData.fields.cards.map((card, index)=>{
+						return (
+							<Grid item xs={2} key={index}>
+								{convertCardNumberToCardImage(card.fields.cardNumber)}
+							</Grid> 
+							?? "");
 					})}
 				</CardWrapper>
 				<TotalBetAmount>
