@@ -7,6 +7,7 @@ export const convertCardNumberToCardImage = (
 	if (cardNumber > 52) {
 		cardImageNumber = 100;
 	} else {
+		// 여기에 decrypt function이 쓰일 예정
 		cardImageNumber = Number(cardNumber);
 	};
 
