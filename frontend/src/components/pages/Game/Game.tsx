@@ -6,7 +6,7 @@ import { GamePlayerSpace } from "./GamePlayerSpace/GamePlayerSpace";
 import { UserSpace } from "./UserSpace/UserSpace";
 import { GamePlayBar } from "./GamePlayBar/GamePlayBar";
 import { GameTable } from "./GameTable/GameTable";
-import { gameTableAtom } from "@/lib/states";
+import { gameTableAtom, playersInfoDataAtom } from "@/lib/states";
 import { useAtom } from "jotai";
 import { convertKeys } from "@/lib/formatting";
 import {
@@ -29,6 +29,7 @@ export const Game = () => {
 	const [, setGameTable] = useAtom(gameTableAtom);
 
 	const [playersData] = useAtom(playersDataAtom);
+	const [playersInfoData] = useAtom(playersInfoDataAtom);
 	const [myIndex] = useAtom(myIndexAtom);
 
 	const playerIndex = (relativeIndex : number) => {
@@ -61,7 +62,7 @@ export const Game = () => {
 			<Wrapper container>
 				<Grid xs={4}>
 					<GamePlayerWrapper>
-						{playersData && playersData.length >= 4 && (
+						{playersData && playersInfoData && playersData.length >= 4 && (
 							<CardPlaceHolder
 								position="left"	
 								value={1000}
@@ -70,9 +71,10 @@ export const Game = () => {
 									<FlippedCard key="flippedCard" />,
 								]}
 								playerData={playersData[playerIndex(myIndex + 3)]}
+								playerInfo={playersInfoData[playerIndex(myIndex + 3)]}
 							/>
 						)}
-						{playersData && playersData.length >= 5 && (
+						{playersData && playersInfoData && playersData.length >= 5 && (
 							<CardPlaceHolder
 								position="left"	
 								value={1000}
@@ -81,6 +83,7 @@ export const Game = () => {
 									<FlippedCard key="flippedCard" />,
 								]}
 								playerData={playersData[playerIndex(myIndex + 4)]}
+								playerInfo={playersInfoData[playerIndex(myIndex + 4)]}
 							/>
 						)}
 					</GamePlayerWrapper>
@@ -96,7 +99,7 @@ export const Game = () => {
 				</Grid>
 				<Grid xs={4}>
 					<GamePlayerWrapper>
-						{playersData && playersData.length >= 3 && (
+						{playersData && playersInfoData && playersData.length >= 3 && (
 							<CardPlaceHolder
 								position="left"	
 								value={1000}
@@ -105,9 +108,10 @@ export const Game = () => {
 									<FlippedCard key="flippedCard" />,
 								]}
 								playerData={playersData[playerIndex(myIndex + 2)]}
+								playerInfo={playersInfoData[playerIndex(myIndex + 2)]}
 							/>
 						)}
-						{playersData && playersData.length >= 2 && (
+						{playersData && playersInfoData && playersData.length >= 2 && (
 							<CardPlaceHolder
 								position="left"	
 								value={1000}
@@ -116,12 +120,13 @@ export const Game = () => {
 									<FlippedCard key="flippedCard" />,
 								]}
 								playerData={playersData[playerIndex(myIndex + 1)]}
+								playerInfo={playersInfoData[playerIndex(myIndex + 1)]}
 							/>
 						)}
 					</GamePlayerWrapper>
 				</Grid>
 			</Wrapper>
-			{playersData && playersData.length > 0 && (
+			{playersData && playersInfoData && playersData.length > 0 && (
 				<CardPlaceHolder
 					position="left"	
 					value={1000}
@@ -130,6 +135,7 @@ export const Game = () => {
 						<FlippedCard key="flippedCard" />,
 					]}
 					playerData={playersData[myIndex]}
+								playerInfo={playersInfoData[myIndex]}
 				/>
 			)}
 			<GamePlayBar gameTableId={gameTableId} />

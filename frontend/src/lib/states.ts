@@ -80,3 +80,9 @@ export const playersDataAtom = atom((get) => {
 
 	return gameTable?.fields.playerSeats;
 });
+
+export const playersInfoDataAtom = atom((get) => {
+	const gameTable = get(gameTableAtom);
+
+	return gameTable?.fields.gameStatus.fields.playerInfos;
+});

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Button, Typography, styled } from "@mui/material";
 import { Fragment, ReactNode } from "react";
-import { PlayerSeat } from "@/lib/types";
+import { PlayerInfo, PlayerSeat } from "@/lib/types";
 import { PlayerInfoPopover } from "./PlayerInfoPopover";
 
 interface CardPlaceHolderProps {
@@ -11,6 +11,7 @@ interface CardPlaceHolderProps {
 	isTurn?: boolean;
 	cards?: ReactNode[];
 	playerData?: PlayerSeat;
+	playerInfo?: PlayerInfo;
 }
 
 export const CardPlaceHolder = ({
@@ -20,6 +21,7 @@ export const CardPlaceHolder = ({
 	isUser = false,
 	isTurn = false,
 	playerData,
+	playerInfo
 }: CardPlaceHolderProps) => {
 	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
