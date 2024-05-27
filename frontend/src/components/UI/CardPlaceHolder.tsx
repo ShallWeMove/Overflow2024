@@ -5,6 +5,7 @@ import { PlayerInfo, PlayerSeat } from "@/lib/types";
 import { PlayerInfoPopover } from "./PlayerInfoPopover";
 import { StatusBadge } from "../pages/Game/GamePlayerSpace/StatusBadge";
 import { convertIntToActionType } from "@/api/game";
+import { convertIntToPlayingStatusType } from "@/api/game";
 
 interface CardPlaceHolderProps {
 	value: number;
@@ -44,7 +45,7 @@ export const CardPlaceHolder = ({
 			{position === "left" && (
 				<Fragment>
 					<UserProfileWrapper>
-						<StatusBadge value={playerInfo?.fields.playingStatus}></StatusBadge>
+						<StatusBadge value={playerInfo?.fields.playingStatus && convertIntToPlayingStatusType(playerInfo?.fields.playingStatus)}></StatusBadge>
 						<StatusBadge value={playerInfo?.fields.playingAction && convertIntToActionType(playerInfo?.fields.playingAction)}></StatusBadge>
 						<UserProfile isTurn={isTurn} />
 					</UserProfileWrapper>

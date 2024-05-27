@@ -197,6 +197,13 @@ export const action = async (
 		console.error("'action' transaction failed", e);
 	}
 };
+export enum PlayingStatusType {
+	EMPTY = "EMPTY",
+	ENTER = "ENTER",
+	READY = "READY",
+	PLAYING = "PLAYING",
+	GAME_END = "GAME_END",
+}
 
 export enum ActionType {
 	NONE = "NONE",
@@ -205,6 +212,22 @@ export enum ActionType {
 	CALL = "CALL",
 	RAISE = "RAISE",
 	FOLD = "FOLD",
+}
+export const convertIntToPlayingStatusType = (playingStatusTypeNumber: number): PlayingStatusType => {
+	switch (playingStatusTypeNumber) {
+		case 10:
+			return PlayingStatusType.EMPTY;
+		case 11:
+			return PlayingStatusType.ENTER;
+		case 12:
+			return PlayingStatusType.READY;
+		case 13:
+			return PlayingStatusType.PLAYING;
+		case 14:
+			return PlayingStatusType.GAME_END;
+		default:
+			throw new Error("Invalid playing status type number");
+	}
 }
 
 const convertActionTypeToInt = (actionType: ActionType): number => {
@@ -241,7 +264,7 @@ export const convertIntToActionType = (actionTypeNumber: number): ActionType => 
 		case 25:
 			return ActionType.FOLD;
 		default:
-			throw new Error("Invalid action type");
+			throw new Error("Invalid action type number");
 	}
 };
 
