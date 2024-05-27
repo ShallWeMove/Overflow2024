@@ -6,12 +6,14 @@ import { PlayerInfoPopover } from "./PlayerInfoPopover";
 import { StatusBadge } from "../pages/Game/GamePlayerSpace/StatusBadge";
 import { convertIntToActionType } from "@/api/game";
 import { convertIntToPlayingStatusType } from "@/api/game";
+import { useEffect } from "react";
+import { tableAtom } from "@/lib/states";
+import { useAtom } from "jotai";
 
 interface CardPlaceHolderProps {
 	value: number;
 	position: "left" | "right";
 	isUser?: boolean;
-	isTurn?: boolean;
 	cards?: ReactNode[];
 	playerData?: PlayerSeat;
 	playerInfo?: PlayerInfo;
@@ -22,11 +24,12 @@ export const CardPlaceHolder = ({
 	position,
 	cards = [],
 	isUser = false,
-	isTurn = false,
 	playerData,
-	playerInfo
+	playerInfo,
 }: CardPlaceHolderProps) => {
+	const [tableInfo] = useAtom(tableAtom);
 	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+	const [isTurn, setIsTurn] = useState(false);
 
 	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
 		if (playerData) {
@@ -38,7 +41,10 @@ export const CardPlaceHolder = ({
 		setAnchorEl(null);
 	};
 
-	//TODO playerData 오류 해결
+	useEffect(()=>{
+		setIsTurn(tableInfo.currentPlayerAddress == playerData?.fields.playerAddress);
+	},[playerData])
+
 
 	return (
 		<Container>
