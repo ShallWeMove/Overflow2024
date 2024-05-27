@@ -11,5 +11,5 @@ export const GamePlayerRight = ({
 	cards,
 	playerData,
 }: GamePlayerRightProps) => {
-	return <CardPlaceHolder position="right" cards={cards} />;
+	return <CardPlaceHolder />;
 };

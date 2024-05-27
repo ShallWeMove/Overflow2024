@@ -8,8 +8,6 @@ interface UserSpaceProps {
 export const UserSpace = ({ value }: UserSpaceProps) => {
 	return (
 		<CardPlaceHolder
-			position="left"
-			isTurn={true}
 		/>
 	);
 };
