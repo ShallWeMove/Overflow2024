@@ -49,6 +49,14 @@ export const tableAtom = atom((get) => {
 		};
 	}
 
+	let numberOfPlayers = 0;
+	let numberOfPlayerSeats = gameTable?.fields.playerSeats?.length ?? 0;
+	for (let i = 0 ; i < numberOfPlayerSeats ; i++) {
+		if (gameTable?.fields.playerSeats[i]?.fields.playerAddress != null) {
+			numberOfPlayers++
+		}
+	}
+
 	const currentTurnIndex =
 		gameTable?.fields.gameStatus?.fields.gameInfo?.fields.currentTurnIndex ?? 0;
 	const playerInfo =
@@ -58,7 +66,8 @@ export const tableAtom = atom((get) => {
 			gameTable?.fields.gameStatus?.fields.moneyBoxInfo?.fields.totalBetAmount
 		) ?? 0;
 	const callAmount = Number(playerInfo?.fields.previousBetAmount) ?? 0;
-	const players = gameTable?.fields.playerSeats?.length ?? 0;
+	// const players = gameTable?.fields.playerSeats?.length ?? 0;
+	const players = numberOfPlayers;
 	const gameStatus =
 		gameTable?.fields.gameStatus?.fields.gameInfo.fields.gamePlayingStatus;
 	const currentPlayerAddress =
