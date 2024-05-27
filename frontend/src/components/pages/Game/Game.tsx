@@ -9,6 +9,15 @@ import { GameTable } from "./GameTable/GameTable";
 import { gameTableAtom } from "@/lib/states";
 import { useAtom } from "jotai";
 import { convertKeys } from "@/lib/formatting";
+import {
+	SpadeA,
+	HeartQ,
+	DiamondK,
+	ClubJ,
+	FlippedCard,
+} from "@/components/UI/Cards";
+import { CardPlaceHolder } from "@/components/UI/CardPlaceHolder";
+import { playersDataAtom, myIndexAtom } from "@/lib/states";
 
 export const Game = () => {
 	const gameInfoRefreshIntervalMs = 1000;
@@ -18,6 +27,18 @@ export const Game = () => {
 	const query = Array.isArray(value) ? value[0] : value;
 
 	const [, setGameTable] = useAtom(gameTableAtom);
+
+	const [playersData] = useAtom(playersDataAtom);
+	const [myIndex] = useAtom(myIndexAtom);
+
+	const playerIndex = (relativeIndex : number) => {
+		if (playersData != null && relativeIndex > playersData.length - 1) {
+			return relativeIndex - playersData.length;
+		} else if (playersData != null && relativeIndex < 0) {
+			return relativeIndex + playersData.length;
+		}
+		return relativeIndex;
+	}
 
 	let gameTableId = "";
 	if (query) {
@@ -39,7 +60,30 @@ export const Game = () => {
 		<Container>
 			<Wrapper container>
 				<Grid xs={4}>
-					<GamePlayerSpace position="left" />
+					<GamePlayerWrapper>
+						{playersData && playersData.length > 0 && (
+							<CardPlaceHolder
+								position="left"	
+								value={1000}
+								cards={[
+									<SpadeA key="spadeA" />,
+									<FlippedCard key="flippedCard" />,
+								]}
+								playerData={playersData[playerIndex(myIndex - 2)]}
+							/>
+						)}
+						{playersData && playersData.length > 0 && (
+							<CardPlaceHolder
+								position="left"	
+								value={1000}
+								cards={[
+									<SpadeA key="spadeA" />,
+									<FlippedCard key="flippedCard" />,
+								]}
+								playerData={playersData[playerIndex(myIndex - 1)]}
+							/>
+						)}
+					</GamePlayerWrapper>
 				</Grid>
 				<Grid
 					xs={4}
@@ -51,10 +95,43 @@ export const Game = () => {
 					<GameTable />
 				</Grid>
 				<Grid xs={4}>
-					<GamePlayerSpace position="right" />
+					<GamePlayerWrapper>
+						{playersData && playersData.length > 0 && (
+							<CardPlaceHolder
+								position="left"	
+								value={1000}
+								cards={[
+									<SpadeA key="spadeA" />,
+									<FlippedCard key="flippedCard" />,
+								]}
+								playerData={playersData[playerIndex(myIndex + 2)]}
+							/>
+						)}
+						{playersData && playersData.length > 0 && (
+							<CardPlaceHolder
+								position="left"	
+								value={1000}
+								cards={[
+									<SpadeA key="spadeA" />,
+									<FlippedCard key="flippedCard" />,
+								]}
+								playerData={playersData[playerIndex(myIndex + 1)]}
+							/>
+						)}
+					</GamePlayerWrapper>
 				</Grid>
 			</Wrapper>
-			<UserSpace value={1000} />
+			{playersData && playersData.length > 0 && (
+				<CardPlaceHolder
+					position="left"	
+					value={1000}
+					cards={[
+						<SpadeA key="spadeA" />,
+						<FlippedCard key="flippedCard" />,
+					]}
+					playerData={playersData[myIndex]}
+				/>
+			)}
 			<GamePlayBar gameTableId={gameTableId} />
 		</Container>
 	);
@@ -77,4 +154,10 @@ const Wrapper = styled(Grid)({
 	width: "100%",
 	display: "flex",
 	justifyContent: "space-between",
+});
+
+const GamePlayerWrapper = styled(Box)({
+	display: "flex",
+	flexDirection: "column",
+	gap: 16,
 });
