@@ -48,7 +48,7 @@ To run the project locally, follow these steps:
 ## Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/shallwemove.git
+git clone https://github.com/ShallWeMove/Overflow2024.git
 ```
 
 ## Smart Contracts
