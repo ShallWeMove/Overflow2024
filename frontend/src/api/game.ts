@@ -7,7 +7,7 @@ const PACKAGE_ID =
 const CASINO_ID =
 	"0x60001ec6301371ced4b7f2886bf54de4bef33d27c61797073554a3d100e30914";
 const LOUNGE_ID =
-	"0x5c22b036e5b0c9d90abe5dd287fb31c71bf440d1c220d40a51534bff23051b35";
+	"0x76ad33f3514a6a1cf8c0b0aaf4e5d0fb3d301cef8257c3445ebce70fe118c80b";
 const MODULE = "cardgame";
 
 export const GAME_TABLE_TYPE = `${PACKAGE_ID}::game_table::GameTable`;
@@ -75,7 +75,7 @@ export const exit = async (wallet: WalletContextState, gameTableId: string) => {
 				showEffects: true,
 				showEvents: true,
 				showObjectChanges: true,
-			}
+			},
 		});
 		console.log("exit transaction result: ", res);
 		return res;
@@ -188,11 +188,10 @@ export const action = async (
 				showEffects: true,
 				showEvents: true,
 				showObjectChanges: true,
-			}
+			},
 		});
 		console.log("action transaction result: ", res);
 		return res;
-
 	} catch (e) {
 		console.error("'action' transaction failed", e);
 	}
@@ -213,7 +212,9 @@ export enum ActionType {
 	RAISE = "RAISE",
 	FOLD = "FOLD",
 }
-export const convertIntToPlayingStatusType = (playingStatusTypeNumber: number): PlayingStatusType => {
+export const convertIntToPlayingStatusType = (
+	playingStatusTypeNumber: number
+): PlayingStatusType => {
 	switch (playingStatusTypeNumber) {
 		case 10:
 			return PlayingStatusType.EMPTY;
@@ -228,7 +229,7 @@ export const convertIntToPlayingStatusType = (playingStatusTypeNumber: number): 
 		default:
 			throw new Error("Invalid playing status type number");
 	}
-}
+};
 
 const convertActionTypeToInt = (actionType: ActionType): number => {
 	switch (actionType) {
@@ -249,7 +250,9 @@ const convertActionTypeToInt = (actionType: ActionType): number => {
 	}
 };
 
-export const convertIntToActionType = (actionTypeNumber: number): ActionType => {
+export const convertIntToActionType = (
+	actionTypeNumber: number
+): ActionType => {
 	switch (actionTypeNumber) {
 		case 20:
 			return ActionType.NONE;

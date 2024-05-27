@@ -1,40 +1,56 @@
-import { Box, Button, Typography, styled } from "@mui/material";
+import { Box, Typography, styled } from "@mui/material";
 
-export const StatusBadge = ({value} : any) => {
-  return(
-		<Container color={"white"}>
-      <AmountWrapper>
-        <Amount>
-          <Typography color="white" fontWeight={700}>
-            {value}
-          </Typography>
-        </Amount>
-      </AmountWrapper>
-    </Container>
-  )
+function getBadgeColor(value: string) {
+	switch (value) {
+		case "ENTER":
+		case "CALL":
+			return "green";
+		case "NONE":
+		case "CHECK":
+		case "EMPTY":
+			return "grey";
+		case "GAME_END":
+		case "FOLD":
+			return "red";
+		case "RAISE":
+			return "orange";
+		case "BET":
+		case "READY":
+			return "#ffd200";
+		default:
+			return "white";
+	}
 }
-const Container = styled(Box)<{ color: string }>(({ color }) => ({
-	position: "relative",
-	// border: `2px solid ${color}`,
+
+export const StatusBadge = ({ value, left = false }: any) => {
+	return (
+		<Container color={"white"} left={left}>
+			<AmountWrapper value={value}>
+				<Typography color={getBadgeColor(value)} fontWeight={700}>
+					{value}
+				</Typography>
+			</AmountWrapper>
+		</Container>
+	);
+};
+const Container = styled(Box)<{ left: boolean }>(({ left }) => ({
+	position: "absolute",
 	borderRadius: 4,
-	backgroundColor: "transparent",
+	top: -25,
+	left: left ? -25 : 65,
 	flexGrow: 1,
 	fontSize: 24,
 	fontWeight: "bold",
 	textAlign: "center",
 }));
 
-
-const AmountWrapper = styled(Box)({
-	width: "100%",
-	// position: "absolute",
-	bottom: 30,
+const AmountWrapper = styled(Box)<{ value: any }>(({ value }) => ({
+	width: 50,
+	height: 50,
 	display: "flex",
 	justifyContent: "center",
-});
-
-const Amount = styled(Box)({
-	backgroundColor: "black",
-	padding: "2px 12px",
-	borderRadius: "15px",
-});
+	padding: 16,
+	borderRadius: "50%",
+	backgroundColor: "#18222D",
+	border: `1px solid ${getBadgeColor(value)}`,
+}));
