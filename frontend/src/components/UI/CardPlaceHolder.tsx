@@ -60,7 +60,7 @@ export const CardPlaceHolder = ({
 				<Typography>
 					{playerData && playerData.fields.playerAddress?.slice(0, 5)}
 					{playerData?.fields.playerAddress && "..."}
-					{playerData && playerData.fields.playerAddress?.slice(-6, -1)}
+					{playerData && playerData.fields.playerAddress?.slice(-6)}
 				</Typography>
 			</UserProfileWrapper>
 			<PlaceHolder isTurn={isTurn} onClick={handleClick}>
