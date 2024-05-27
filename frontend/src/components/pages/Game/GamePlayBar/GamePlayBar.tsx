@@ -4,6 +4,7 @@ import { BetButton } from "./BetButton";
 import { CallButton } from "./CallButton";
 import { CheckButton } from "./CheckButton";
 import { FoldButton } from "./FoldButton";
+import { ExitButton } from "./ExitButton";
 import { AnteButton } from "./AnteButton";
 import {StartButton} from "@/components/pages/Game/GamePlayBar/StartButton";
 
@@ -21,6 +22,7 @@ export const GamePlayBar = ({gameTableId}: GamePlayBarProps) => {
 			<CheckButton gameTableId={gameTableId} value={1000} />
 			<CallButton gameTableId={gameTableId} value={1000} />
 			<RaiseButton gameTableId={gameTableId} value={1000} />
+			<ExitButton gameTableId={gameTableId} />
 		</Container>
 	);
 };

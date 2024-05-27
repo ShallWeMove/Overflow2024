@@ -63,15 +63,22 @@ export const exit = async (wallet: WalletContextState, gameTableId: string) => {
 		arguments: [
 			txb.object(CASINO_ID), // casino
 			txb.object(LOUNGE_ID), // lounge
-			txb.object(gameTableId), // game table
+			txb.pure(gameTableId), // game table
 		],
 	});
 
 	try {
 		const res = wallet.signAndExecuteTransactionBlock({
 			transactionBlock: txb,
+			options: {
+				showInput: true,
+				showEffects: true,
+				showEvents: true,
+				showObjectChanges: true,
+			}
 		});
 		console.log("exit transaction result: ", res);
+		return res;
 	} catch (e) {
 		console.error("'exit' transaction failed", e);
 	}
@@ -213,27 +220,6 @@ const convertActionTypeToInt = (actionType: ActionType): number => {
 			return 25;
 		default:
 			throw new Error("Invalid action type");
-	}
-};
-
-// fold - called when the player folds
-export const fold = async (wallet: WalletContextState, gameTableId: string) => {
-	const txb = new TransactionBlock();
-	txb.moveCall({
-		target: `${PACKAGE_ID}::${MODULE}::fold`,
-		arguments: [
-			txb.object(CASINO_ID), // casino
-			txb.object(gameTableId), // game table
-		],
-	});
-
-	try {
-		const res = wallet.signAndExecuteTransactionBlock({
-			transactionBlock: txb,
-		});
-		console.log("fold transaction result: ", res);
-	} catch (e) {
-		console.error("'fold' transaction failed", e);
 	}
 };
 
