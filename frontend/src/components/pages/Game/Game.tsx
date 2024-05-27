@@ -33,9 +33,9 @@ export const Game = () => {
 
 	const playerIndex = (relativeIndex : number) => {
 		if (playersData != null && relativeIndex > playersData.length - 1) {
-			return relativeIndex - playersData.length;
+			return relativeIndex % playersData.length;
 		} else if (playersData != null && relativeIndex < 0) {
-			return relativeIndex + playersData.length;
+			return playersData.length - (-relativeIndex) % playersData.length ;
 		}
 		return relativeIndex;
 	}
@@ -61,7 +61,7 @@ export const Game = () => {
 			<Wrapper container>
 				<Grid xs={4}>
 					<GamePlayerWrapper>
-						{playersData && playersData.length > 0 && (
+						{playersData && playersData.length >= 4 && (
 							<CardPlaceHolder
 								position="left"	
 								value={1000}
@@ -69,10 +69,10 @@ export const Game = () => {
 									<SpadeA key="spadeA" />,
 									<FlippedCard key="flippedCard" />,
 								]}
-								playerData={playersData[playerIndex(myIndex - 2)]}
+								playerData={playersData[playerIndex(myIndex + 3)]}
 							/>
 						)}
-						{playersData && playersData.length > 0 && (
+						{playersData && playersData.length >= 5 && (
 							<CardPlaceHolder
 								position="left"	
 								value={1000}
@@ -80,7 +80,7 @@ export const Game = () => {
 									<SpadeA key="spadeA" />,
 									<FlippedCard key="flippedCard" />,
 								]}
-								playerData={playersData[playerIndex(myIndex - 1)]}
+								playerData={playersData[playerIndex(myIndex + 4)]}
 							/>
 						)}
 					</GamePlayerWrapper>
@@ -96,7 +96,7 @@ export const Game = () => {
 				</Grid>
 				<Grid xs={4}>
 					<GamePlayerWrapper>
-						{playersData && playersData.length > 0 && (
+						{playersData && playersData.length >= 3 && (
 							<CardPlaceHolder
 								position="left"	
 								value={1000}
@@ -107,7 +107,7 @@ export const Game = () => {
 								playerData={playersData[playerIndex(myIndex + 2)]}
 							/>
 						)}
-						{playersData && playersData.length > 0 && (
+						{playersData && playersData.length >= 2 && (
 							<CardPlaceHolder
 								position="left"	
 								value={1000}
