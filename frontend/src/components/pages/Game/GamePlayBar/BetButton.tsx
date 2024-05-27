@@ -1,4 +1,3 @@
-import { Box, styled } from "@mui/material";
 import { GamePlayButton } from "@/components/UI/GamePlayButton";
 import { ActionType } from "@/api/game";
 import { action } from "@/api/game";
@@ -24,10 +23,15 @@ export const BetButton = ({ value, gameTableId }: BetButtonProps) => {
 						false,
 						0
 				)
-				console.log("start response: ", response)
-				// TODO: response.effects.status.status === "success" OR "failure"에 따라 성공/에러 처리하기
+
+				if (response?.effects?.status?.status === "failure") {
+					alert("Failed to bet")
+				}
+
+				console.log("bet response: ", response)
+
 		}   catch (error) {
-				console.error('Failed to ante:', error);
+				console.error('Failed to bet:', error);
 		}
 	}
 	return (

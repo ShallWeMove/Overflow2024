@@ -16,11 +16,11 @@ export const GamePlayBar = ({gameTableId}: GamePlayBarProps) => {
 		<Container>
 			<StartButton gameTableId={gameTableId} />
 			<AnteButton gameTableId={gameTableId} />
-			<FoldButton />
+			<FoldButton gameTableId={gameTableId} value={1000} />
 			<BetButton gameTableId={gameTableId} value={1000} />
-			<CheckButton />
-			<CallButton value={1000} />
-			<RaiseButton value={1000} />
+			<CheckButton gameTableId={gameTableId} value={1000} />
+			<CallButton gameTableId={gameTableId} value={1000} />
+			<RaiseButton gameTableId={gameTableId} value={1000} />
 		</Container>
 	);
 };

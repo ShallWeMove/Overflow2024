@@ -1,7 +1,5 @@
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { WalletContextState } from "@suiet/wallet-kit";
-import { client } from "./object";
-import { GetCoinsParams } from "@mysten/sui.js/client";
 import { RSA } from "@/lib/rsa";
 
 const PACKAGE_ID =
@@ -9,7 +7,7 @@ const PACKAGE_ID =
 const CASINO_ID =
 	"0x60001ec6301371ced4b7f2886bf54de4bef33d27c61797073554a3d100e30914";
 const LOUNGE_ID =
-	"0x8988ebd45f7c26d468f89ece6c0220c1a6ed014310f91d5264b50fc79230f077";
+	"0x5c22b036e5b0c9d90abe5dd287fb31c71bf440d1c220d40a51534bff23051b35";
 const MODULE = "cardgame";
 
 export const GAME_TABLE_TYPE = `${PACKAGE_ID}::game_table::GameTable`;
@@ -154,14 +152,14 @@ export const start = async (
 };
 
 // action - called when the player makes an action
-//  one of [ANTE, BET, RAISE, CALL, CHECK]
+//  one of [BET, RAISE, CALL, CHECK]
 export const action = async (
 	wallet: WalletContextState,
 	gameTableId: string,
 	actionType: ActionType,
 	withNewCard: boolean,
 	chipCount: number
-): Promise<string> => {
+) => {
 	const txb = new TransactionBlock();
 	txb.moveCall({
 		target: `${PACKAGE_ID}::${MODULE}::action`,
@@ -178,13 +176,19 @@ export const action = async (
 	try {
 		const res = wallet.signAndExecuteTransactionBlock({
 			transactionBlock: txb,
+			options: {
+				showInput: true,
+				showEffects: true,
+				showEvents: true,
+				showObjectChanges: true,
+			}
 		});
 		console.log("action transaction result: ", res);
+		return res;
+
 	} catch (e) {
 		console.error("'action' transaction failed", e);
 	}
-
-	return "gameTableId";
 };
 
 export enum ActionType {
@@ -197,7 +201,6 @@ export enum ActionType {
 
 const convertActionTypeToInt = (actionType: ActionType): number => {
 	switch (actionType) {
-		// TODO: sync each number with the contract
 		case ActionType.BET:
 			return 21;
 		case ActionType.CHECK:

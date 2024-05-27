@@ -1,4 +1,4 @@
-import Game from "@/components/pages/Game/Game";
+import { Game } from "@/components/pages/Game/Game";
 
 const GamePage = () => {
 	return <Game />;

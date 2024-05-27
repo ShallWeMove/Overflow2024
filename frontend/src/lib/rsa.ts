@@ -5,12 +5,12 @@ export const LOCAL_STORAGE_KEY_EXPIRATION = 'keyExpiration';
 
 export class RSA {
     private prime: Set<number> = new Set();
-    private publicKey: number = 0;
+    private publicKey: number = 65537; // fixed to 65537
     private privateKey: number = 0;
     private n: number = 0;
 
-    constructor(mod?: number, publicKey?: number, privateKey?: number) {
-        if (mod == undefined || !publicKey || !privateKey) {
+    constructor(mod?: number, privateKey?: number) {
+        if (mod == undefined || !privateKey) {
             if (!this.loadKeys()) {
                 this.primeFiller();
                 this.generateKeys();
@@ -18,7 +18,6 @@ export class RSA {
             return;
         }
 
-        this.publicKey = publicKey;
         this.n = mod;
         this.privateKey = privateKey;
     }
@@ -57,12 +56,9 @@ export class RSA {
         const prime2 = this.pickRandomPrime();
         this.n = prime1 * prime2;
         const fi = (prime1 - 1) * (prime2 - 1);
-        let e = 2;
-        while (true) {
-            if (this.gcd(e, fi) === 1) break;
-            e++;
-        }
-        this.publicKey = e;
+
+        const e = this.publicKey; // e is fixed to 65537
+
         let d = 2;
         while (true) {
             if ((d * e) % fi === 1) break;
