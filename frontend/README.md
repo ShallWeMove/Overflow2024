@@ -16,10 +16,6 @@ Dive into the game interface, designed to offer a seamless and engaging Blackjac
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Get Started](#get-started)
-- [Usage](#usage)
-- [Smart Contracts](#smart-contracts)
-- [Contributing](#contributing)
-- [License](#license)
 
 # Overview
 
