@@ -106,13 +106,14 @@ module shallwemove::cardgame {
   entry fun exit(
     casino: &Casino, 
     lounge: &mut Lounge, // 필요 없을 수도 => 무조건 필요함... parent에서 접근해야 함
-    game_table: &GameTable, 
+    game_table_id: ID, 
     ctx: &mut TxContext
   ) {
     assert!(casino.id() == lounge.casino_id(), 403);
-    assert!(lounge.id() == game_table.lounge_id(), 403);
 
-    let game_table = lounge.borrow_mut_game_table(game_table.id());
+    let lounge_id = lounge.id();
+    let game_table = lounge.borrow_mut_game_table(game_table_id);
+    assert!(lounge_id == game_table.lounge_id(), 403);
     
     game_table.exit(ctx);
   }
