@@ -9,7 +9,6 @@ export const UserSpace = ({ value }: UserSpaceProps) => {
 	return (
 		<CardPlaceHolder
 			position="left"
-			cards={[<SpadeA key="spadeA" />, <SpadeK key="king" />]}
 			isTurn={true}
 		/>
 	);

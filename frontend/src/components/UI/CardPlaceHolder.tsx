@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Box, Button, Typography, styled } from "@mui/material";
-import { ReactNode } from "react";
 import { PlayerInfo, PlayerSeat } from "@/lib/types";
 import { PlayerInfoPopover } from "./PlayerInfoPopover";
 import { StatusBadge } from "../pages/Game/GamePlayerSpace/StatusBadge";
@@ -9,16 +8,15 @@ import { convertIntToPlayingStatusType } from "@/api/game";
 import { useEffect } from "react";
 import { tableAtom } from "@/lib/states";
 import { useAtom } from "jotai";
+import { convertCardNumberToCardImage } from "@/components/UI/Cards";
 
 interface CardPlaceHolderProps {
 	isUser?: boolean;
-	cards?: ReactNode[];
 	playerData?: PlayerSeat;
 	playerInfo?: PlayerInfo;
 }
 
 export const CardPlaceHolder = ({
-	cards = [],
 	isUser = false,
 	playerData,
 	playerInfo,
@@ -62,8 +60,9 @@ export const CardPlaceHolder = ({
 			</UserProfileWrapper>
 			<PlaceHolder isTurn={isTurn} onClick={handleClick}>
 				<CardWrapper>
-					{cards[0] ?? ""}
-					{cards[1] ?? ""}
+					{playerData && playerData.fields.cards && playerData.fields.cards.map((card)=>{
+						return convertCardNumberToCardImage(card.fields.cardNumber) ?? "";
+					})}
 				</CardWrapper>
 				<TotalBetAmount>
 					<Typography color="white" fontSize="16px" fontWeight={700}>
