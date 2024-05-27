@@ -10,7 +10,6 @@ interface GamePlayerLeftProps {
 export const GamePlayerLeft = ({ cards, playerData }: GamePlayerLeftProps) => {
 	return (
 		<CardPlaceHolder
-			position="left"
 			value={1000}
 			cards={cards}
 			playerData={playerData}
