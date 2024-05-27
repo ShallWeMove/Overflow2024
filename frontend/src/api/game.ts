@@ -199,6 +199,7 @@ export const action = async (
 };
 
 export enum ActionType {
+	NONE = "NONE",
 	BET = "BET",
 	CHECK = "CHECK",
 	CALL = "CALL",
@@ -208,6 +209,8 @@ export enum ActionType {
 
 const convertActionTypeToInt = (actionType: ActionType): number => {
 	switch (actionType) {
+		case ActionType.NONE:
+			return 20;
 		case ActionType.BET:
 			return 21;
 		case ActionType.CHECK:
@@ -218,6 +221,25 @@ const convertActionTypeToInt = (actionType: ActionType): number => {
 			return 24;
 		case ActionType.FOLD:
 			return 25;
+		default:
+			throw new Error("Invalid action type");
+	}
+};
+
+export const convertIntToActionType = (actionTypeNumber: number): ActionType => {
+	switch (actionTypeNumber) {
+		case 20:
+			return ActionType.NONE;
+		case 21:
+			return ActionType.BET;
+		case 22:
+			return ActionType.CHECK;
+		case 23:
+			return ActionType.CALL;
+		case 24:
+			return ActionType.RAISE;
+		case 25:
+			return ActionType.FOLD;
 		default:
 			throw new Error("Invalid action type");
 	}

@@ -3,6 +3,8 @@ import { Box, Button, Typography, styled } from "@mui/material";
 import { Fragment, ReactNode } from "react";
 import { PlayerInfo, PlayerSeat } from "@/lib/types";
 import { PlayerInfoPopover } from "./PlayerInfoPopover";
+import { StatusBadge } from "../pages/Game/GamePlayerSpace/StatusBadge";
+import { convertIntToActionType } from "@/api/game";
 
 interface CardPlaceHolderProps {
 	value: number;
@@ -41,7 +43,11 @@ export const CardPlaceHolder = ({
 		<Container>
 			{position === "left" && (
 				<Fragment>
-					<UserProfile isTurn={isTurn} />
+					<UserProfileWrapper>
+						<StatusBadge value={playerInfo?.fields.playingStatus}></StatusBadge>
+						<StatusBadge value={playerInfo?.fields.playingAction && convertIntToActionType(playerInfo?.fields.playingAction)}></StatusBadge>
+						<UserProfile isTurn={isTurn} />
+					</UserProfileWrapper>
 					<PlaceHolder isTurn={isTurn} onClick={handleClick}>
 						<CardWrapper>
 							{cards[0] ?? ""}
@@ -128,3 +134,8 @@ const CardWrapper = styled(Box)({
 	gap: 6,
 	marginTop: -36,
 });
+
+const UserProfileWrapper = styled(Box)({
+	display: "flex",
+	flexDirection: "column"
+})
