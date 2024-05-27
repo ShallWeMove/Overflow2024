@@ -63,15 +63,22 @@ export const exit = async (wallet: WalletContextState, gameTableId: string) => {
 		arguments: [
 			txb.object(CASINO_ID), // casino
 			txb.object(LOUNGE_ID), // lounge
-			txb.object(gameTableId), // game table
+			txb.pure(gameTableId), // game table
 		],
 	});
 
 	try {
 		const res = wallet.signAndExecuteTransactionBlock({
 			transactionBlock: txb,
+			options: {
+				showInput: true,
+				showEffects: true,
+				showEvents: true,
+				showObjectChanges: true,
+			}
 		});
 		console.log("exit transaction result: ", res);
+		return res;
 	} catch (e) {
 		console.error("'exit' transaction failed", e);
 	}
@@ -190,17 +197,43 @@ export const action = async (
 		console.error("'action' transaction failed", e);
 	}
 };
+export enum PlayingStatusType {
+	EMPTY = "EMPTY",
+	ENTER = "ENTER",
+	READY = "READY",
+	PLAYING = "PLAYING",
+	GAME_END = "GAME_END",
+}
 
 export enum ActionType {
+	NONE = "NONE",
 	BET = "BET",
 	CHECK = "CHECK",
 	CALL = "CALL",
 	RAISE = "RAISE",
 	FOLD = "FOLD",
 }
+export const convertIntToPlayingStatusType = (playingStatusTypeNumber: number): PlayingStatusType => {
+	switch (playingStatusTypeNumber) {
+		case 10:
+			return PlayingStatusType.EMPTY;
+		case 11:
+			return PlayingStatusType.ENTER;
+		case 12:
+			return PlayingStatusType.READY;
+		case 13:
+			return PlayingStatusType.PLAYING;
+		case 14:
+			return PlayingStatusType.GAME_END;
+		default:
+			throw new Error("Invalid playing status type number");
+	}
+}
 
 const convertActionTypeToInt = (actionType: ActionType): number => {
 	switch (actionType) {
+		case ActionType.NONE:
+			return 20;
 		case ActionType.BET:
 			return 21;
 		case ActionType.CHECK:
@@ -216,24 +249,22 @@ const convertActionTypeToInt = (actionType: ActionType): number => {
 	}
 };
 
-// fold - called when the player folds
-export const fold = async (wallet: WalletContextState, gameTableId: string) => {
-	const txb = new TransactionBlock();
-	txb.moveCall({
-		target: `${PACKAGE_ID}::${MODULE}::fold`,
-		arguments: [
-			txb.object(CASINO_ID), // casino
-			txb.object(gameTableId), // game table
-		],
-	});
-
-	try {
-		const res = wallet.signAndExecuteTransactionBlock({
-			transactionBlock: txb,
-		});
-		console.log("fold transaction result: ", res);
-	} catch (e) {
-		console.error("'fold' transaction failed", e);
+export const convertIntToActionType = (actionTypeNumber: number): ActionType => {
+	switch (actionTypeNumber) {
+		case 20:
+			return ActionType.NONE;
+		case 21:
+			return ActionType.BET;
+		case 22:
+			return ActionType.CHECK;
+		case 23:
+			return ActionType.CALL;
+		case 24:
+			return ActionType.RAISE;
+		case 25:
+			return ActionType.FOLD;
+		default:
+			throw new Error("Invalid action type number");
 	}
 };
 
