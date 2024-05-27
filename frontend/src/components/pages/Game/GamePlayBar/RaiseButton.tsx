@@ -21,7 +21,7 @@ export const RaiseButton = ({ value, gameTableId }: RaiseButtonProps) => {
 				gameTableId,
 				ActionType.RAISE,
 				false,
-				0
+				1
 			)
 
 			if (response?.effects?.status?.status === "failure") {
