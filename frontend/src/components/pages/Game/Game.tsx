@@ -65,7 +65,6 @@ export const Game = () => {
 					<GamePlayerWrapper sx={{ marginLeft: 4 }}>
 						{playersData && playersInfoData && playersData.length >= 4 && (
 							<CardPlaceHolder
-								value={1000}
 								cards={[
 									<HeartQ key="heartQ" />,
 									<FlippedCard key="flippedCard" />,
@@ -76,7 +75,6 @@ export const Game = () => {
 						)}
 						{playersData && playersInfoData && playersData.length >= 5 && (
 							<CardPlaceHolder
-								value={1000}
 								cards={[
 									<DiamondK key="diamondK" />,
 									<FlippedCard key="flippedCard" />,
@@ -100,7 +98,6 @@ export const Game = () => {
 					<GamePlayerWrapper>
 						{playersData && playersInfoData && playersData.length >= 3 && (
 							<CardPlaceHolder
-								value={1000}
 								cards={[
 									<ClubJ key="clubJ" />,
 									<FlippedCard key="flippedCard" />,
@@ -111,7 +108,6 @@ export const Game = () => {
 						)}
 						{playersData && playersInfoData && playersData.length >= 2 && (
 							<CardPlaceHolder
-								value={1000}
 								cards={[
 									<SpadeK key="spadeK" />,
 									<FlippedCard key="flippedCard" />,
@@ -125,7 +121,6 @@ export const Game = () => {
 			</Wrapper>
 			{playersData && playersInfoData && playersData.length > 0 && (
 				<CardPlaceHolder
-					value={1000}
 					cards={[<SpadeA key="spadeA" />, <FlippedCard key="flippedCard" />]}
 					playerData={playersData[myIndex]}
 					playerInfo={playersInfoData[myIndex]}

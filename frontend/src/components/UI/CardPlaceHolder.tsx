@@ -11,7 +11,6 @@ import { tableAtom } from "@/lib/states";
 import { useAtom } from "jotai";
 
 interface CardPlaceHolderProps {
-	value: number;
 	isUser?: boolean;
 	cards?: ReactNode[];
 	playerData?: PlayerSeat;
@@ -19,7 +18,6 @@ interface CardPlaceHolderProps {
 }
 
 export const CardPlaceHolder = ({
-	value,
 	cards = [],
 	isUser = false,
 	playerData,
@@ -69,7 +67,7 @@ export const CardPlaceHolder = ({
 				</CardWrapper>
 				<TotalBetAmount>
 					<Typography color="white" fontSize="16px" fontWeight={700}>
-						{value} SUI
+						{playerInfo?.fields.deposit} MIST
 					</Typography>
 				</TotalBetAmount>
 			</PlaceHolder>
