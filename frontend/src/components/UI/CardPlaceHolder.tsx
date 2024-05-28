@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import { tableAtom } from "@/lib/states";
 import { useAtom } from "jotai";
 import { convertCardNumberToCardImage } from "@/components/UI/Cards";
+import { TotalBetAmountBadge } from "../pages/Game/GamePlayerSpace/TotalBetAmountBadge";
 
 interface CardPlaceHolderProps {
 	isUser?: boolean;
@@ -24,6 +25,7 @@ export const CardPlaceHolder = ({
 	const [tableInfo] = useAtom(tableAtom);
 	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 	const [isTurn, setIsTurn] = useState(false);
+	const [isManagerPlayer, setIsManagerPlayer] = useState(false);
 
 	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
 		if (playerData) {
@@ -39,6 +41,9 @@ export const CardPlaceHolder = ({
 		setIsTurn(
 			tableInfo.currentPlayerAddress == playerData?.fields.playerAddress
 		);
+    setIsManagerPlayer(
+      tableInfo.managerPlayerAddress == playerData?.fields.playerAddress
+    );
 	}, [playerData]);
 
 	return (
@@ -51,17 +56,23 @@ export const CardPlaceHolder = ({
 						convertIntToPlayingStatusType(playerInfo?.fields.playingStatus)
 					}
 					left={true}
-				></StatusBadge>
+				/>
+				{playerData?.fields.playerAddress && isManagerPlayer && <StatusBadge
+				value={"Manager"} 
+				left={true} 
+				manager={true}
+				/>}
 				<StatusBadge
 					value={
 						playerInfo?.fields.playingAction &&
 						convertIntToActionType(playerInfo?.fields.playingAction)
 					}
-				></StatusBadge>
+				/>
+				<TotalBetAmountBadge value={playerInfo?.fields.totalBetAmount}/>
 				<Typography>
 					{playerData && playerData.fields.playerAddress?.slice(0, 5)}
 					{playerData?.fields.playerAddress && "..."}
-					{playerData && playerData.fields.playerAddress?.slice(-6, -1)}
+					{playerData && playerData.fields.playerAddress?.slice(-6)}
 				</Typography>
 			</UserProfileWrapper>
 			<PlaceHolder isTurn={isTurn} onClick={handleClick}>

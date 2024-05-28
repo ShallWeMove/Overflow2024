@@ -1,30 +1,31 @@
 import { Box, Typography, styled } from "@mui/material";
+import {ActionType, PlayingStatusType} from "@/api/game";
 
 function getBadgeColor(value: string) {
 	switch (value) {
-		case "ENTER":
-		case "CALL":
+		case PlayingStatusType.ENTER:
+		case ActionType.CALL:
 			return "green";
-		case "NONE":
-		case "CHECK":
-		case "EMPTY":
+			case PlayingStatusType.EMPTY:
+		case ActionType.NONE:
+		case ActionType.CHECK:
 			return "grey";
-		case "GAME_END":
-		case "FOLD":
+		case PlayingStatusType.GAME_END:
+		case ActionType.FOLD:
 			return "red";
-		case "RAISE":
+		case ActionType.RAISE:
 			return "orange";
-		case "BET":
-		case "READY":
+			case PlayingStatusType.READY:
+		case ActionType.BET:
 			return "#ffd200";
 		default:
 			return "white";
 	}
 }
 
-export const StatusBadge = ({ value, left = false }: any) => {
+export const StatusBadge = ({ value, left = false, manager = false }: any) => {
 	return (
-		<Container color={"white"} left={left}>
+		<Container color={"white"} left={left} manager={manager}>
 			<AmountWrapper value={value}>
 				<Typography color={getBadgeColor(value)} fontWeight={700}>
 					{value}
@@ -33,10 +34,10 @@ export const StatusBadge = ({ value, left = false }: any) => {
 		</Container>
 	);
 };
-const Container = styled(Box)<{ left: boolean }>(({ left }) => ({
+const Container = styled(Box)<{ left: boolean, manager: boolean }>(({ left, manager }) => ({
 	position: "absolute",
 	borderRadius: 4,
-	top: -25,
+	top: manager ? 50 :-25,
 	left: left ? -25 : 65,
 	flexGrow: 1,
 	fontSize: 24,

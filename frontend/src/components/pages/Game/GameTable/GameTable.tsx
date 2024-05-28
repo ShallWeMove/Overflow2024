@@ -13,6 +13,9 @@ export const GameTable = () => {
 				players={tableInfo?.players ?? 0}
 				gameStatus={tableInfo?.gameStatus ?? 0}
 				currentPlayerAddress={tableInfo?.currentPlayerAddress ?? ""}
+				betUnit={tableInfo?.betUnit}
+				anteAmount={tableInfo?.anteAmount}
+				winnerPlayer={tableInfo?.winnerPlayer}
 			/>
 		</Container>
 	);
