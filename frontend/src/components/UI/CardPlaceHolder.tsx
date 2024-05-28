@@ -54,7 +54,7 @@ export const CardPlaceHolder = ({
 					}
 					left={true}
 				/>
-				{isManagerPlayer && <StatusBadge 
+				{playerData?.fields.playerAddress && isManagerPlayer && <StatusBadge
 				value={"Manager"} 
 				left={true} 
 				manager={true}
