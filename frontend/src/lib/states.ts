@@ -75,6 +75,9 @@ export const tableAtom = atom((get) => {
 			.playerAddress;
 	const managerPlayerAddress =
 		gameTable?.fields.gameStatus?.fields.gameInfo.fields.managerPlayer;
+	const betUnit = gameTable?.fields.gameStatus.fields.gameInfo.fields.betUnit
+	const anteAmount = gameTable?.fields.gameStatus.fields.gameInfo.fields.anteAmount
+	const winnerPlayer = gameTable?.fields.gameStatus.fields.gameInfo.fields.winnerPlayer
 
 	return {
 		totalBetAmount,
@@ -83,6 +86,9 @@ export const tableAtom = atom((get) => {
 		gameStatus,
 		currentPlayerAddress,
 		managerPlayerAddress,
+		betUnit,
+		anteAmount,
+		winnerPlayer
 	};
 });
 

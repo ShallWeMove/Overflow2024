@@ -7,6 +7,9 @@ interface TotalAmountProps {
 	players: number;
 	gameStatus: number;
 	currentPlayerAddress: string;
+	betUnit: bigint | undefined;
+	anteAmount: bigint | undefined;
+	winnerPlayer: string | undefined;
 }
 
 export const TotalAmount = ({
@@ -15,6 +18,9 @@ export const TotalAmount = ({
 	players,
 	gameStatus,
 	currentPlayerAddress,
+	betUnit,
+	anteAmount,
+	winnerPlayer
 }: TotalAmountProps) => {
 	return (
 		<Container>
@@ -86,6 +92,42 @@ export const TotalAmount = ({
 					}}
 				>
 					{currentPlayerAddress}
+				</Typography>
+			</Wrapper>
+			<Wrapper>
+				<Typography color="#C1CCDC" fontWeight={700}>
+					Ante Amount
+				</Typography>
+				<Typography
+					color="#C1CCDC"
+					fontWeight={700}
+				>
+					{anteAmount}
+				</Typography>
+				<Typography color="#C1CCDC" fontWeight={700}>
+					Betting Unit
+				</Typography>
+				<Typography
+					color="#C1CCDC"
+					fontWeight={700}
+				>
+					{betUnit}
+				</Typography>
+			</Wrapper>
+			<Wrapper>
+				<Typography color="#C1CCDC" fontWeight={700}>
+					Winner Player
+				</Typography>
+				<Typography
+					color="#C1CCDC"
+					fontWeight={700}
+					sx={{
+						display: "flex",
+						gap: 0.5,
+						overflowWrap: "anywhere",
+					}}
+				>
+					{winnerPlayer}
 				</Typography>
 			</Wrapper>
 		</Container>
