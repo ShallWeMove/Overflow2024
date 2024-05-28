@@ -24,6 +24,7 @@ export const CardPlaceHolder = ({
 	const [tableInfo] = useAtom(tableAtom);
 	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 	const [isTurn, setIsTurn] = useState(false);
+	const [isManagerPlayer, setIsManagerPlayer] = useState(false);
 
 	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
 		if (playerData) {
@@ -37,6 +38,7 @@ export const CardPlaceHolder = ({
 
 	useEffect(()=>{
 		setIsTurn(tableInfo.currentPlayerAddress == playerData?.fields.playerAddress);
+		setIsManagerPlayer(tableInfo.managerPlayerAddress == playerData?.fields.playerAddress);
 	},[playerData])
 
 
@@ -50,13 +52,18 @@ export const CardPlaceHolder = ({
 						convertIntToPlayingStatusType(playerInfo?.fields.playingStatus)
 					}
 					left={true}
-				></StatusBadge>
+				/>
+				{isManagerPlayer && <StatusBadge 
+				value={"Manager"} 
+				left={true} 
+				manager={true}
+				/>}
 				<StatusBadge
 					value={
 						playerInfo?.fields.playingAction &&
 						convertIntToActionType(playerInfo?.fields.playingAction)
 					}
-				></StatusBadge>
+				/>
 				<Typography>
 					{playerData && playerData.fields.playerAddress?.slice(0, 5)}
 					{playerData?.fields.playerAddress && "..."}
