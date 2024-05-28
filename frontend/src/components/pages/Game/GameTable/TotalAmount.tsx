@@ -1,5 +1,6 @@
 import { Box, styled, Typography } from "@mui/material";
 import { animated, useSpring } from "react-spring";
+import { convertIntToGameStatusType } from "@/api/game";
 
 interface TotalAmountProps {
 	totalBetAmount: number | undefined;
@@ -70,11 +71,7 @@ export const TotalAmount = ({
 					fontWeight={700}
 					sx={{ display: "flex", gap: 0.5 }}
 				>
-					{gameStatus === 0
-						? "Pre Game"
-						: gameStatus === 1
-						? "In Game"
-						: "Game Finished"}
+					{convertIntToGameStatusType(gameStatus)}
 				</Typography>
 			</Wrapper>
 			<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
