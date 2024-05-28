@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import { tableAtom } from "@/lib/states";
 import { useAtom } from "jotai";
 import { convertCardNumberToCardImage } from "@/components/UI/Cards";
+import { TotalBetAmountBadge } from "../pages/Game/GamePlayerSpace/TotalBetAmountBadge";
 
 interface CardPlaceHolderProps {
 	isUser?: boolean;
@@ -64,6 +65,7 @@ export const CardPlaceHolder = ({
 						convertIntToActionType(playerInfo?.fields.playingAction)
 					}
 				/>
+				<TotalBetAmountBadge value={playerInfo?.fields.totalBetAmount}/>
 				<Typography>
 					{playerData && playerData.fields.playerAddress?.slice(0, 5)}
 					{playerData?.fields.playerAddress && "..."}
