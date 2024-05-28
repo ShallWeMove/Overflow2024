@@ -1,29 +1,29 @@
 import React, { useState } from "react";
-import { Box, Button, Typography, styled } from "@mui/material";
-import { ReactNode } from "react";
+import { Box, Button, Typography, styled, Grid } from "@mui/material";
 import { PlayerInfo, PlayerSeat } from "@/lib/types";
 import { PlayerInfoPopover } from "./PlayerInfoPopover";
 import { StatusBadge } from "../pages/Game/GamePlayerSpace/StatusBadge";
 import { convertIntToActionType } from "@/api/game";
 import { convertIntToPlayingStatusType } from "@/api/game";
+import { useEffect } from "react";
+import { tableAtom } from "@/lib/states";
+import { useAtom } from "jotai";
+import { convertCardNumberToCardImage } from "@/components/UI/Cards";
 
 interface CardPlaceHolderProps {
-	value: number;
 	isUser?: boolean;
-	isTurn?: boolean;
-	cards?: ReactNode[];
 	playerData?: PlayerSeat;
 	playerInfo?: PlayerInfo;
 }
 
 export const CardPlaceHolder = ({
-	value,
-	cards = [],
-	isTurn = false,
+	isUser = false,
 	playerData,
 	playerInfo,
 }: CardPlaceHolderProps) => {
+	const [tableInfo] = useAtom(tableAtom);
 	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+	const [isTurn, setIsTurn] = useState(false);
 
 	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
 		if (playerData) {
@@ -35,7 +35,10 @@ export const CardPlaceHolder = ({
 		setAnchorEl(null);
 	};
 
-	//TODO playerData 오류 해결
+	useEffect(()=>{
+		setIsTurn(tableInfo.currentPlayerAddress == playerData?.fields.playerAddress);
+	},[playerData])
+
 
 	return (
 		<Container>
@@ -54,15 +57,25 @@ export const CardPlaceHolder = ({
 						convertIntToActionType(playerInfo?.fields.playingAction)
 					}
 				></StatusBadge>
+				<Typography>
+					{playerData && playerData.fields.playerAddress?.slice(0, 5)}
+					{playerData?.fields.playerAddress && "..."}
+					{playerData && playerData.fields.playerAddress?.slice(-6, -1)}
+				</Typography>
 			</UserProfileWrapper>
 			<PlaceHolder isTurn={isTurn} onClick={handleClick}>
 				<CardWrapper>
-					{cards[0] ?? ""}
-					{cards[1] ?? ""}
+					{playerData && playerData.fields.cards && playerData.fields.cards.map((card, index)=>{
+						return (
+							<Grid item xs={2} key={index}>
+								{convertCardNumberToCardImage(card.fields.cardNumber)}
+							</Grid> 
+							?? "");
+					})}
 				</CardWrapper>
 				<TotalBetAmount>
 					<Typography color="white" fontSize="16px" fontWeight={700}>
-						{value} SUI
+						{playerInfo?.fields.deposit} MIST
 					</Typography>
 				</TotalBetAmount>
 			</PlaceHolder>
