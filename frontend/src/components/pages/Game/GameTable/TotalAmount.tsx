@@ -51,6 +51,26 @@ export const TotalAmount = ({
 			<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
 			<Wrapper>
 				<Typography color="#C1CCDC" fontWeight={700}>
+					Ante Amount
+				</Typography>
+				<Typography
+					color="#C1CCDC"
+					fontWeight={700}
+				>
+					{anteAmount}
+				</Typography>
+				<Typography color="#C1CCDC" fontWeight={700}>
+					Betting Unit
+				</Typography>
+				<Typography
+					color="#C1CCDC"
+					fontWeight={700}
+				>
+					{betUnit}
+				</Typography>
+			</Wrapper>
+			<Wrapper>
+				<Typography color="#C1CCDC" fontWeight={700}>
 					Players
 				</Typography>
 				<Typography
@@ -91,26 +111,7 @@ export const TotalAmount = ({
 					{currentPlayerAddress}
 				</Typography>
 			</Wrapper>
-			<Wrapper>
-				<Typography color="#C1CCDC" fontWeight={700}>
-					Ante Amount
-				</Typography>
-				<Typography
-					color="#C1CCDC"
-					fontWeight={700}
-				>
-					{anteAmount}
-				</Typography>
-				<Typography color="#C1CCDC" fontWeight={700}>
-					Betting Unit
-				</Typography>
-				<Typography
-					color="#C1CCDC"
-					fontWeight={700}
-				>
-					{betUnit}
-				</Typography>
-			</Wrapper>
+			<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
 			<Wrapper>
 				<Typography color="#C1CCDC" fontWeight={700}>
 					Winner Player
@@ -137,7 +138,7 @@ const Container = styled(Box)({
 	border: "2px solid #C1CCDC",
 	borderRadius: 8,
 	width: 400,
-	height: 80,
+	height: 115,
 });
 
 const Wrapper = styled(Box)({
