@@ -32,7 +32,7 @@ export const TotalAmount = ({
 				<Box sx={{ display: "flex", gap: 0.5 }}>
 					<AnimatedSUI n={totalBetAmount?.toString() ?? "0"} />
 					<Typography color="#C1CCDC" fontWeight={700}>
-						SUI
+						MIST
 					</Typography>
 				</Box>
 			</Wrapper>
@@ -44,7 +44,7 @@ export const TotalAmount = ({
 				<Box sx={{ display: "flex", gap: 0.5 }}>
 					<AnimatedSUI n={callAmount?.toString() ?? "0"} />
 					<Typography color="#C1CCDC" fontWeight={700}>
-						SUI
+						MIST
 					</Typography>
 				</Box>
 			</Wrapper>
@@ -57,7 +57,7 @@ export const TotalAmount = ({
 					color="#C1CCDC"
 					fontWeight={700}
 				>
-					{anteAmount}
+					{anteAmount} MIST
 				</Typography>
 				<Typography color="#C1CCDC" fontWeight={700}>
 					Betting Unit
@@ -66,7 +66,7 @@ export const TotalAmount = ({
 					color="#C1CCDC"
 					fontWeight={700}
 				>
-					{betUnit}
+					{betUnit} MIST
 				</Typography>
 			</Wrapper>
 			<Wrapper>
