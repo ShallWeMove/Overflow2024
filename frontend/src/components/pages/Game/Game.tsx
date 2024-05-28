@@ -2,21 +2,11 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { Box, Grid, styled } from "@mui/material";
 import { getObject } from "@/api/object";
-import { GamePlayerSpace } from "./GamePlayerSpace/GamePlayerSpace";
-import { UserSpace } from "./UserSpace/UserSpace";
 import { GamePlayBar } from "./GamePlayBar/GamePlayBar";
 import { GameTable } from "./GameTable/GameTable";
 import { gameTableAtom, playersInfoDataAtom } from "@/lib/states";
 import { useAtom } from "jotai";
 import { convertKeys } from "@/lib/formatting";
-import {
-	SpadeA,
-	HeartQ,
-	DiamondK,
-	ClubJ,
-	SpadeK,
-	FlippedCard,
-} from "@/components/UI/Cards";
 import { CardPlaceHolder } from "@/components/UI/CardPlaceHolder";
 import { playersDataAtom, myIndexAtom } from "@/lib/states";
 

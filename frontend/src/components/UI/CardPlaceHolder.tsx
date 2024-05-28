@@ -37,11 +37,14 @@ export const CardPlaceHolder = ({
 		setAnchorEl(null);
 	};
 
-	useEffect(()=>{
-		setIsTurn(tableInfo.currentPlayerAddress == playerData?.fields.playerAddress);
-		setIsManagerPlayer(tableInfo.managerPlayerAddress == playerData?.fields.playerAddress);
-	},[playerData])
-
+	useEffect(() => {
+		setIsTurn(
+			tableInfo.currentPlayerAddress == playerData?.fields.playerAddress
+		);
+    setIsManagerPlayer(
+      tableInfo.managerPlayerAddress == playerData?.fields.playerAddress
+    );
+	}, [playerData]);
 
 	return (
 		<Container>
@@ -73,14 +76,18 @@ export const CardPlaceHolder = ({
 				</Typography>
 			</UserProfileWrapper>
 			<PlaceHolder isTurn={isTurn} onClick={handleClick}>
-				<CardWrapper>
-					{playerData && playerData.fields.cards && playerData.fields.cards.map((card, index)=>{
-						return (
-							<Grid item xs={2} key={index}>
-								{convertCardNumberToCardImage(card.fields.cardNumber)}
-							</Grid> 
-							?? "");
-					})}
+				<CardWrapper container>
+					{playerData &&
+						playerData.fields.cards &&
+						playerData.fields.cards.map((card, index) => {
+							return (
+								(
+									<Grid item xs={2} key={index}>
+										{convertCardNumberToCardImage(card.fields.cardNumber)}
+									</Grid>
+								) ?? ""
+							);
+						})}
 				</CardWrapper>
 				<TotalBetAmount>
 					<Typography color="white" fontSize="16px" fontWeight={700}>
@@ -138,7 +145,7 @@ const TotalBetAmount = styled(Box)({
 	alignItems: "center",
 });
 
-const CardWrapper = styled(Box)({
+const CardWrapper = styled(Grid)({
 	width: "100%",
 	display: "flex",
 	justifyContent: "center",
