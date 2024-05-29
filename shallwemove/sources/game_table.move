@@ -135,6 +135,10 @@ module shallwemove::game_table {
     PLAYER_NOT_FOUND
   }
 
+  fun get_number_of_players(game_table : &GameTable) : u64 {
+    let number_of_players = ( game_table.game_status.game_seats() - game_table.game_status.avail_game_seats() ) as u64;
+    return number_of_players
+  }
 
   // set methods
 
@@ -151,21 +155,15 @@ module shallwemove::game_table {
 
     player_info.set_playing_status(player_info::CONST_ENTER());
 
-    game_table.game_status.enter_player(ctx);
+    // player가 해당 게임에 manage_player가 없으면 manager_player로 등록
+    if (game_table.game_status.manager_player() == option::none<address>()) {
+      game_table.game_status.set_manager_player(option::some(tx_context::sender(ctx)), 0);
+    };
+
+    // avail_seat 하나 감소
+    game_table.game_status.decrease_avail_seat();
   }
 
-  fun get_number_of_players(game_table : &GameTable) : u64 {
-    let mut i = 0;
-    let mut number_of_players = 0;
-    while (i < game_table.player_seats.length()) {
-      let player_seat = game_table.player_seats.borrow(i);
-      if (player_seat.player_address() != option::none()) {
-        number_of_players = number_of_players + 1;
-      };
-      i = i + 1;
-    };
-    return number_of_players
-  }
 
   fun is_all_player_ready(game_table : &GameTable) : bool {
     let mut i = 0;

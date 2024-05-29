@@ -174,7 +174,7 @@ module shallwemove::game_status {
     game_status.game_info.avail_game_seats = game_status.game_info.avail_game_seats + 1; 
   }
 
-  fun decrement_avail_seat(game_status : &mut GameStatus) {
+  public fun decrease_avail_seat(game_status : &mut GameStatus) {
     game_status.game_info.avail_game_seats = game_status.game_info.avail_game_seats - 1; 
   }
 
@@ -221,18 +221,6 @@ module shallwemove::game_status {
 
   public fun add_player_info(game_status : &mut GameStatus, player_info : PlayerInfo) {game_status.player_infos.push_back(player_info);}
 
-  public fun enter_player(game_status : &mut GameStatus, ctx : &mut TxContext) {
-    // player가 해당 게임의 첫 번째 유저면 manager_player로 등록
-    if (game_status.manager_player() == option::none<address>()) {
-      // game_status.set_manager_player(option::some(tx_context::sender(ctx)));
-    };
-
-    // avail_seat 하나 감소
-    game_status.decrement_avail_seat();
-  }
-
-
-  
   // ============================================
   // ================ TEST ======================
 }
