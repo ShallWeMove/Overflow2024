@@ -2,13 +2,11 @@
 
 Welcome to Shall We Move, a fully on-chain multiplayer Blackjack game implemented on the Sui blockchain. This project leverages the unique features of the Sui blockchain to provide secure, transparent, and decentralized gameplay.
 
-![Shall We Move Landing Page](images/landing.jpg)
+![Shall We Move Landing Page](images/landing.png)
 
 Dive into the game interface, designed to offer a seamless and engaging Blackjack experience with real-time multiplayer support.
 
-![Shall We Move Game Page](images/game.jpg)
-
-
+![Shall We Move Game Page](images/game.png)
 
 # Table of Contents
 
@@ -41,7 +39,7 @@ To run the project locally, follow these steps:
 
 ## Prerequisites
 
-- Node.js (v18.x or later)
+- Node.js (v18.17.0 or later)
 - pnpm
 - Sui Blockchain node (or access to a Sui node)
 
@@ -54,15 +52,20 @@ git clone https://github.com/ShallWeMove/Overflow2024.git
 ## Smart Contracts
 
 ### Publish the Smart Contracts
+
 you should see the package address in the output after running the command below.
+
 ```bash
 cd shallwemove
 sui client publish
 ```
 
 ### Create your Casino & Lounge on the Sui Blockchain
+
 you should see the casino and lounge addresses in the output after running the command above. Use these addresses to create your casino and lounge on the Sui blockchain.
+
 ## 업데이트 필요!
+
 ```bash
 sui move create-casino
 sui move create-lounge
@@ -71,11 +74,13 @@ sui move create-lounge
 ## Frontend
 
 ### Set Environment Variables
+
 - package address
 - casino address
 - lounge address
 
 `cd frontend` and create a `.env.local` file with the following content:
+
 ```
 PACKAGE_ADDRESS=0x1234567890
 CASINO_ADDRESS=0x1234567890
@@ -83,11 +88,13 @@ LOUNGE_ADDRESS=0x1234567890
 ```
 
 ### Install Dependencies
+
 ```bash
 pnpm install
 ```
 
 ### Start the Development Server
+
 ```bash
 pnpm dev
 ```
