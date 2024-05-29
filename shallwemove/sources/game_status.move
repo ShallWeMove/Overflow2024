@@ -184,8 +184,8 @@ module shallwemove::game_status {
   }
   fun total_bet_amount(game_status : &GameStatus) : u64 {game_status.money_box_info.total_bet_amount}
 
-  public fun add_money(game_status : &mut GameStatus, money : &Coin<SUI>) {
-    game_status.money_box_info.total_bet_amount = game_status.money_box_info.total_bet_amount + money.value();
+  public fun add_bet_amount(game_status : &mut GameStatus, bet_amount : u64) {
+    game_status.money_box_info.total_bet_amount = game_status.money_box_info.total_bet_amount + bet_amount;
   }
 
   public fun discard_money(game_status : &mut GameStatus, money : &Coin<SUI>) {

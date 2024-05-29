@@ -105,7 +105,7 @@ module shallwemove::player_seat {
     };
   }
 
-  public fun merge_and_split_money(player_seat : &mut PlayerSeat, amount : u64, ctx : &mut TxContext) : Coin<SUI> {
+  public fun withdraw_money(player_seat : &mut PlayerSeat, player_info : &mut PlayerInfo, amount : u64, ctx : &mut TxContext) : Coin<SUI> {
     let mut i = player_seat.deposit.length();
     let mut money_container = coin::zero<SUI>(ctx);
     while (i > 0) {
@@ -116,7 +116,9 @@ module shallwemove::player_seat {
     };
 
     let money = coin::split<SUI>(&mut money_container, amount, ctx);
+    let money_value = money.value();
     vector::push_back(&mut player_seat.deposit, money_container);
+    player_info.discard_deposit(money_value);
     return money
   }
 

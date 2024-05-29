@@ -277,29 +277,16 @@ module shallwemove::game_table {
   }
 
 
-  fun send_money(game_table : &mut GameTable, player_seat_index : u64, money_amont : u64, ctx : &mut TxContext) {
+  fun bet_money(game_table : &mut GameTable, player_seat_index : u64, money_amont : u64, ctx : &mut TxContext) {
     let player_seat = game_table.player_seats.borrow_mut(player_seat_index);
-    //PlayerSeat의 deposit에서 money_amount 만큼 꺼내기
-    let money_to_send = player_seat.merge_and_split_money(money_amont, ctx);
-
-    // PlayerInfo bet amount 업데이트
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
-    player_info.discard_deposit(money_to_send.value());
-    player_info.add_bet_amount(money_to_send.value());
 
-    //MoneyBox total 금액 업데이트 및 MoneyBox로 전송
-    game_table.game_status.add_money(&money_to_send);
-    game_table.money_box.add_money(money_to_send);
-  }
+    // tx sender가 해당 player_seat 자리 주인이 아니면 assert!
+    assert!(option::some(tx_context::sender(ctx)) == player_seat.player_address(), 403);
 
-  fun send_ante(game_table : &mut GameTable, player_seat_index : u64, ctx : &mut TxContext) {
-    // //PlayerSeat의 deposit에서 ante 만큼 꺼내서 MoneyBox 로 보내기
-    let ante_amount = game_table.game_status.ante_amount();
-    game_table.send_money(player_seat_index, ante_amount, ctx);
-
-    // // PlayerInfo bet amount 업데이트 & READY 상태로 변환
-    let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
-    player_info.set_playing_status(player_info::CONST_READY());
+    //PlayerSeat의 deposit에서 money_amount 만큼 꺼내서 MoneyBox로 보내기
+    let money_to_bet = player_seat.withdraw_money(player_info, money_amont, ctx);
+    game_table.money_box.bet_money(&mut game_table.game_status, player_info, money_to_bet);
   }
 
   fun draw_card(game_table : &mut GameTable, player_seat_index : u64) {
@@ -386,8 +373,13 @@ module shallwemove::game_table {
     // 못 찾는다면 잘못된 game_table이라는 것. enter 하지 않았다는 뜻
     assert!(player_seat_index != PLAYER_NOT_FOUND, 403);
 
-    // ante 내기
-    game_table.send_ante(player_seat_index, ctx);
+    // PlayerSeat의 deposit에서 ante 만큼 꺼내서 MoneyBox 로 보내기
+    let ante_amount = game_table.game_status.ante_amount();
+    game_table.bet_money(player_seat_index, ante_amount, ctx);
+
+    // READY 상태로 전환
+    let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
+    player_info.set_playing_status(player_info::CONST_READY());
   }
 
   public fun start(game_table : &mut GameTable) {
@@ -495,7 +487,7 @@ module shallwemove::game_table {
       // 그리고 다음 턴
     let player_seat_index = game_table.find_player_seat_index(ctx);
     let bet_unit = game_table.game_status.bet_unit();
-    game_table.send_money(player_seat_index,bet_unit , ctx);
+    game_table.bet_money(player_seat_index,bet_unit , ctx);
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
     player_info.set_playing_action(player_info::CONST_BET());
 
@@ -552,7 +544,7 @@ module shallwemove::game_table {
 
       // 현재 플레이어의 총 베팅 금액을 직전 플레이어의 총 베팅 금액과 동일하게 맞춘다.
     let bet_amount = previous_player_total_bet_amount - player_info.total_bet_amount();
-    game_table.send_money(player_seat_index, bet_amount, ctx);
+    game_table.bet_money(player_seat_index, bet_amount, ctx);
     
     if (!game_table.is_all_player_bet_amount_same()) {
       game_table.next_turn(ctx);
@@ -589,7 +581,7 @@ module shallwemove::game_table {
     let call_bet_amount = previous_player_total_bet_amount - player_info.total_bet_amount();
     let raise_bet_amount = raise_chip_count * game_table.game_status.bet_unit();
     let bet_amount = call_bet_amount + raise_bet_amount;
-    game_table.send_money(player_seat_index, bet_amount, ctx);
+    game_table.bet_money(player_seat_index, bet_amount, ctx);
 
       // 다음 턴
     game_table.next_turn(ctx);
