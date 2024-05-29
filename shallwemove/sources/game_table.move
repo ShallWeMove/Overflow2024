@@ -20,7 +20,7 @@ module shallwemove::game_table {
   // ============== CONSTANTS ===================
   
   const GAME_TABLE_FULL : u64 = 100;
-  const PLAYER_NOT_FOUND : u64 = 100;
+  const PLAYER_NOT_FOUND : u64 = 101;
 
   // ============================================
   // ============== STRUCTS =====================
@@ -71,42 +71,7 @@ module shallwemove::game_table {
 
   // ===================== Methods ===============================
 
-  // get methods
-  public fun id(game_table : &GameTable) : ID {object::id(game_table)}
-
-  public fun lounge_id(game_table : &GameTable) : ID {game_table.lounge_id}
-
-  fun used_card_decks(game_table : &GameTable) : vector<ID> {game_table.used_card_decks}
-
-
-  public fun game_status(game_table : &GameTable) : &GameStatus {
-    &game_table.game_status
-  }
-
-  // set methods
-
-  fun set_player_address(game_table : &mut GameTable, index : u64, ctx : &mut TxContext) {
-      let player_info = game_table.game_status.player_infos_mut().borrow_mut(index);
-      let player_seat = game_table.player_seats.borrow_mut(index);
-      player_seat.set_player_address(ctx);
-      player_info.set_player_address(ctx);
-  }
-
-  fun set_player_public_key(game_table : &mut GameTable, index : u64, public_key : vector<u8>) {
-      let player_info = game_table.game_status.player_infos_mut().borrow_mut(index);
-      let player_seat = game_table.player_seats.borrow_mut(index);
-      player_seat.set_public_key(public_key);
-      player_info.set_public_key(public_key);
-  }
-
-  fun set_player_deposit(game_table : &mut GameTable, index : u64, deposit : Coin<SUI>) {
-      let player_info = game_table.game_status.player_infos_mut().borrow_mut(index);
-      let player_seat = game_table.player_seats.borrow_mut(index);
-      // player_info.add_money(deposit.value());
-      player_seat.add_money(player_info, deposit);
-      player_info.set_playing_status(player_info::CONST_ENTER());
-  }
-
+  // create methods
   fun create_player_seats(game_table : &mut GameTable, ctx: &mut TxContext) {
     let mut i = 0 as u8;
     while (i < game_table.game_status.game_seats()) {
@@ -120,8 +85,18 @@ module shallwemove::game_table {
     };
   }
 
+  // get methods
+  public fun id(game_table : &GameTable) : ID {object::id(game_table)}
+
+  public fun lounge_id(game_table : &GameTable) : ID {game_table.lounge_id}
+
+  fun used_card_decks(game_table : &GameTable) : vector<ID> {game_table.used_card_decks}
+
+  public fun game_status(game_table : &GameTable) : &GameStatus {
+    &game_table.game_status
+  }
+
   fun find_empty_seat_index(game_table : &GameTable) : u64 {
-    let is_game_table_full = false;
     let mut index = 0;
     while (index < game_table.game_status.game_seats() as u64) {
       let player_info = game_table.game_status.player_infos().borrow(index);
@@ -134,19 +109,17 @@ module shallwemove::game_table {
     };
 
     if (index == game_table.game_status.game_seats() as u64) {
-      is_game_table_full == true;
       index = GAME_TABLE_FULL; // 완전 PlayerSeat index 범위를 벗어나는 숫자
     };
 
     index
   }
 
-  fun find_player_seat_index(game_table : &mut GameTable, ctx : &mut TxContext) : u64 {
-    let mut index = 0;
-
+  fun find_player_seat_index(game_table : &GameTable, ctx : &mut TxContext) : u64 {
     // player가 속한 player_seat index 찾아내기
+    let mut index = 0;
     while (index < game_table.player_seats.length()) {
-      let player_seat = game_table.player_seats.borrow_mut(index);
+      let player_seat = game_table.player_seats.borrow(index);
       if (player_seat.player_address() == option::none<address>()) {
         index = index + 1;
         continue
@@ -160,6 +133,25 @@ module shallwemove::game_table {
     };
 
     PLAYER_NOT_FOUND
+  }
+
+
+  // set methods
+
+  fun enter_player(game_table : &mut GameTable, empty_seat_index : u64, public_key : vector<u8>, deposit : Coin<SUI>, ctx : &mut TxContext) {
+    let player_info = game_table.game_status.player_infos_mut().borrow_mut(empty_seat_index);
+    let player_seat = game_table.player_seats.borrow_mut(empty_seat_index);
+
+    // tx sender가 해당 player_seat 자리 주인이 아니면 assert!
+    assert!(option::some(tx_context::sender(ctx)) == player_seat.player_address(), 403);
+
+    player_seat.set_player_address(player_info, ctx);
+    player_seat.set_public_key(player_info, public_key);
+    player_seat.add_money(player_info, deposit);
+
+    player_info.set_playing_status(player_info::CONST_ENTER());
+
+    game_table.game_status.enter_player(ctx);
   }
 
   fun get_number_of_players(game_table : &GameTable) : u64 {
@@ -192,16 +184,7 @@ module shallwemove::game_table {
     is_all_player_ready
   }
 
-  fun set_player(game_table : &mut GameTable, empty_seat_index : u64, public_key : vector<u8>, deposit : Coin<SUI>, ctx : &mut TxContext) {
-      game_table.set_player_address(empty_seat_index, ctx);
-      game_table.set_player_public_key(empty_seat_index, public_key);
-      game_table.set_player_deposit(empty_seat_index, deposit);
-
-      game_table.game_status.enter_player(ctx);
-  }
-
-
-  fun remove_player_deposit(game_table : &mut GameTable, player_seat_index : u64, ctx : &mut TxContext) {
+  fun exit_player(game_table : &mut GameTable, player_seat_index : u64, ctx : &mut TxContext) {
     let player_seat = game_table.player_seats.borrow_mut(player_seat_index);
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
     
@@ -209,68 +192,46 @@ module shallwemove::game_table {
     assert!(option::some(tx_context::sender(ctx)) == player_seat.player_address(), 403);
 
     player_seat.remove_deposit(player_info, ctx);
-  }
-
-  fun remove_player_cards(game_table : &mut GameTable, player_seat_index : u64, ctx : &mut TxContext) {
-    let player_seat = game_table.player_seats.borrow_mut(player_seat_index);
-    let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
-
-    // tx sender가 해당 player_seat 자리 주인이 아니면 assert!
-    assert!(option::some(tx_context::sender(ctx)) == player_seat.player_address(), 403);
-
-    player_seat.remove_cards(game_table.card_deck.borrow_mut(), player_info);
-  }
-
-  fun remove_player_info(game_table : &mut GameTable, player_seat_index : u64, ctx : &mut TxContext) {
-    let player_seat = game_table.player_seats.borrow_mut(player_seat_index);
-    let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
-
-    // tx sender가 해당 player_seat 자리 주인이 아니면 assert!
-    assert!(option::some(tx_context::sender(ctx)) == player_seat.player_address(), 403);
-
+    player_seat.remove_cards(player_info, game_table.card_deck.borrow_mut());
     player_seat.remove_player_info(player_info);
-  }
-
-  fun remove_player(game_table : &mut GameTable, player_seat_index : u64, ctx : &mut TxContext) {
-    game_table.remove_player_deposit(player_seat_index, ctx);
-    game_table.remove_player_cards(player_seat_index, ctx);
-    // remove_player_info 마지막에 해야 함
-    game_table.remove_player_info(player_seat_index, ctx);
 
     game_table.game_status.increment_avail_seat();
   }
 
   fun update_manager_player(game_table : &mut GameTable, player_seat_index : u64) {
-    let mut i = player_seat_index + 1;
+    let mut next_player_seat_index = player_seat_index + 1;
     let mut is_nobody_here = false;
     loop {
-      if (i == game_table.player_seats.length()) {
-        i = 0;
+      if (next_player_seat_index == game_table.player_seats.length()) {
+        next_player_seat_index = 0;
       };
 
       // 한 바퀴 돌았는데도 player 못 찾은거면 아무도 없는 거임
-      if (i == player_seat_index) {
+      if (next_player_seat_index == player_seat_index) {
         is_nobody_here = true;
         break
       };
 
       // none 이면 다음 넘기기
-      if (game_table.player_seats.borrow_mut(i).player_address() == option::none<address>()) {
-        i = i + 1;
+      if (game_table.player_seats.borrow_mut(next_player_seat_index).player_address() == option::none<address>()) {
+        next_player_seat_index = next_player_seat_index + 1;
         continue
       };
 
       // 다음 player를 찾았다!
-      if (game_table.player_seats.borrow_mut(i).player_address() != option::none<address>()) {
-        game_table.game_status.set_manager_player(game_table.player_seats.borrow_mut(i).player_address());
+      if (game_table.player_seats.borrow_mut(next_player_seat_index).player_address() != option::none<address>()) {
+        game_table.game_status.set_manager_player(
+          game_table.player_seats.borrow_mut(next_player_seat_index).player_address(), 
+          next_player_seat_index
+        );
         break
       };
 
-      i = i + 1;
+      next_player_seat_index = next_player_seat_index + 1;
     };
 
     if (is_nobody_here) {
-      game_table.game_status.set_manager_player(option::none());
+      game_table.game_status.set_manager_player(option::none(), 0);
     };
   }
 
@@ -315,26 +276,6 @@ module shallwemove::game_table {
     game_table.game_status.set_current_turn(i as u8);
   }
 
-
-  fun exit_player(game_table : &mut GameTable, player_seat_index : u64, ctx : &mut TxContext) {
-    // player가 해당 게임의 manager_player이면 다음으로 넘겨주거나 마지막 유저면 option::none()
-    game_table.update_manager_player(player_seat_index);
-    
-    // 게임 중인가?? 그리고 지금 exit 하는 유저가 current turn인가?? -> next turn
-    if (game_table.game_status.game_playing_status() == game_status::CONST_IN_GAME() && game_table.game_status.is_current_turn(ctx)) {
-      game_table.next_turn(ctx);
-    };
-
-    // 만약 게임 중이고 남은 플레이어가 1명이라 게임이 불가하면
-    if (game_table.game_status.game_playing_status() == game_status::CONST_IN_GAME() && game_table.get_number_of_players() == 1) {
-      // 남은 사람이 이기게 되는 걸로 게임 종료
-      // 게임 종료 (추후 개발)
-      // game_table.finish_game();
-    };
-
-    // player 정보 제거
-    game_table.remove_player(player_seat_index, ctx);
-  }
 
   fun send_money(game_table : &mut GameTable, player_seat_index : u64, money_amont : u64, ctx : &mut TxContext) {
     let player_seat = game_table.player_seats.borrow_mut(player_seat_index);
@@ -408,7 +349,7 @@ module shallwemove::game_table {
       transfer::public_transfer(deposit, tx_context::sender(ctx));
     } else {
       // game table에 참여할 수 있으면 참여 시킨다.
-      game_table.set_player(empty_seat_index, public_key, deposit, ctx);
+      game_table.enter_player(empty_seat_index, public_key, deposit, ctx);
     };
   }
 
@@ -419,6 +360,22 @@ module shallwemove::game_table {
     // 못 찾는다면 잘못된 game_table이라는 것. 
     assert!(player_seat_index != PLAYER_NOT_FOUND, 403);
 
+    // player가 해당 게임의 manager_player이면 다음으로 넘겨주거나 마지막 유저면 option::none()
+    game_table.update_manager_player(player_seat_index);
+    
+    // 게임 중인가?? 그리고 지금 exit 하는 유저가 current turn인가?? -> next turn
+    if (game_table.game_status.game_playing_status() == game_status::CONST_IN_GAME() && game_table.game_status.is_current_turn(ctx)) {
+      game_table.next_turn(ctx);
+    };
+
+    // 만약 게임 중이고 남은 플레이어가 1명이라 게임이 불가하면
+    if (game_table.game_status.game_playing_status() == game_status::CONST_IN_GAME() && game_table.get_number_of_players() == 1) {
+      // 남은 사람이 이기게 되는 걸로 게임 종료
+      // 게임 종료 (추후 개발)
+      // game_table.finish_game();
+    };
+
+    // player 정보 제거
     game_table.exit_player(player_seat_index, ctx);
   }
 

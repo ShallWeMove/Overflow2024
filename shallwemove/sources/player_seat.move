@@ -46,21 +46,24 @@ module shallwemove::player_seat {
   fun public_key(player_seat : &PlayerSeat) : vector<u8> {player_seat.public_key}
 
 
-  public fun set_player_address(player_seat : &mut PlayerSeat, ctx : &TxContext) {
+  public fun set_player_address(player_seat : &mut PlayerSeat, player_info : &mut PlayerInfo, ctx : &mut TxContext) {
     player_seat.player_address = option::some(tx_context::sender(ctx));
+    player_info.set_player_address(ctx);
   }
 
-  public fun set_player_address_empty(player_seat : &mut PlayerSeat) {
-    player_seat.player_address = option::none();
-  }
+  // public fun set_player_address_empty(player_seat : &mut PlayerSeat) {
+  //   player_seat.player_address = option::none();
+  // }
 
-  public fun set_public_key(player_seat : &mut PlayerSeat, public_key : vector<u8>) {
+  public fun set_public_key(player_seat : &mut PlayerSeat, player_info : &mut PlayerInfo, public_key : vector<u8>) {
     player_seat.public_key = public_key;
+    player_info.set_public_key(public_key);
   }
 
   public fun add_money(player_seat : &mut PlayerSeat, player_info : &mut PlayerInfo, money : Coin<SUI>) {
-    player_info.add_deposit(money.value());
+    let money_value = money.value();
     player_seat.deposit.push_back(money);
+    player_info.add_deposit(money_value);
   }
 
   public fun receive_card(player_seat : &mut PlayerSeat, card : Card) {
@@ -90,7 +93,7 @@ module shallwemove::player_seat {
       transfer::public_transfer(money_container, player_address);
   }
 
-  public fun remove_cards(player_seat : &mut PlayerSeat, card_deck : &mut CardDeck, player_info : &mut PlayerInfo) {
+  public fun remove_cards(player_seat : &mut PlayerSeat,player_info : &mut PlayerInfo, card_deck : &mut CardDeck) {
     let mut i = player_seat.cards.length();
     while (i > 0) {
       let used_card = player_seat.cards.pop_back();

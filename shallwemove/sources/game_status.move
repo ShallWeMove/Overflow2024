@@ -159,7 +159,7 @@ module shallwemove::game_status {
     game_status.game_info.game_playing_status = game_playing_status
   }
 
-  public fun set_manager_player(game_status: &mut GameStatus, manager_player_address : Option<address>) {
+  public fun set_manager_player(game_status: &mut GameStatus, manager_player_address : Option<address>, player_seat_index : u64) {
     game_status.game_info.manager_player = manager_player_address;
 
     if (manager_player_address == option::none()) {
@@ -167,25 +167,7 @@ module shallwemove::game_status {
       return
     };
     
-    // 그리고 해당 manager player의 자리로 set current turn 해야 함.
-      // player가 속한 player_info index 찾아내기
-    let mut i = 0; 
-    while (i < game_status.player_infos().length()) {
-      let player_seat = game_status.player_infos_mut().borrow_mut(i);
-      if (player_seat.player_address() == option::none<address>()) {
-        i = i + 1;
-        continue
-      };
-
-      let player_address_of_seat = game_status.player_infos()[i].player_address();
-      if (manager_player_address == player_address_of_seat) {
-        break
-      };
-
-      i = i + 1;
-    };
-
-    game_status.set_current_turn(i as u8);
+    game_status.set_current_turn(player_seat_index as u8);
   }
 
   public fun increment_avail_seat(game_status : &mut GameStatus) {
@@ -242,7 +224,7 @@ module shallwemove::game_status {
   public fun enter_player(game_status : &mut GameStatus, ctx : &mut TxContext) {
     // player가 해당 게임의 첫 번째 유저면 manager_player로 등록
     if (game_status.manager_player() == option::none<address>()) {
-      game_status.set_manager_player(option::some(tx_context::sender(ctx)));
+      // game_status.set_manager_player(option::some(tx_context::sender(ctx)));
     };
 
     // avail_seat 하나 감소

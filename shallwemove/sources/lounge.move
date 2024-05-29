@@ -70,7 +70,7 @@ module shallwemove::lounge {
     dynamic_object_field::add<ID, GameTable>(&mut lounge.id, game_table.id(), game_table);
   }
 
-  public fun available_game_table_id(lounge : &Lounge) : Option<ID> {
+  public fun get_available_game_table_id(lounge : &Lounge) : Option<ID> {
     let mut game_tables = lounge.game_tables;
     game_tables.reverse();
 
