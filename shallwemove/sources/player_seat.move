@@ -67,10 +67,9 @@ module shallwemove::player_seat {
     player_info.add_deposit(money_value);
   }
 
-  public fun draw_card(player_seat : &mut PlayerSeat, player_info : &mut PlayerInfo, game_status : &mut GameStatus, card : Card) {
+  public fun draw_card(player_seat : &mut PlayerSeat, player_info : &mut PlayerInfo, card : Card) {
     player_seat.cards.push_back(card);
     player_info.receive_card();
-    game_status.draw_card();
   }
 
   public fun remove_player_info(player_seat : &mut PlayerSeat, player_info : &mut PlayerInfo){
@@ -87,7 +86,7 @@ module shallwemove::player_seat {
       while(i > 0) {
         let money = player_seat.deposit.pop_back();
         player_info.discard_deposit(money.value());
-        debug::print(&player_info.deposit());
+        // debug::print(&player_info.deposit());
 
         coin::join<SUI>(&mut money_container, money);
 

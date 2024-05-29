@@ -37,10 +37,9 @@ module shallwemove::money_box {
     &mut money_box.money
   }
 
-  public fun bet_money(money_box : &mut MoneyBox, game_status : &mut GameStatus, player_info : &mut PlayerInfo, money : Coin<SUI>) {
+  public fun bet_money(money_box : &mut MoneyBox, player_info : &mut PlayerInfo, money : Coin<SUI>) {
     let money_value = money.value();
     vector::push_back(&mut money_box.money, money);
-    game_status.add_bet_amount(money_value);
     player_info.add_bet_amount(money_value);
   }
 

@@ -78,7 +78,7 @@ module shallwemove::game_status {
   }
 
   fun new_game_info(max_round : u8, ante_amount : u64, bet_unit : u64, game_seats : u8) : GameInfo {
-    assert!(game_seats >= 2 && game_seats <= 5, 403);
+    assert!(game_seats >= 2 && game_seats <= 5, 201);
 
     GameInfo {
       game_playing_status : 0,
@@ -125,6 +125,10 @@ module shallwemove::game_status {
   }
 
   fun winner_player(game_status : &GameStatus) : Option<address> {game_status.game_info.winner_player}
+
+  public fun set_winner_player(game_status : &mut GameStatus, player_address : Option<address>) {
+    game_status.game_info.winner_player = player_address;
+  }
   
   public fun ante_amount(game_status : &GameStatus) : u64 {game_status.game_info.ante_amount}
 

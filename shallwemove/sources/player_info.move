@@ -139,6 +139,9 @@ module shallwemove::player_info {
 
     player_info.playing_status = EMPTY;
     player_info.playing_action = NONE;
+
+    player_info.previous_bet_amount = 0;
+    player_info.total_bet_amount = 0;
   }
 
 
