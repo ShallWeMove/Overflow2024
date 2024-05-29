@@ -143,14 +143,17 @@ module shallwemove::game_table {
         next_player_seat_index = 0;
       };
 
-      let player_seat = game_table.player_seats.borrow(next_player_seat_index);
-      if (player_seat.player_address() == option::none<address>()) {
+      let player_info = game_table.game_status.player_infos().borrow(next_player_seat_index);
+      if (player_info.player_address() == option::none<address>()) {
+        next_player_seat_index = next_player_seat_index + 1;
+        continue
+      };
+      if (player_info.playing_action() == player_info::CONST_FOLD()) {
         next_player_seat_index = next_player_seat_index + 1;
         continue
       };
 
-      // if (player_address == player_address_of_seat) {
-      if (player_seat.player_address() != option::none<address>()) {
+      if (player_info.player_address() != option::none<address>()) {
         break
       };
 
@@ -215,6 +218,27 @@ module shallwemove::game_table {
         continue
       };
       if (game_table.game_status.player_infos().borrow(i).playing_action() != player_info::CONST_CHECK()) {
+        return false
+      };
+
+      i = i + 1;
+    };
+
+    return true
+  }
+
+  fun is_all_player_not_none_action(game_table : &GameTable) : bool {
+    let mut i = 0;
+    while(i < game_table.player_seats.length()){
+      if (game_table.game_status.player_infos().borrow(i).player_address() == option::none()) {
+        i = i + 1;
+        continue
+      };
+      if (game_table.game_status.player_infos().borrow(i).playing_action() == player_info::CONST_FOLD()) {
+        i = i + 1;
+        continue
+      };
+      if (game_table.game_status.player_infos().borrow(i).playing_action() == player_info::CONST_NONE()) {
         return false
       };
 
@@ -322,24 +346,31 @@ module shallwemove::game_table {
 
   public fun next_turn(game_table : &mut GameTable, ctx : &mut TxContext) {
     let player_seat_index = game_table.find_player_seat_index(ctx);
-    let player_info = game_table.game_status.player_infos().borrow(player_seat_index);
+    let playing_action = game_table.game_status.player_infos().borrow(player_seat_index).playing_action();
 
     // action을 하는 player index와 current turn index는 다를 수 있다. (exit은 언제든 할 수 있기 때문)
       // 현재 유저가 current turn 이라면 넘겨주고
       // (action이 Exit이고) current turn이 아니라면 안 넘겨줘도 됨
-    if (player_info.playing_action() == player_info::CONST_EXIT() && player_seat_index != (game_table.game_status.current_turn_index() as u64)) {
+    if (playing_action == player_info::CONST_EXIT() && player_seat_index != (game_table.game_status.current_turn_index() as u64)) {
       return
     };
 
     // 여기선 웬만하면 player index == current turn index (Exit을 제외한 모든 action은 current turn일 때만 실행 가능) 
     // fold도 아니고 exit도 아니라면 현재 턴이 previous turn이 되어야 함
-    if (player_info.playing_action() != player_info::CONST_FOLD() && player_info.playing_action() != player_info::CONST_EXIT()) {
+    if (playing_action != player_info::CONST_FOLD() && playing_action != player_info::CONST_EXIT()) {
       game_table.game_status.set_previous_turn(player_seat_index as u8); 
     };
+  
 
     // 다음 플레이어로 턴 넘겨 줌
     let next_player_seat_index = game_table.find_next_player_seat_index(player_seat_index);
     game_table.game_status.set_current_turn(next_player_seat_index as u8);
+
+    if (playing_action == player_info::CONST_FOLD() && game_table.game_status.current_turn_index() == game_table.game_status.previous_turn_index()) {
+      game_table.game_status.set_previous_turn(next_player_seat_index as u8); 
+    } else if (playing_action == player_info::CONST_FOLD() && game_table.game_status.current_turn_index() != game_table.game_status.previous_turn_index()) {
+      return
+    };
   }
 
 
@@ -475,6 +506,10 @@ module shallwemove::game_table {
         i = i + 1;
         continue
       };
+      if (game_table.game_status.player_infos().borrow(i).playing_action() == player_info::CONST_FOLD()) {
+        i = i + 1;
+        continue
+      };
 
       game_table.game_status.player_infos_mut().borrow_mut(i).set_playing_action(player_info::CONST_NONE());
       i = i + 1;
@@ -497,19 +532,29 @@ module shallwemove::game_table {
 
   }
 
-  fun check_winner(game_table : &mut GameTable) {
+  fun check_winner(game_table : &mut GameTable) : u64 {
+    let mut i = 0;
+    while (i < game_table.player_seats.length()) {
+      let player_seat = game_table.player_seats.borrow_mut(i);
+      if (player_seat.player_address() == option::none()) {
+        i = i + 1;
+        continue
+      };
+
+      
+
+      i = i + 1;
+    };
+    return 0
   }
 
   fun finish_game(game_table : &mut GameTable, ctx : &mut TxContext) {
-    debug::print(&string::utf8(b"finish game"));
     let player_seat_index = game_table.find_player_seat_index(ctx);
     let player_info = game_table.game_status.player_infos().borrow(player_seat_index);
     // player 가 하나 남았나? (남은 플레이어가 Exit 했나?)
     if (player_info.playing_action() == player_info::CONST_EXIT() && game_table.number_of_players() == 2) {
       let next_player_seat_index = game_table.find_next_player_seat_index(player_seat_index);
       let next_player_seat = game_table.player_seats.borrow(next_player_seat_index);
-      debug::print(&string::utf8(b"next player seat index"));
-      debug::print(&next_player_seat_index);
       game_table.game_status.set_winner_player(next_player_seat.player_address());
     };
 
@@ -520,10 +565,14 @@ module shallwemove::game_table {
       game_table.game_status.set_winner_player(next_player_seat.player_address());
     }; 
 
-    // winner player 결정하고 게임 끝내기?
-    game_table.check_winner();
-    
+    // 모든 플레이어 카드 오픈
     game_table.open_all_player_card();
+
+    // winner player 결정하고 winner player에게 money box 돈 다 보내기
+    let winner_player_index = game_table.check_winner();
+    let winner_player_info = game_table.game_status.player_infos().borrow(winner_player_index);
+    game_table.game_status.set_winner_player(winner_player_info.player_address());
+    
     // GAME FINISHED
     game_table.reset_all_player_playing_action_to_GAME_END();
     game_table.game_status.set_game_playing_status(game_status::CONST_GAME_FINISHED());
@@ -538,7 +587,6 @@ module shallwemove::game_table {
     game_table.game_status.set_previous_turn(current_turn_index); // 그리고 previous turn은 current turn과 동일하게 초기화
   }
   
-  // check를 하니 바로 다음 round로 넘어간다
   fun check(game_table : &mut GameTable, ctx : &mut TxContext) {
     let player_seat_index = game_table.find_player_seat_index(ctx);
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
@@ -582,7 +630,6 @@ module shallwemove::game_table {
   }
 
 
-  // 3명이서 플레이 중 2번 쨰 사람이 call 하니 round가 넘어갔다.
   fun call(game_table : &mut GameTable, ctx : &mut TxContext) {
     let previous_player_seat_index = game_table.game_status.previous_turn_index() as u64;
     let previous_player_total_bet_amount = game_table.game_status.player_infos().borrow(previous_player_seat_index).total_bet_amount();
@@ -641,7 +688,7 @@ module shallwemove::game_table {
   }
 
   fun fold(game_table : &mut GameTable, ctx : &mut TxContext) {
-      let player_seat_index = game_table.find_player_seat_index(ctx);
+    let player_seat_index = game_table.find_player_seat_index(ctx);
     {
       let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
 
@@ -660,7 +707,7 @@ module shallwemove::game_table {
     };
 
     // FOLD 후 게임 진행 가능 & PLAYING 중인 모든 player가 CHECK를 했는가?
-    if (game_table.is_all_player_check() && is_game_able_to_continue) {
+    if ( game_table.is_all_player_check() && is_game_able_to_continue) {
       // 게임을 더 진행할 수 있는가? (round가 아직 남았나? == 아직 max round를 넘지 않았나?)
       if (!game_table.is_over_max_round()){
         game_table.next_round(ctx);
@@ -673,7 +720,9 @@ module shallwemove::game_table {
     };
 
     // FOLD를 후 게임 진행 가능 & 남은 PLAYING 중인 모든 플레이어의 베팅 총액이 동일해 졌는가? -> 맞다면
-    if (game_table.is_all_player_bet_amount_same() && is_game_able_to_continue) {
+      // round 돌고 turn 맨 처음 유저가 fold하면 여기가 걸리네..
+      // 즉, 모든 플레이어가 action이 NONE이 아니고 베팅 총액이 동일해야 다음 라운드 조건이 성립됨!
+    if (game_table.is_all_player_not_none_action() && game_table.is_all_player_bet_amount_same() && is_game_able_to_continue) {
       // 게임을 더 진행할 수 있는가? (round가 아직 남았나? == 아직 max round를 넘지 않았나?)
       if (!game_table.is_over_max_round()){
         game_table.next_round(ctx);
