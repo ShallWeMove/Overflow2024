@@ -62,6 +62,7 @@ sui client publish
 
 ### Create your Casino & Lounge on the Sui Blockchain
 you should see the casino and lounge addresses in the output after running the command above. Use these addresses to create your casino and lounge on the Sui blockchain.
+## 업데이트 필요!
 ```bash
 sui move create-casino
 sui move create-lounge
