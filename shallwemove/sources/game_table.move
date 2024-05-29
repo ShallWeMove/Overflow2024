@@ -288,23 +288,13 @@ module shallwemove::game_table {
   }
 
   fun draw_card(game_table : &mut GameTable, player_seat_index : u64) {
-    {
-      let player_seat = game_table.player_seats.borrow_mut(player_seat_index);
-      // 자리 없으면 건너 뜀
-      if (player_seat.player_address() == option::none<address>()){
-        return
-      };
-      player_seat.receive_card(game_table.card_deck.borrow_mut().draw_card());
+    let player_seat = game_table.player_seats.borrow_mut(player_seat_index);
+    let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
+    // 자리 없으면 건너 뜀
+    if (player_seat.player_address() == option::none<address>() || player_info.player_address() == option::none<address>()){
+      return
     };
-    {
-      let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
-      // 자리 없으면 건너 뜀
-      if (player_info.player_address() == option::none<address>()){
-        return
-      };
-      player_info.receive_card();
-    };
-    game_table.game_status.draw_card();
+    player_seat.draw_card(player_info, &mut game_table.game_status, game_table.card_deck.borrow_mut().draw_card());
   }
 
   fun draw_card_to_all_player(game_table : &mut GameTable) {
@@ -389,7 +379,7 @@ module shallwemove::game_table {
     game_table.draw_card_to_all_player();
     game_table.draw_card_to_all_player();
 
-    // GameStatus 및 PlayerInfo playing_status 업데이트
+    // GameStatus 및 모든 플레이이어의 playing_status 업데이트
     let mut i = 0;
     while (i < game_table.game_status.player_infos().length()) {
       let player_info = game_table.game_status.player_infos_mut().borrow_mut(i);

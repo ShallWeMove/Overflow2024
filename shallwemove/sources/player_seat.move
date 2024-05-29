@@ -5,6 +5,7 @@ module shallwemove::player_seat {
 
   use shallwemove::card_deck::{Self, CardDeck, Card};
   use shallwemove::player_info::{Self, PlayerInfo};
+  use shallwemove::game_status::{Self, GameStatus};
   use sui::dynamic_object_field;
   use sui::coin::{Self, Coin};
   use sui::sui::SUI;
@@ -66,8 +67,10 @@ module shallwemove::player_seat {
     player_info.add_deposit(money_value);
   }
 
-  public fun receive_card(player_seat : &mut PlayerSeat, card : Card) {
+  public fun draw_card(player_seat : &mut PlayerSeat, player_info : &mut PlayerInfo, game_status : &mut GameStatus, card : Card) {
     player_seat.cards.push_back(card);
+    player_info.receive_card();
+    game_status.draw_card();
   }
 
   public fun remove_player_info(player_seat : &mut PlayerSeat, player_info : &mut PlayerInfo){
