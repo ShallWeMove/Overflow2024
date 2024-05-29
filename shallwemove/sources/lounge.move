@@ -72,6 +72,7 @@ module shallwemove::lounge {
 
   public fun available_game_table_id(lounge : &Lounge) : Option<ID> {
     let mut game_tables = lounge.game_tables;
+    game_tables.reverse();
 
     while (!game_tables.is_empty()) {
       let game_table_id = game_tables.pop_back();

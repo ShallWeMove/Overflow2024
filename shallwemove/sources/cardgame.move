@@ -66,7 +66,7 @@ module shallwemove::cardgame {
       // deposit은 일정량 -> game_table의 bet_unit의 100배
 
       // available한 GameTable 가져온다
-      let mut available_game_table_id = lounge.available_game_table_id();
+      let mut available_game_table_id = lounge.get_available_game_table_id();
       assert!(available_game_table_id != option::none());
 
       let avail_game_table = lounge.borrow_mut_game_table(available_game_table_id.extract());
