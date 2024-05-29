@@ -1,14 +1,13 @@
 import { GamePlayButton } from "@/components/UI/GamePlayButton";
-import {action, ActionType} from "@/api/game";
-import {useAtomValue} from "jotai/index";
-import {walletAtom} from "@/lib/states";
+import { action, ActionType } from "@/api/game";
+import { useAtomValue } from "jotai/index";
+import { walletAtom } from "@/lib/states";
 
 interface FoldButtonProps {
-	value: number;
 	gameTableId: string;
 }
 
-export const FoldButton = ({ value, gameTableId }: FoldButtonProps) => {
+export const FoldButton = ({ gameTableId }: FoldButtonProps) => {
 	const disabled = false;
 	const wallet = useAtomValue(walletAtom);
 
@@ -21,18 +20,17 @@ export const FoldButton = ({ value, gameTableId }: FoldButtonProps) => {
 				ActionType.FOLD,
 				false,
 				0
-			)
+			);
 
 			if (response?.effects?.status?.status === "failure") {
-				alert("Failed to fold")
+				alert("Failed to fold");
 			}
 
-			console.log("fold response: ", response)
-
-		}   catch (error) {
-			console.error('Failed to fold:', error);
+			console.log("fold response: ", response);
+		} catch (error) {
+			console.error("Failed to fold:", error);
 		}
-	}
+	};
 
 	return (
 		<GamePlayButton

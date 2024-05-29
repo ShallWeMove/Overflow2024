@@ -1,39 +1,38 @@
 import { GamePlayButton } from "@/components/UI/GamePlayButton";
 import { ActionType } from "@/api/game";
 import { action } from "@/api/game";
-import {useAtomValue} from "jotai/index";
-import {walletAtom} from "@/lib/states";
+import { useAtomValue } from "jotai/index";
+import { walletAtom } from "@/lib/states";
 
 interface BetButtonProps {
-	value: number;
+	value?: number;
 	gameTableId: string;
 }
 
 export const BetButton = ({ value, gameTableId }: BetButtonProps) => {
 	const disabled = false;
 	const wallet = useAtomValue(walletAtom);
-			
+
 	const handleClick = async () => {
 		// action;
 		try {
-				const response = await action(
-						wallet,
-						gameTableId,
-						ActionType.BET,
-						false,
-						0
-				)
+			const response = await action(
+				wallet,
+				gameTableId,
+				ActionType.BET,
+				false,
+				0
+			);
 
-				if (response?.effects?.status?.status === "failure") {
-					alert("Failed to bet")
-				}
+			if (response?.effects?.status?.status === "failure") {
+				alert("Failed to bet");
+			}
 
-				console.log("bet response: ", response)
-
-		}   catch (error) {
-				console.error('Failed to bet:', error);
+			console.log("bet response: ", response);
+		} catch (error) {
+			console.error("Failed to bet:", error);
 		}
-	}
+	};
 	return (
 		<GamePlayButton
 			onClick={handleClick}

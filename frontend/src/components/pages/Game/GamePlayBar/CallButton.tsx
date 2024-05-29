@@ -1,10 +1,10 @@
 import { GamePlayButton } from "@/components/UI/GamePlayButton";
-import {action, ActionType} from "@/api/game";
-import {useAtomValue} from "jotai/index";
-import {walletAtom} from "@/lib/states";
+import { action, ActionType } from "@/api/game";
+import { useAtomValue } from "jotai/index";
+import { walletAtom } from "@/lib/states";
 
 interface CallButtonProps {
-	value: number;
+	value?: number;
 	gameTableId: string;
 }
 
@@ -21,18 +21,17 @@ export const CallButton = ({ value, gameTableId }: CallButtonProps) => {
 				ActionType.CALL,
 				false,
 				0
-			)
+			);
 
 			if (response?.effects?.status?.status === "failure") {
-				alert("Failed to call")
+				alert("Failed to call");
 			}
 
-			console.log("call response: ", response)
-
-		}   catch (error) {
-			console.error('Failed to call:', error);
+			console.log("call response: ", response);
+		} catch (error) {
+			console.error("Failed to call:", error);
 		}
-	}
+	};
 	return (
 		<GamePlayButton
 			onClick={handleClick}
