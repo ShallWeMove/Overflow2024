@@ -57,7 +57,7 @@ git clone https://github.com/ShallWeMove/Overflow2024.git
 you should see the package address in the output after running the command below.
 ```bash
 cd shallwemove
-sui publish
+sui client publish
 ```
 
 ### Create your Casino & Lounge on the Sui Blockchain
