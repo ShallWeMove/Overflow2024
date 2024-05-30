@@ -10,6 +10,7 @@ import { tableAtom } from "@/lib/states";
 import { useAtom } from "jotai";
 import { convertCardNumberToCardImage } from "@/components/UI/Cards";
 import { TotalBetAmountBadge } from "../pages/Game/GamePlayerSpace/TotalBetAmountBadge";
+import { RSA } from "@/lib/rsa";
 
 interface CardPlaceHolderProps {
 	isUser?: boolean;
@@ -80,10 +81,11 @@ export const CardPlaceHolder = ({
 					{playerData &&
 						playerData.fields.cards &&
 						playerData.fields.cards.map((card, index) => {
+							let rsa = new RSA();
 							return (
 								(
 									<Grid item xs={2} key={index}>
-										{convertCardNumberToCardImage(card.fields.cardNumber)}
+										{convertCardNumberToCardImage(rsa.decrypt_card_number(card.fields.cardNumberForUser))}
 									</Grid>
 								) ?? ""
 							);

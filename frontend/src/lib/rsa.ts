@@ -5,7 +5,7 @@ export const LOCAL_STORAGE_KEY_EXPIRATION = 'keyExpiration';
 
 export class RSA {
     private prime: Set<number> = new Set();
-    private publicKey: number = 65537; // fixed to 65537
+    private exp: number = 65537; // fixed to 65537
     private privateKey: number = 0;
     private n: number = 0;
 
@@ -57,7 +57,7 @@ export class RSA {
         this.n = prime1 * prime2;
         const fi = (prime1 - 1) * (prime2 - 1);
 
-        const e = this.publicKey; // e is fixed to 65537
+        const e = this.exp; // e is fixed to 65537
 
         let d = 2;
         while (true) {
@@ -69,7 +69,7 @@ export class RSA {
         const expirationDate = new Date();
         expirationDate.setDate(expirationDate.getDate() + EXPIRATION_DAYS);
 
-        localStorage.setItem(LOCAL_STORAGE_PUBLIC_KEY, JSON.stringify({ e: this.publicKey, n: this.n }));
+        localStorage.setItem(LOCAL_STORAGE_PUBLIC_KEY, JSON.stringify({ e: this.exp, n: this.n }));
         localStorage.setItem(LOCAL_STORAGE_PRIVATE_KEY, JSON.stringify({ d: this.privateKey, n: this.n }));
         localStorage.setItem(LOCAL_STORAGE_KEY_EXPIRATION, expirationDate.toISOString());
     }
@@ -88,7 +88,7 @@ export class RSA {
 
             const parsedPublicKey = JSON.parse(publicKey);
             const parsedPrivateKey = JSON.parse(privateKey);
-            this.publicKey = parsedPublicKey.e;
+            this.exp = parsedPublicKey.e;
             this.n = parsedPublicKey.n;
             this.privateKey = parsedPrivateKey.d;
             return true;
@@ -118,8 +118,13 @@ export class RSA {
         return result;
     }
 
+    
+    public decrypt_card_number(card_number: number): number{
+        return this.modular_exponent(card_number, this.privateKey, this.n)
+    }
+
     private encrypt(msg: number): number {
-        return this.modular_exponent(msg, this.publicKey, this.n);
+        return this.modular_exponent(msg, this.exp, this.n);
     }
 
     private decrypt(encryptedMsg: number): number {
@@ -127,7 +132,7 @@ export class RSA {
     }
 
     public getPublicKey(): number {
-        return this.publicKey;
+        return this.n;
     }
 
     // encode message to encrypted number array
