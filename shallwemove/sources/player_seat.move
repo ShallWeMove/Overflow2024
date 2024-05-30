@@ -46,6 +46,8 @@ module shallwemove::player_seat {
 
   fun public_key(player_seat : &PlayerSeat) : vector<u8> {player_seat.public_key}
 
+  public fun cards(player_seat : &PlayerSeat) : &vector<Card> {&player_seat.cards}
+
 
   public fun set_player_address(player_seat : &mut PlayerSeat, player_info : &mut PlayerInfo, ctx : &mut TxContext) {
     player_seat.player_address = option::some(tx_context::sender(ctx));
