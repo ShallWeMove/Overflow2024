@@ -481,8 +481,7 @@ module shallwemove::game_table {
     assert!(game_table.number_of_players() >= 2, 106);
     assert!(game_table.is_all_player_ready(), 107);
 
-    // 모든 참여 PlayerSeat에 카드 2장씩 분배하기
-    game_table.draw_card_to_all_player();
+    // 모든 참여 PlayerSeat에 카드 1장씩 분배하기
     game_table.draw_card_to_all_player();
 
     // GameStatus 및 모든 플레이이어의 playing_status 업데이트
