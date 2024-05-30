@@ -42,7 +42,7 @@ module shallwemove::game_table {
 
   public fun new(
     lounge_id : ID,
-    public_key : vector<u8>,
+    casino_public_key : vector<u8>,
     max_round : u8,
     ante_amount : u64, 
     bet_unit : u64, 
@@ -52,9 +52,9 @@ module shallwemove::game_table {
 
     let mut game_status = game_status::new(max_round, ante_amount, bet_unit, game_seats);
     let money_box = money_box::new(ctx);
-    let mut card_deck = card_deck::new(public_key, ctx);
+    let mut card_deck = card_deck::new(casino_public_key, ctx);
 
-    card_deck.fill_cards(&mut game_status, public_key, r, ctx);
+    card_deck.fill_cards(&mut game_status, casino_public_key, r, ctx);
 
     let mut game_table = GameTable {
       id : object::new(ctx),
