@@ -82,14 +82,14 @@ module shallwemove::card_deck {
 
   fun card_number_for_user(card : &Card) : u256 {card.card_number_for_user}
 
-  public fun encrypt_card_number(card : &mut Card, user_public_key : vector<u8>) {
+  public fun encrypt_card_number_for_user(card : &mut Card, user_public_key : vector<u8>) {
     let user_n = encrypt::convert_vec_u8_to_u256(user_public_key);
     card.card_number_for_user = encrypt::encrypt_256(user_n, card.card_number_for_user);
   }
 
   fun decrypt_card_number(card : &mut Card, casino_public_key : vector<u8>) {
-    let user_n = encrypt::convert_vec_u8_to_u256(casino_public_key);
-    card.card_number_for_user = encrypt::decrypt_256(user_n, card.card_number_for_user);
+    let casino_n = encrypt::convert_vec_u8_to_u256(casino_public_key);
+    card.card_number_for_user = encrypt::decrypt_256(casino_n, card.card_number_for_user);
   }
 
   // ============================================

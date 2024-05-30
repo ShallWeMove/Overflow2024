@@ -71,7 +71,7 @@ module shallwemove::player_seat {
 
   public fun receive_card(player_seat : &mut PlayerSeat, player_info : &mut PlayerInfo, card : Card) {
     let mut encrypted_card = card;
-    encrypted_card.encrypt_card_number(player_seat.public_key);
+    encrypted_card.encrypt_card_number_for_user(player_seat.public_key);
     player_seat.cards.push_back(encrypted_card);
     player_info.receive_card();
   }
