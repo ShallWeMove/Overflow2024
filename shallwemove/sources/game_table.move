@@ -262,7 +262,7 @@ module shallwemove::game_table {
   }
 
   fun is_over_max_round(game_table : &GameTable) : bool {
-    game_table.game_status.max_round() < game_table.game_status.current_round()
+    game_table.game_status.max_round() <= game_table.game_status.current_round()
   }
 
   fun is_all_player_bet_amount_same(game_table : &GameTable) : bool {
