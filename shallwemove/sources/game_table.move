@@ -400,7 +400,7 @@ module shallwemove::game_table {
       if (player_seat.player_address() == option::none<address>() || player_info.player_address() == option::none<address>()){
         return
       };
-      player_seat.draw_card(player_info, game_table.card_deck.borrow_mut().draw_card());
+      player_seat.receive_card(player_info, game_table.card_deck.borrow_mut().draw_card());
     };
     game_table.game_status.draw_card();
   }
