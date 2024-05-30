@@ -218,6 +218,7 @@ export enum ActionType {
 	CALL = "CALL",
 	RAISE = "RAISE",
 	FOLD = "FOLD",
+	EXIT = "EXIT",
 }
 
 export const convertIntToGameStatusType = (
@@ -267,6 +268,8 @@ const convertActionTypeToInt = (actionType: ActionType): number => {
 			return 24;
 		case ActionType.FOLD:
 			return 25;
+		case ActionType.EXIT:
+			return 26;
 		default:
 			throw new Error("Invalid action type");
 	}
@@ -288,6 +291,8 @@ export const convertIntToActionType = (
 			return ActionType.RAISE;
 		case 25:
 			return ActionType.FOLD;
+		case 26:
+			return ActionType.EXIT;
 		default:
 			throw new Error("Invalid action type number");
 	}
