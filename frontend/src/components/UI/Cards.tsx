@@ -14,110 +14,110 @@ export const convertCardNumberToCardImage = (
 	switch (cardImageNumber) {
 		case 0:
 			return FlippedCard();
-		case 1:
-			return SpadeA();
-		case 2:
-			return Spade2();
-		case 3:
-			return Spade3();
-		case 4:
-			return Spade4();
-		case 5:
-			return Spade5();
-		case 6:
-			return Spade6();
-		case 7:
-			return Spade7();
-		case 8:
-			return Spade8();
-		case 9:
-			return Spade9();
-		case 10:
-			return Spade10();
-		case 11:
-			return SpadeJ();
-		case 12:
-			return SpadeQ();
-		case 13:
-			return SpadeK();
-		case 14:
-			return ClubA();
-		case 15:
+		case 0:
 			return Club2();
-		case 16:
+    case 1:
 			return Club3();
-		case 17:
+    case 2:
 			return Club4();
-		case 18:
+    case 3:
 			return Club5();
-		case 19:
+    case 4:
 			return Club6();
-		case 20:
+    case 5:
 			return Club7();
-		case 21:
+    case 6:
 			return Club8();
-		case 22:
+    case 7:
 			return Club9();
-		case 23:
+    case 8:
 			return Club10();
-		case 24:
+    case 9:
 			return ClubJ();
-		case 25:
+    case 10:
 			return ClubQ();
-		case 26:
+    case 11:
 			return ClubK();
-		case 27:
-			return DiamondA();
-		case 28:
-			return Diamond2();
-		case 29:
-			return Diamond3();
-		case 30:
-			return Diamond4();
-		case 31:
-			return Diamond5();
-		case 32:
-			return Diamond6();
-		case 33:
-			return Diamond7();
-		case 34:
-			return Diamond8();
-		case 35:
-			return Diamond9();
-		case 36:
-			return Diamond10();
-		case 37:
-			return DiamondJ();
-		case 38:
-			return DiamondQ();
-		case 39:
-			return DiamondK();
-		case 40:
-			return HeartA();
-		case 41:
+    case 12:
+			return ClubA();
+		case 13:
 			return Heart2();
-		case 42:
+    case 14:
 			return Heart3();
-		case 43:
+    case 15:
 			return Heart4();
-		case 44:
+    case 16:
 			return Heart5();
-		case 45:
+    case 17:
 			return Heart6();
-		case 46:
+    case 18:
 			return Heart7();
-		case 47:
+    case 19:
 			return Heart8();
-		case 48:
+    case 20:
 			return Heart9();
-		case 49:
+    case 21:
 			return Heart10();
-		case 50:
+    case 22:
 			return HeartJ();
-		case 51:
+    case 23:
 			return HeartQ();
-		case 52:
+    case 24:
 			return HeartK();
+    case 25:
+			return HeartA();
+		case 26:
+			return Diamond2();
+    case 27:
+			return Diamond3();
+    case 28:
+			return Diamond4();
+    case 29:
+			return Diamond5();
+    case 30:
+			return Diamond6();
+    case 31:
+			return Diamond7();
+    case 32:
+			return Diamond8();
+    case 33:
+			return Diamond9();
+    case 34:
+			return Diamond10();
+    case 35:
+			return DiamondJ();
+    case 36:
+			return DiamondQ();
+    case 37:
+			return DiamondK();
+    case 38:
+			return DiamondA();
+		case 39:
+			return Spade2();
+    case 40:
+			return Spade3();
+    case 41:
+			return Spade4();
+    case 42:
+			return Spade5();
+    case 43:
+			return Spade6();
+    case 44:
+			return Spade7();
+    case 45:
+			return Spade8();
+    case 46:
+			return Spade9();
+    case 47:
+			return Spade10();
+    case 48:
+			return SpadeJ();
+    case 49:
+			return SpadeQ();
+    case 50:
+			return SpadeK();
+    case 51:
+			return SpadeA();
 		case 100:
 			return FlippedCard();
 		default:

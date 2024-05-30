@@ -71,7 +71,7 @@ module shallwemove::card_deck {
 
   fun card_index(card : &Card) : u8 {card.index}
 
-  fun card_number(card : &Card) : u256 {card.card_number}
+  public fun card_number(card : &Card) : u256 {card.card_number}
 
   // ============================================
   // ================ TEST ======================

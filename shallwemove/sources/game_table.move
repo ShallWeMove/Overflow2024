@@ -8,6 +8,7 @@ module shallwemove::game_table {
   use shallwemove::player_seat::{Self, PlayerSeat};
   use shallwemove::money_box::{Self, MoneyBox};
   use shallwemove::card_deck::{Self, CardDeck, Card};
+  use shallwemove::mini_poker_logic::{Self};
   use sui::coin::{Self, Coin};
   use sui::sui::SUI;
   use std::string::{Self, String};
@@ -261,7 +262,7 @@ module shallwemove::game_table {
   }
 
   fun is_over_max_round(game_table : &GameTable) : bool {
-    game_table.game_status.max_round() < game_table.game_status.current_round()
+    game_table.game_status.max_round() <= game_table.game_status.current_round()
   }
 
   fun is_all_player_bet_amount_same(game_table : &GameTable) : bool {
@@ -481,8 +482,7 @@ module shallwemove::game_table {
     assert!(game_table.number_of_players() >= 2, 106);
     assert!(game_table.is_all_player_ready(), 107);
 
-    // 모든 참여 PlayerSeat에 카드 2장씩 분배하기
-    game_table.draw_card_to_all_player();
+    // 모든 참여 PlayerSeat에 카드 1장씩 분배하기
     game_table.draw_card_to_all_player();
 
     // GameStatus 및 모든 플레이이어의 playing_status 업데이트
@@ -532,20 +532,37 @@ module shallwemove::game_table {
 
   }
 
-  fun check_winner(game_table : &mut GameTable) : u64 {
+  fun check_winner_index(game_table : &mut GameTable) : u64 {
     let mut i = 0;
+    let mut player_score = vector<u64>[];
     while (i < game_table.player_seats.length()) {
       let player_seat = game_table.player_seats.borrow_mut(i);
       if (player_seat.player_address() == option::none()) {
+        player_score.push_back(0);
         i = i + 1;
         continue
       };
 
-      
+      let card1 = player_seat.cards().borrow(0);
+      let card2 = player_seat.cards().borrow(1);
+
+      player_score.push_back(mini_poker_logic::convert_card_combination_to_score(card1.card_number(),card2.card_number()));
 
       i = i + 1;
     };
-    return 0
+
+    let mut highest_score = player_score[0];
+    let mut highest_score_player_index = 0;
+    let mut j = 0;
+    while (j < player_score.length()) {
+      if (highest_score < *player_score.borrow(j)) {
+        highest_score = *player_score.borrow(j);
+        highest_score_player_index = j;
+      };
+      j = j + 1;
+    };
+
+    return highest_score_player_index
   }
 
   fun finish_game(game_table : &mut GameTable, ctx : &mut TxContext) {
@@ -569,7 +586,7 @@ module shallwemove::game_table {
     game_table.open_all_player_card();
 
     // winner player 결정하고 winner player에게 money box 돈 다 보내기
-    let winner_player_index = game_table.check_winner();
+    let winner_player_index = game_table.check_winner_index();
     let winner_player_info = game_table.game_status.player_infos().borrow(winner_player_index);
     game_table.game_status.set_winner_player(winner_player_info.player_address());
     
