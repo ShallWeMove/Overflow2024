@@ -78,7 +78,7 @@ module shallwemove::game_status {
   }
 
   fun new_game_info(max_round : u8, ante_amount : u64, bet_unit : u64, game_seats : u8) : GameInfo {
-    assert!(game_seats >= 2 && game_seats <= 5, 403);
+    assert!(game_seats >= 2 && game_seats <= 5, 201);
 
     GameInfo {
       game_playing_status : 0,
@@ -125,6 +125,10 @@ module shallwemove::game_status {
   }
 
   fun winner_player(game_status : &GameStatus) : Option<address> {game_status.game_info.winner_player}
+
+  public fun set_winner_player(game_status : &mut GameStatus, player_address : Option<address>) {
+    game_status.game_info.winner_player = player_address;
+  }
   
   public fun ante_amount(game_status : &GameStatus) : u64 {game_status.game_info.ante_amount}
 
@@ -159,7 +163,7 @@ module shallwemove::game_status {
     game_status.game_info.game_playing_status = game_playing_status
   }
 
-  public fun set_manager_player(game_status: &mut GameStatus, manager_player_address : Option<address>) {
+  public fun set_manager_player(game_status: &mut GameStatus, manager_player_address : Option<address>, player_seat_index : u64) {
     game_status.game_info.manager_player = manager_player_address;
 
     if (manager_player_address == option::none()) {
@@ -167,32 +171,14 @@ module shallwemove::game_status {
       return
     };
     
-    // 그리고 해당 manager player의 자리로 set current turn 해야 함.
-      // player가 속한 player_info index 찾아내기
-    let mut i = 0; 
-    while (i < game_status.player_infos().length()) {
-      let player_seat = game_status.player_infos_mut().borrow_mut(i);
-      if (player_seat.player_address() == option::none<address>()) {
-        i = i + 1;
-        continue
-      };
-
-      let player_address_of_seat = game_status.player_infos()[i].player_address();
-      if (manager_player_address == player_address_of_seat) {
-        break
-      };
-
-      i = i + 1;
-    };
-
-    game_status.set_current_turn(i as u8);
+    game_status.set_current_turn(player_seat_index as u8);
   }
 
   public fun increment_avail_seat(game_status : &mut GameStatus) {
     game_status.game_info.avail_game_seats = game_status.game_info.avail_game_seats + 1; 
   }
 
-  fun decrement_avail_seat(game_status : &mut GameStatus) {
+  public fun decrease_avail_seat(game_status : &mut GameStatus) {
     game_status.game_info.avail_game_seats = game_status.game_info.avail_game_seats - 1; 
   }
 
@@ -202,8 +188,8 @@ module shallwemove::game_status {
   }
   fun total_bet_amount(game_status : &GameStatus) : u64 {game_status.money_box_info.total_bet_amount}
 
-  public fun add_money(game_status : &mut GameStatus, money : &Coin<SUI>) {
-    game_status.money_box_info.total_bet_amount = game_status.money_box_info.total_bet_amount + money.value();
+  public fun add_bet_amount(game_status : &mut GameStatus, bet_amount : u64) {
+    game_status.money_box_info.total_bet_amount = game_status.money_box_info.total_bet_amount + bet_amount;
   }
 
   public fun discard_money(game_status : &mut GameStatus, money : &Coin<SUI>) {
@@ -239,18 +225,6 @@ module shallwemove::game_status {
 
   public fun add_player_info(game_status : &mut GameStatus, player_info : PlayerInfo) {game_status.player_infos.push_back(player_info);}
 
-  public fun enter_player(game_status : &mut GameStatus, ctx : &mut TxContext) {
-    // player가 해당 게임의 첫 번째 유저면 manager_player로 등록
-    if (game_status.manager_player() == option::none<address>()) {
-      game_status.set_manager_player(option::some(tx_context::sender(ctx)));
-    };
-
-    // avail_seat 하나 감소
-    game_status.decrement_avail_seat();
-  }
-
-
-  
   // ============================================
   // ================ TEST ======================
 }

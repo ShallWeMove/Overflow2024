@@ -57,6 +57,19 @@ module shallwemove::lounge {
 
   public fun max_round(lounge : &Lounge) : u8 {lounge.max_round}
 
+  public fun clean_up(lounge : &mut Lounge) {
+    let mut i = 0;
+
+    while (i < lounge.game_tables.length()) {
+      let game_table_id = lounge.game_tables.pop_back();
+      let game_table = dynamic_object_field::remove<ID, GameTable> (&mut lounge.id, game_table_id);
+      transfer::public_share_object(game_table);
+      i = i + 1;
+    }
+
+  }
+
+
   public fun borrow_game_table(lounge: &Lounge, game_table_id : ID) : &GameTable {
     dynamic_object_field::borrow<ID, GameTable> (&lounge.id, game_table_id)
   }
@@ -70,8 +83,9 @@ module shallwemove::lounge {
     dynamic_object_field::add<ID, GameTable>(&mut lounge.id, game_table.id(), game_table);
   }
 
-  public fun available_game_table_id(lounge : &Lounge) : Option<ID> {
+  public fun get_available_game_table_id(lounge : &Lounge) : Option<ID> {
     let mut game_tables = lounge.game_tables;
+    game_tables.reverse();
 
     while (!game_tables.is_empty()) {
       let game_table_id = game_tables.pop_back();
