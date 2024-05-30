@@ -4,6 +4,7 @@ module shallwemove::money_box {
 
   use shallwemove::player_seat::{Self, PlayerSeat};
   use shallwemove::player_info::{Self, PlayerInfo};
+  use shallwemove::game_status::{Self, GameStatus};
   use sui::coin::{Self, Coin};
   use sui::sui::SUI;
 
@@ -36,8 +37,10 @@ module shallwemove::money_box {
     &mut money_box.money
   }
 
-  public fun add_money(money_box : &mut MoneyBox, money : Coin<SUI>) {
+  public fun bet_money(money_box : &mut MoneyBox, player_info : &mut PlayerInfo, money : Coin<SUI>) {
+    let money_value = money.value();
     vector::push_back(&mut money_box.money, money);
+    player_info.add_bet_amount(money_value);
   }
 
   public fun send_all_money(money_box : &mut MoneyBox, player_seat : &mut PlayerSeat, player_info : &mut PlayerInfo) {

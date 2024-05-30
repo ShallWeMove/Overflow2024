@@ -1,18 +1,16 @@
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { WalletContextState } from "@suiet/wallet-kit";
-import { client } from "./object";
-import { GetCoinsParams } from "@mysten/sui.js/client";
 import { RSA } from "@/lib/rsa";
 
 const PACKAGE_ID =
-	"0x94ccb3f97236f52229a8d09d270f12334780e2a3885b9593f4498a9f24e06ea2";
+	"0x2ca5ffbc1a790fe173585eff3832c01308bbd60b5428696a7aded3e3e1d5e286";
 const CASINO_ID =
-	"0x710b67fc7d0a20870d3c895e164a2170b3a67cf0658ff87b524b6b54440eb7b4";
+	"0xe914559cd7e3d9d54b1f86d9ffe8a2746fcbb7e7accf4e1719fa4154f8cbe425";
 const LOUNGE_ID =
-	"0xffbc0faf2519428f315900d3b213c8b2cf10e109dee7323bb3497193233a685c";
+	"0xe724624d45fd6467a18d9c72b3b1b338ff6c59bde378b9ea1ba7b02ef9832af3";
 const MODULE = "cardgame";
 
-export const GAME_TABLE_TYPE = `${PACKAGE_ID}::game_table::GameTable`
+export const GAME_TABLE_TYPE = `${PACKAGE_ID}::game_table::GameTable`;
 
 // depositAmount - the amount of chips needed to enter the game
 const depositAmountInMist = 1000000;
@@ -48,7 +46,7 @@ export const enter = async (wallet: WalletContextState) => {
 				showEffects: true,
 				showEvents: true,
 				showObjectChanges: true,
-			}
+			},
 		});
 		console.log("'enter' transaction result: ", res);
 		return res;
@@ -65,15 +63,22 @@ export const exit = async (wallet: WalletContextState, gameTableId: string) => {
 		arguments: [
 			txb.object(CASINO_ID), // casino
 			txb.object(LOUNGE_ID), // lounge
-			txb.object(gameTableId), // game table
+			txb.pure(gameTableId), // game table
 		],
 	});
 
 	try {
 		const res = wallet.signAndExecuteTransactionBlock({
 			transactionBlock: txb,
+			options: {
+				showInput: true,
+				showEffects: true,
+				showEvents: true,
+				showObjectChanges: true,
+			},
 		});
 		console.log("exit transaction result: ", res);
+		return res;
 	} catch (e) {
 		console.error("'exit' transaction failed", e);
 	}
@@ -81,10 +86,7 @@ export const exit = async (wallet: WalletContextState, gameTableId: string) => {
 
 // ante - called when the player antes.
 // 	After all players have anted, manager player can start the game.
-export const ante = async (
-	wallet: WalletContextState,
-	gameTableId: string
-) => {
+export const ante = async (wallet: WalletContextState, gameTableId: string) => {
 	const txb = new TransactionBlock();
 
 	txb.setGasBudget(gasBudgetInMist);
@@ -109,14 +111,14 @@ export const ante = async (
 				showEffects: true,
 				showEvents: true,
 				showObjectChanges: true,
-			}
+			},
 		});
 		console.log("'ante' transaction result: ", res);
 		return res;
 	} catch (e) {
 		console.error("'ante' transaction failed", e);
 	}
-}
+};
 
 // start - called when the game starts
 export const start = async (
@@ -147,7 +149,7 @@ export const start = async (
 				showEffects: true,
 				showEvents: true,
 				showObjectChanges: true,
-			}
+			},
 		});
 		console.log("'start' transaction result: ", res);
 		return res;
@@ -157,14 +159,14 @@ export const start = async (
 };
 
 // action - called when the player makes an action
-//  one of [ANTE, BET, RAISE, CALL, CHECK]
+//  one of [BET, RAISE, CALL, CHECK]
 export const action = async (
 	wallet: WalletContextState,
 	gameTableId: string,
 	actionType: ActionType,
 	withNewCard: boolean,
 	chipCount: number
-): Promise<string> => {
+) => {
 	const txb = new TransactionBlock();
 	txb.moveCall({
 		target: `${PACKAGE_ID}::${MODULE}::action`,
@@ -181,16 +183,36 @@ export const action = async (
 	try {
 		const res = wallet.signAndExecuteTransactionBlock({
 			transactionBlock: txb,
+			options: {
+				showInput: true,
+				showEffects: true,
+				showEvents: true,
+				showObjectChanges: true,
+			},
 		});
 		console.log("action transaction result: ", res);
+		return res;
 	} catch (e) {
 		console.error("'action' transaction failed", e);
 	}
-
-	return "gameTableId";
 };
 
+export enum GameStatusType {
+	PRE_GAME = "PRE GAME",
+	IN_GAME = "IN GAME",
+	GAME_FINISHED = "GAME_FINISHED",
+}
+
+export enum PlayingStatusType {
+	EMPTY = "EMPTY",
+	ENTER = "ENTER",
+	READY = "READY",
+	PLAYING = "PLAYING",
+	GAME_END = "GAME_END",
+}
+
 export enum ActionType {
+	NONE = "NONE",
 	BET = "BET",
 	CHECK = "CHECK",
 	CALL = "CALL",
@@ -198,9 +220,43 @@ export enum ActionType {
 	FOLD = "FOLD",
 }
 
+export const convertIntToGameStatusType = (
+	gameStatusTypeNumber: number
+) : GameStatusType => {
+	switch (gameStatusTypeNumber) {
+		case 0:
+			return GameStatusType.PRE_GAME
+		case 1:
+			return GameStatusType.IN_GAME
+		case 2:
+			return GameStatusType.GAME_FINISHED
+		default:
+			throw new Error("Invalid game status type number")
+	}
+};
+export const convertIntToPlayingStatusType = (
+	playingStatusTypeNumber: number
+): PlayingStatusType => {
+	switch (playingStatusTypeNumber) {
+		case 10:
+			return PlayingStatusType.EMPTY;
+		case 11:
+			return PlayingStatusType.ENTER;
+		case 12:
+			return PlayingStatusType.READY;
+		case 13:
+			return PlayingStatusType.PLAYING;
+		case 14:
+			return PlayingStatusType.GAME_END;
+		default:
+			throw new Error("Invalid playing status type number");
+	}
+};
+
 const convertActionTypeToInt = (actionType: ActionType): number => {
 	switch (actionType) {
-		// TODO: sync each number with the contract
+		case ActionType.NONE:
+			return 20;
 		case ActionType.BET:
 			return 21;
 		case ActionType.CHECK:
@@ -216,24 +272,24 @@ const convertActionTypeToInt = (actionType: ActionType): number => {
 	}
 };
 
-// fold - called when the player folds
-export const fold = async (wallet: WalletContextState, gameTableId: string) => {
-	const txb = new TransactionBlock();
-	txb.moveCall({
-		target: `${PACKAGE_ID}::${MODULE}::fold`,
-		arguments: [
-			txb.object(CASINO_ID), // casino
-			txb.object(gameTableId), // game table
-		],
-	});
-
-	try {
-		const res = wallet.signAndExecuteTransactionBlock({
-			transactionBlock: txb,
-		});
-		console.log("fold transaction result: ", res);
-	} catch (e) {
-		console.error("'fold' transaction failed", e);
+export const convertIntToActionType = (
+	actionTypeNumber: number
+): ActionType => {
+	switch (actionTypeNumber) {
+		case 20:
+			return ActionType.NONE;
+		case 21:
+			return ActionType.BET;
+		case 22:
+			return ActionType.CHECK;
+		case 23:
+			return ActionType.CALL;
+		case 24:
+			return ActionType.RAISE;
+		case 25:
+			return ActionType.FOLD;
+		default:
+			throw new Error("Invalid action type number");
 	}
 };
 

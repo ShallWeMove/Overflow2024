@@ -1,56 +1,74 @@
-import {Box, styled, Typography} from "@mui/material";
-import {animated, useSpring} from "react-spring";
-import {GameInfo, GameStatus, Player} from "@/components/pages/Game/Game";
-import {useState} from "react";
+import { Box, styled, Typography } from "@mui/material";
+import { animated, useSpring } from "react-spring";
+import { convertIntToGameStatusType } from "@/api/game";
 
 interface TotalAmountProps {
 	totalBetAmount: number | undefined;
 	callAmount: number | undefined;
-	players: Player[];
-	gameInfo: null | GameInfo;
+	players: number;
+	gameStatus: number;
+	currentPlayerAddress: string;
+	betUnit: bigint | undefined;
+	anteAmount: bigint | undefined;
+	winnerPlayer: string | undefined;
 }
 
 export const TotalAmount = ({
-	players,
-	gameInfo,
 	totalBetAmount,
 	callAmount,
+	players,
+	gameStatus,
+	currentPlayerAddress,
+	betUnit,
+	anteAmount,
+	winnerPlayer
 }: TotalAmountProps) => {
-	const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
-	if (gameInfo?.currentTurnIndex) {
-		setCurrentPlayer(players[gameInfo.currentTurnIndex]);
-	}
-
 	return (
 		<Container>
 			<Wrapper>
 				<Typography color="#C1CCDC" fontWeight={700}>
 					Total
 				</Typography>
-				<Typography
-					color="#C1CCDC"
-					fontWeight={700}
-					sx={{ display: "flex", gap: 0.5 }}
-				>
+				<Box sx={{ display: "flex", gap: 0.5 }}>
 					<AnimatedSUI n={totalBetAmount?.toString() ?? "0"} />
-					SUI
-				</Typography>
+					<Typography color="#C1CCDC" fontWeight={700}>
+						MIST
+					</Typography>
+				</Box>
 			</Wrapper>
 			<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
 			<Wrapper>
 				<Typography color="#C1CCDC" fontWeight={700}>
 					Call
 				</Typography>
+				<Box sx={{ display: "flex", gap: 0.5 }}>
+					<AnimatedSUI n={callAmount?.toString() ?? "0"} />
+					<Typography color="#C1CCDC" fontWeight={700}>
+						MIST
+					</Typography>
+				</Box>
+			</Wrapper>
+			<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
+			<Wrapper>
+				<Typography color="#C1CCDC" fontWeight={700}>
+					Ante Amount
+				</Typography>
 				<Typography
 					color="#C1CCDC"
 					fontWeight={700}
-					sx={{ display: "flex", gap: 0.5 }}
 				>
-					<AnimatedSUI n={callAmount?.toString() ?? "0"} />
-					SUI
+					{anteAmount} MIST
+				</Typography>
+				<Typography color="#C1CCDC" fontWeight={700}>
+					Betting Unit
+				</Typography>
+				<Typography
+					color="#C1CCDC"
+					fontWeight={700}
+				>
+					{betUnit} MIST
 				</Typography>
 			</Wrapper>
-			<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
 			<Wrapper>
 				<Typography color="#C1CCDC" fontWeight={700}>
 					Players
@@ -60,7 +78,7 @@ export const TotalAmount = ({
 					fontWeight={700}
 					sx={{ display: "flex", gap: 0.5 }}
 				>
-					{players.length} Players
+					{players} Players
 				</Typography>
 			</Wrapper>
 			<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
@@ -73,7 +91,7 @@ export const TotalAmount = ({
 					fontWeight={700}
 					sx={{ display: "flex", gap: 0.5 }}
 				>
-					{gameInfo?.gamePlayingStatus === GameStatus.PRE_GAME ? "Pre Game" : gameInfo?.gamePlayingStatus === GameStatus.IN_GAME ? "In Game" : "Game Finished"}
+					{convertIntToGameStatusType(gameStatus)}
 				</Typography>
 			</Wrapper>
 			<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
@@ -84,9 +102,30 @@ export const TotalAmount = ({
 				<Typography
 					color="#C1CCDC"
 					fontWeight={700}
-					sx={{ display: "flex", gap: 0.5 }}
+					sx={{
+						display: "flex",
+						gap: 0.5,
+						overflowWrap: "anywhere",
+					}}
 				>
-					{currentPlayer?.address}
+					{currentPlayerAddress}
+				</Typography>
+			</Wrapper>
+			<Box sx={{ height: 2, width: "100%", border: "1px solid #C1CCDC" }} />
+			<Wrapper>
+				<Typography color="#C1CCDC" fontWeight={700}>
+					Winner Player
+				</Typography>
+				<Typography
+					color="#C1CCDC"
+					fontWeight={700}
+					sx={{
+						display: "flex",
+						gap: 0.5,
+						overflowWrap: "anywhere",
+					}}
+				>
+					{winnerPlayer}
 				</Typography>
 			</Wrapper>
 		</Container>
@@ -99,7 +138,7 @@ const Container = styled(Box)({
 	border: "2px solid #C1CCDC",
 	borderRadius: 8,
 	width: 400,
-	height: 80,
+	height: 115,
 });
 
 const Wrapper = styled(Box)({

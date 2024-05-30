@@ -1,55 +1,106 @@
-import { Box, Typography, styled } from "@mui/material";
-import { Fragment, ReactNode } from "react";
+import React, { useState } from "react";
+import { Box, Button, Typography, styled, Grid } from "@mui/material";
+import { PlayerInfo, PlayerSeat } from "@/lib/types";
+import { PlayerInfoPopover } from "./PlayerInfoPopover";
+import { StatusBadge } from "../pages/Game/GamePlayerSpace/StatusBadge";
+import { convertIntToActionType } from "@/api/game";
+import { convertIntToPlayingStatusType } from "@/api/game";
+import { useEffect } from "react";
+import { tableAtom } from "@/lib/states";
+import { useAtom } from "jotai";
+import { convertCardNumberToCardImage } from "@/components/UI/Cards";
+import { TotalBetAmountBadge } from "../pages/Game/GamePlayerSpace/TotalBetAmountBadge";
 
 interface CardPlaceHolderProps {
-	value: number;
-	position: "left" | "right";
 	isUser?: boolean;
-	isTurn?: boolean;
-	cards?: ReactNode[];
+	playerData?: PlayerSeat;
+	playerInfo?: PlayerInfo;
 }
 
 export const CardPlaceHolder = ({
-	value,
-	position,
-	cards = [],
 	isUser = false,
-	isTurn = false,
+	playerData,
+	playerInfo,
 }: CardPlaceHolderProps) => {
+	const [tableInfo] = useAtom(tableAtom);
+	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+	const [isTurn, setIsTurn] = useState(false);
+	const [isManagerPlayer, setIsManagerPlayer] = useState(false);
+
+	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+		if (playerData) {
+			setAnchorEl(event.currentTarget);
+		}
+	};
+
+	const handleClose = () => {
+		setAnchorEl(null);
+	};
+
+	useEffect(() => {
+		setIsTurn(
+			tableInfo.currentPlayerAddress == playerData?.fields.playerAddress
+		);
+    setIsManagerPlayer(
+      tableInfo.managerPlayerAddress == playerData?.fields.playerAddress
+    );
+	}, [playerData]);
+
 	return (
 		<Container>
-			{position === "left" && (
-				<Fragment>
-					<UserProfile isTurn={isTurn} />
-					<PlaceHolder isTurn={isTurn}>
-						<CardWrapper>
-							{cards[0] ?? ""}
-							{cards[1] ?? ""}
-						</CardWrapper>
-						<TotalBetAmount>
-							<Typography color="white" fontSize="16px" fontWeight={700}>
-								{value} SUI
-							</Typography>
-						</TotalBetAmount>
-					</PlaceHolder>
-				</Fragment>
-			)}
-			{position === "right" && (
-				<Fragment>
-					<PlaceHolder isTurn={isTurn}>
-						<CardWrapper>
-							{cards[0] ?? ""}
-							{cards[1] ?? ""}
-						</CardWrapper>
-						<TotalBetAmount>
-							<Typography color="white" fontSize="16px" fontWeight={700}>
-								{value} SUI
-							</Typography>
-						</TotalBetAmount>
-					</PlaceHolder>
-					<UserProfile isTurn={isTurn} />
-				</Fragment>
-			)}
+			<UserProfileWrapper>
+				<UserProfile isTurn={isTurn} />
+				<StatusBadge
+					value={
+						playerInfo?.fields.playingStatus &&
+						convertIntToPlayingStatusType(playerInfo?.fields.playingStatus)
+					}
+					left={true}
+				/>
+				{playerData?.fields.playerAddress && isManagerPlayer && <StatusBadge
+				value={"Manager"} 
+				left={true} 
+				manager={true}
+				/>}
+				<StatusBadge
+					value={
+						playerInfo?.fields.playingAction &&
+						convertIntToActionType(playerInfo?.fields.playingAction)
+					}
+				/>
+				<TotalBetAmountBadge value={playerInfo?.fields.totalBetAmount}/>
+				<Typography>
+					{playerData && playerData.fields.playerAddress?.slice(0, 5)}
+					{playerData?.fields.playerAddress && "..."}
+					{playerData && playerData.fields.playerAddress?.slice(-6)}
+				</Typography>
+			</UserProfileWrapper>
+			<PlaceHolder isTurn={isTurn} onClick={handleClick}>
+				<CardWrapper container>
+					{playerData &&
+						playerData.fields.cards &&
+						playerData.fields.cards.map((card, index) => {
+							return (
+								(
+									<Grid item xs={2} key={index}>
+										{convertCardNumberToCardImage(card.fields.cardNumber)}
+									</Grid>
+								) ?? ""
+							);
+						})}
+				</CardWrapper>
+				<TotalBetAmount>
+					<Typography color="white" fontSize="16px" fontWeight={700}>
+						{playerInfo?.fields.deposit} MIST
+					</Typography>
+				</TotalBetAmount>
+			</PlaceHolder>
+			<PlayerInfoPopover
+				open={Boolean(anchorEl)}
+				anchorEl={anchorEl}
+				onClose={handleClose}
+				playerData={playerData}
+			/>
 		</Container>
 	);
 };
@@ -65,20 +116,20 @@ interface PlaceHolderProps {
 }
 
 const UserProfile = styled(Box)<PlaceHolderProps>(({ isTurn }) => ({
-	width: 110,
-	height: 100,
+	width: 90,
+	height: 80,
 	border: isTurn ? "3px solid #E9DDAE" : "none",
 	backgroundImage: "url('/default-profile.jpg')",
 	backgroundSize: "cover",
 	borderRadius: 8,
 }));
 
-const PlaceHolder = styled(Box)<PlaceHolderProps>(({ isTurn }) => ({
+const PlaceHolder = styled(Button)<PlaceHolderProps>(({ isTurn }) => ({
 	position: "relative",
 	backgroundColor: "#273648",
 	border: isTurn ? "3px solid #E9DDAE" : "none",
 	borderRadius: 8,
-	width: 400,
+	width: 350,
 	height: 200,
 }));
 
@@ -94,10 +145,16 @@ const TotalBetAmount = styled(Box)({
 	alignItems: "center",
 });
 
-const CardWrapper = styled(Box)({
+const CardWrapper = styled(Grid)({
 	width: "100%",
 	display: "flex",
 	justifyContent: "center",
 	gap: 6,
-	padding: 6,
+	marginTop: -36,
+});
+
+const UserProfileWrapper = styled(Box)({
+	position: "relative",
+	display: "flex",
+	flexDirection: "column",
 });

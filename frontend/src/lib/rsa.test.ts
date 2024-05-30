@@ -46,6 +46,11 @@ describe('RSA', () => {
         expect(privateKey).not.toBeNull();
         expect(expiration).not.toBeNull();
 
+        console.log("@@@ RSA generate keys @@@")
+        console.log("Public key:\n", publicKey);
+        console.log("Private key:\n", privateKey);
+        console.log("Expiration date:\n", expiration);
+
         if(publicKey && privateKey && expiration) {
             const parsedPublicKey = JSON.parse(publicKey);
             const parsedPrivateKey = JSON.parse(privateKey);
@@ -65,9 +70,9 @@ describe('RSA', () => {
     });
 
     test('should encode and decode a message correctly', () => {
-        const rsa = new RSA(185, 5, 29);
+        const rsa = new RSA(12017, 5633);
         const message = 'Hello';
-        const expectedEncoded = [42, 11, 53, 53, 111];
+        const expectedEncoded = [10686, 8328, 74, 74, 11823];
 
         const encoded = rsa.encode(message);
         const decoded = rsa.decode(encoded);

@@ -8,10 +8,6 @@ interface UserSpaceProps {
 export const UserSpace = ({ value }: UserSpaceProps) => {
 	return (
 		<CardPlaceHolder
-			value={value}
-			position="left"
-			cards={[<SpadeA key="spadeA" />, <SpadeK key="king" />]}
-			isTurn={true}
 		/>
 	);
 };

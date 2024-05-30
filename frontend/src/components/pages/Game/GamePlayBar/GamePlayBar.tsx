@@ -4,23 +4,25 @@ import { BetButton } from "./BetButton";
 import { CallButton } from "./CallButton";
 import { CheckButton } from "./CheckButton";
 import { FoldButton } from "./FoldButton";
+import { ExitButton } from "./ExitButton";
 import { AnteButton } from "./AnteButton";
-import {StartButton} from "@/components/pages/Game/GamePlayBar/StartButton";
+import { StartButton } from "@/components/pages/Game/GamePlayBar/StartButton";
 
 interface GamePlayBarProps {
 	gameTableId: string;
 }
 
-export const GamePlayBar = ({gameTableId}: GamePlayBarProps) => {
+export const GamePlayBar = ({ gameTableId }: GamePlayBarProps) => {
 	return (
 		<Container>
 			<StartButton gameTableId={gameTableId} />
 			<AnteButton gameTableId={gameTableId} />
-			<FoldButton />
-			<BetButton gameTableId={gameTableId} value={1000} />
-			<CheckButton />
-			<CallButton value={1000} />
-			<RaiseButton value={1000} />
+			<FoldButton gameTableId={gameTableId} />
+			<BetButton gameTableId={gameTableId} />
+			<CheckButton gameTableId={gameTableId} />
+			<CallButton gameTableId={gameTableId} />
+			<RaiseButton gameTableId={gameTableId} />
+			<ExitButton gameTableId={gameTableId} />
 		</Container>
 	);
 };

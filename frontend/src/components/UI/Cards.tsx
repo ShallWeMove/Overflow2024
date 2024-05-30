@@ -1,7 +1,134 @@
 import Image from "next/image";
 
+export const convertCardNumberToCardImage = (
+	cardNumber: number
+) : JSX.Element => {
+	let cardImageNumber : number = 0;
+	if (cardNumber > 52) {
+		cardImageNumber = 100;
+	} else {
+		// 여기에 decrypt function이 쓰일 예정
+		cardImageNumber = Number(cardNumber);
+	};
+
+	switch (cardImageNumber) {
+		case 0:
+			return FlippedCard();
+		case 0:
+			return Club2();
+    case 1:
+			return Club3();
+    case 2:
+			return Club4();
+    case 3:
+			return Club5();
+    case 4:
+			return Club6();
+    case 5:
+			return Club7();
+    case 6:
+			return Club8();
+    case 7:
+			return Club9();
+    case 8:
+			return Club10();
+    case 9:
+			return ClubJ();
+    case 10:
+			return ClubQ();
+    case 11:
+			return ClubK();
+    case 12:
+			return ClubA();
+		case 13:
+			return Heart2();
+    case 14:
+			return Heart3();
+    case 15:
+			return Heart4();
+    case 16:
+			return Heart5();
+    case 17:
+			return Heart6();
+    case 18:
+			return Heart7();
+    case 19:
+			return Heart8();
+    case 20:
+			return Heart9();
+    case 21:
+			return Heart10();
+    case 22:
+			return HeartJ();
+    case 23:
+			return HeartQ();
+    case 24:
+			return HeartK();
+    case 25:
+			return HeartA();
+		case 26:
+			return Diamond2();
+    case 27:
+			return Diamond3();
+    case 28:
+			return Diamond4();
+    case 29:
+			return Diamond5();
+    case 30:
+			return Diamond6();
+    case 31:
+			return Diamond7();
+    case 32:
+			return Diamond8();
+    case 33:
+			return Diamond9();
+    case 34:
+			return Diamond10();
+    case 35:
+			return DiamondJ();
+    case 36:
+			return DiamondQ();
+    case 37:
+			return DiamondK();
+    case 38:
+			return DiamondA();
+		case 39:
+			return Spade2();
+    case 40:
+			return Spade3();
+    case 41:
+			return Spade4();
+    case 42:
+			return Spade5();
+    case 43:
+			return Spade6();
+    case 44:
+			return Spade7();
+    case 45:
+			return Spade8();
+    case 46:
+			return Spade9();
+    case 47:
+			return Spade10();
+    case 48:
+			return SpadeJ();
+    case 49:
+			return SpadeQ();
+    case 50:
+			return SpadeK();
+    case 51:
+			return SpadeA();
+		case 100:
+			return FlippedCard();
+		default:
+			return FlippedCard();
+
+			// throw new Error("Invalid card number");
+	}
+};
+
 export const FlippedCard = () => {
-	return <Image src="/cards/card.png" alt="card" width={110} height={150} />;
+	return <Image src="/cards/card.png" alt="card" width={108} height={146} />;
 };
 
 export const SpadeA = () => {

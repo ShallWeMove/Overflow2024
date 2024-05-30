@@ -123,15 +123,15 @@ module shallwemove::player_info {
 
   public fun total_bet_amount(player_info : &PlayerInfo) : u64 {player_info.total_bet_amount}
 
+  public fun set_player_address(player_info : &mut PlayerInfo, ctx : &mut TxContext) {
+    player_info.player_address = option::some(tx_context::sender(ctx));
+  }
 
   public fun add_bet_amount(player_info : &mut PlayerInfo, bet_amount : u64) {
     player_info.previous_bet_amount = bet_amount;
     player_info.total_bet_amount = player_info.total_bet_amount + bet_amount;
   }
 
-  public fun set_player_address(player_info : &mut PlayerInfo, ctx : &mut TxContext) {
-    player_info.player_address = option::some(tx_context::sender(ctx));
-  }
 
   public fun remove_player_info(player_info : &mut PlayerInfo) {
     player_info.player_address = option::none();
@@ -139,6 +139,9 @@ module shallwemove::player_info {
 
     player_info.playing_status = EMPTY;
     player_info.playing_action = NONE;
+
+    player_info.previous_bet_amount = 0;
+    player_info.total_bet_amount = 0;
   }
 
 
