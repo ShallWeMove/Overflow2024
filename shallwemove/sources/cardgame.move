@@ -9,6 +9,7 @@ module shallwemove::cardgame {
   use sui::coin::{Self, Coin};
   use sui::sui::SUI;
   use std::debug;
+  use sui::random::{Self, Random};
   use std::string::{Self};
 
   // ======================= Errors ==============================
@@ -48,14 +49,14 @@ module shallwemove::cardgame {
     ante_amount : u64, 
     bet_unit : u64, 
     game_seats : u8, 
+    r : &Random,
     ctx : &mut TxContext) {
     assert!(casino.admin() == tx_context::sender(ctx), 1);
 
-    let game_table = game_table::new(lounge.id(), casino.public_key(), lounge.max_round(), ante_amount, bet_unit, game_seats, ctx);
+    let game_table = game_table::new(lounge.id(), casino.public_key(), lounge.max_round(), ante_amount, bet_unit, game_seats, r, ctx);
 
     lounge.add_game_table(game_table);
   }
-
 
   // --------- For Player ---------
 
@@ -205,8 +206,9 @@ module shallwemove::cardgame {
     ante_amount : u64, 
     bet_unit : u64, 
     game_seats : u8, 
+    r: &Random,
     ctx : &mut TxContext) {
-      add_game_table(casino, lounge, ante_amount, bet_unit, game_seats, ctx);
+      add_game_table(casino, lounge, ante_amount, bet_unit, game_seats, r, ctx);
     }
 
   #[test_only]
