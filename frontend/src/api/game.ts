@@ -223,16 +223,16 @@ export enum ActionType {
 
 export const convertIntToGameStatusType = (
 	gameStatusTypeNumber: number
-) : GameStatusType => {
+): GameStatusType => {
 	switch (gameStatusTypeNumber) {
 		case 0:
-			return GameStatusType.PRE_GAME
+			return GameStatusType.PRE_GAME;
 		case 1:
-			return GameStatusType.IN_GAME
+			return GameStatusType.IN_GAME;
 		case 2:
-			return GameStatusType.GAME_FINISHED
+			return GameStatusType.GAME_FINISHED;
 		default:
-			throw new Error("Invalid game status type number")
+			throw new Error("Invalid game status type number");
 	}
 };
 export const convertIntToPlayingStatusType = (
