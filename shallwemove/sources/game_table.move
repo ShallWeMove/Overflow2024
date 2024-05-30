@@ -30,6 +30,7 @@ module shallwemove::game_table {
   public struct GameTable has key, store {
     id : UID,
     lounge_id : ID,
+    casino_public_key : vector<u8>,
     game_status : GameStatus,
     money_box : MoneyBox,
     card_deck : Option<CardDeck>,
@@ -59,6 +60,7 @@ module shallwemove::game_table {
     let mut game_table = GameTable {
       id : object::new(ctx),
       lounge_id : lounge_id,
+      casino_public_key : casino_public_key,
       game_status : game_status,
       money_box : money_box,
       card_deck : option::some(card_deck),
@@ -400,7 +402,7 @@ module shallwemove::game_table {
       if (player_seat.player_address() == option::none<address>() || player_info.player_address() == option::none<address>()){
         return
       };
-      player_seat.receive_card(player_info, game_table.card_deck.borrow_mut().draw_card());
+      player_seat.receive_card(player_info, game_table.card_deck.borrow_mut().draw_card(game_table.casino_public_key));
     };
     game_table.game_status.draw_card();
   }

@@ -19,10 +19,9 @@ module shallwemove::encrypt {
     let exponent : u256 = 65537;
     modular_exponent(char, exponent, n)
   }
-  public fun decrypt_256(char: u256): u256{
-    let exponent : u256 = 65537;
+  public fun decrypt_256(n: u256 ,char: u256): u256{
     let priv_key : u256 = 24057;
-    modular_exponent(char, priv_key, exponent)
+    modular_exponent(char, priv_key, n)
   }
 
   public fun modular_exponent(mut base : u256, mut exp : u256, mod : u256) : u256 {
@@ -79,7 +78,9 @@ module shallwemove::encrypt {
     let mut i = 0;
     while (i < length){
         char = *vector::borrow(&cipher, i);
-        vector::push_back(&mut message, decrypt_256(char) as u8);
+        let decrypted = decrypt_256(n, char);
+
+        vector::push_back(&mut message, decrypted as u8);
         i = i + 1
     };
 
