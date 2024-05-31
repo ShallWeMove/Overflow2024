@@ -153,25 +153,15 @@ module shallwemove::game_table {
     game_table.game_status.player_infos_mut().borrow_mut(player_seat_index).set_playing_status(player_info::CONST_READY());
   }
 
-  public fun start(game_table : &mut GameTable) {
-    // 플레이어 수가 2명 이상이고 모든 참여 플레이어가 READY 상태인가??
+  public fun start(game_table : &mut GameTable, ctx : &mut TxContext) {
+    assert!(game_table.game_status.is_manager_player(ctx), 106);
     assert!(game_table.number_of_players() >= 2, 106);
     assert!(game_table.is_all_player_ready(), 107);
 
-    // 모든 참여 PlayerSeat에 카드 1장씩 분배하기
     game_table.draw_card_to_all_player();
 
     // GameStatus 및 모든 플레이이어의 playing_status 업데이트
-    let mut i = 0;
-    while (i < game_table.game_status.player_infos().length()) {
-      let player_info = game_table.game_status.player_infos_mut().borrow_mut(i);
-      if (player_info.player_address() == option::none()) {
-        i = i + 1;
-        continue
-      };
-      player_info.set_playing_status(player_info::CONST_PLAYING());
-      i = i + 1;
-    };
+    game_table.set_all_player_playing_status(player_info::CONST_PLAYING());
     game_table.game_status.set_game_playing_status(game_status::CONST_IN_GAME());
   }
 
@@ -511,7 +501,7 @@ module shallwemove::game_table {
     game_table.game_status.set_winner_player(winner_player_info.player_address());
     
     // GAME FINISHED
-    game_table.reset_all_player_playing_action_to_GAME_END();
+    game_table.set_all_player_playing_status(player_info::CONST_GAME_END());
     game_table.game_status.set_game_playing_status(game_status::CONST_GAME_FINISHED());
   }
 
@@ -621,7 +611,6 @@ module shallwemove::game_table {
   // Check Methods ===============================
   fun is_all_player_ready(game_table : &GameTable) : bool {
     let mut i = 0;
-    let mut is_all_player_ready = true;
     while (i < game_table.player_seats.length()) {
       let player_info = game_table.game_status.player_infos().borrow(i);
       if (player_info.player_address() == option::none<address>()) {
@@ -629,11 +618,11 @@ module shallwemove::game_table {
         continue
       };
       if (player_info.playing_status() != player_info::CONST_READY()) {
-        is_all_player_ready = false;
+        return false
       };
       i = i + 1;
     };
-    is_all_player_ready
+    return true
   }
 
   fun is_all_player_check(game_table : &GameTable) : bool {
@@ -726,7 +715,7 @@ module shallwemove::game_table {
     game_table.draw_card_to_all_player(); // 남아있는 사람들은 카드를 더 받는다
     game_table.game_status.next_round(); // 그리고 다음 라운드, 다음 턴
     game_table.next_turn(ctx);
-    game_table.reset_all_player_playing_action(); // 모든 player의 playing action은 NONE으로 초기화
+    game_table.set_all_player_playing_action(player_info::CONST_NONE()); // 모든 player의 playing action은 NONE으로 초기화
     let current_turn_index = game_table.game_status.current_turn_index();
     game_table.game_status.set_previous_turn(current_turn_index); // 그리고 previous turn은 current turn과 동일하게 초기화
   }
@@ -806,7 +795,22 @@ module shallwemove::game_table {
 
   }
 
-  fun reset_all_player_playing_action(game_table : &mut GameTable) {
+  fun set_all_player_playing_status(game_table : &mut GameTable, playing_status : u8) {
+    assert!(playing_status >= player_info::CONST_EMPTY() && playing_status <= player_info::CONST_GAME_END(), 403);
+    let mut i = 0;
+    while (i < game_table.game_status.player_infos().length()) {
+      if (game_table.game_status.player_infos_mut().borrow_mut(i).player_address() == option::none()) {
+        i = i + 1;
+        continue
+      };
+
+      game_table.game_status.player_infos_mut().borrow_mut(i).set_playing_status(playing_status);
+      i = i + 1;
+    };
+  }
+
+  fun set_all_player_playing_action(game_table : &mut GameTable, playing_action : u8) {
+    assert!(playing_action >= player_info::CONST_NONE() && playing_action <= player_info::CONST_EXIT(), 403);
     let mut i = 0;
     while (i < game_table.game_status.player_infos().length()) {
       if (game_table.game_status.player_infos_mut().borrow_mut(i).player_address() == option::none()) {
@@ -818,19 +822,7 @@ module shallwemove::game_table {
         continue
       };
 
-      game_table.game_status.player_infos_mut().borrow_mut(i).set_playing_action(player_info::CONST_NONE());
-      i = i + 1;
-    };
-  }
-  fun reset_all_player_playing_action_to_GAME_END(game_table : &mut GameTable) {
-    let mut i = 0;
-    while (i < game_table.game_status.player_infos().length()) {
-      if (game_table.game_status.player_infos_mut().borrow_mut(i).player_address() == option::none()) {
-        i = i + 1;
-        continue
-      };
-
-      game_table.game_status.player_infos_mut().borrow_mut(i).set_playing_status(player_info::CONST_GAME_END());
+      game_table.game_status.player_infos_mut().borrow_mut(i).set_playing_action(playing_action);
       i = i + 1;
     };
   }

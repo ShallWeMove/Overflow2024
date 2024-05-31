@@ -139,7 +139,7 @@ module shallwemove::cardgame {
     // manager player가 아니면 start() 실행 불가
     assert!(game_table.game_status().is_manager_player(ctx), 13);
     
-    game_table.start();
+    game_table.start(ctx);
 
     return game_table.id()
   }
