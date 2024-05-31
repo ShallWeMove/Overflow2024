@@ -145,7 +145,7 @@ module shallwemove::player_info {
   }
 
   public fun reset_player_info(player_info : &mut PlayerInfo) {
-    player_info.playing_status = EMPTY;
+    player_info.playing_status = ENTER;
     player_info.playing_action = NONE;
 
     player_info.previous_bet_amount = 0;
