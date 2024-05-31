@@ -66,7 +66,18 @@ sui client publish
 you should see the casino and lounge addresses in the output after running the command above. Use these addresses to create your casino and lounge on the Sui blockchain.
 
 ```bash
-sui move create-casino
+### create-casino
+sui client call --package {package_address} --module cardgame --function create_casino --args {n_value_of_public_key} --gas-budget 1000000000
+ex) sui client call --package 0x9624ccf91b6c191a231e3538e9e6b533b7467aade40d16c7277119e2ea19240b --module cardgame --function create_casino --args 35263 --gas-budget 1000000000
+
+### create lounge
+sui client call --package {package_address} --module cardgame --function create_lounge --args {casino_id} {max_round} --gas-budget 1000000000
+ex) sui client call --package 0x9624ccf91b6c191a231e3538e9e6b533b7467aade40d16c7277119e2ea19240b --module cardgame --function create_lounge --args 0xfd404dd0b9af26e67a0b6e7265845fdea494973d2e31a583f41e48ed5f6b4dec 1 --gas-budget 1000000000
+
+### add game table to lounge
+sui client call --package {package_address} --module cardgame --function add_game_table --args {casino_id} {lounge_id} {ante_amount} {bet_unit} {game_seats} 0x0000000000000000000000000000000000000000000000000000000000000008 --gas-budget 1000000000
+ex) sui client call --package 0x9624ccf91b6c191a231e3538e9e6b533b7467aade40d16c7277119e2ea19240b --module cardgame --function add_game_table --args 0xfd404dd0b9af26e67a0b6e7265845fdea494973d2e31a583f41e48ed5f6b4dec 0x61fb61bb778d7554ff6490975470b6b10b3821ccc82092c430fcf7d939a37881 500 500 5 0x0000000000000000000000000000000000000000000000000000000000000008 --gas-budget 1000000000
+
 sui move create-lounge
 ```
 
@@ -78,12 +89,11 @@ sui move create-lounge
 - casino address
 - lounge address
 
-`cd frontend` and create a `.env.local` file with the following content:
-
+`cd frontend` and update the top line of `src/api/game.ts` file with the following content:
 ```
-PACKAGE_ADDRESS=0x1234567890
-CASINO_ADDRESS=0x1234567890
-LOUNGE_ADDRESS=0x1234567890
+const PACKAGE_ID = "{YOUR PACKAGE ID}";
+const CASINO_ID = "{YOUR CASINO ID}";
+const LOUNGE_ID = "{YOUR LOUNGE ID}";
 ```
 
 ### Install Dependencies
@@ -104,20 +114,45 @@ pnpm dev
 In contrast to traditional poker, which utilizes 5 cards, Mini Poker is played with only 2 cards, forming combinations to create hands (poker hands). Following the 2-card rule, players are dealt one card each, engage in betting, then receive the second card and proceed with another round of betting before revealing their hands to determine the winner. The draw rule is applied, ensuring that players' cards remain undisclosed throughout the game.
 
 ## Betting Rules
-[**Ante**] 
-The mandatory initial bet placed at the beginning of the game to ensure active participation and discourage excessive folding without betting. It serves to encourage more proactive betting behavior.
 
-[**Check**] 
-A privilege given to the player who either must bet the minimum amount or is the first player to bet regardless of their hand. It allows them to pass their turn without adding more money to the pot.
+- **Ante**: The mandatory initial bet placed at the beginning of the game to ensure active participation and discourage excessive folding without betting. It serves to encourage more proactive betting behavior.
 
-[**Bet**] 
-The act of placing the first bet after card exchange or additional distribution. If no one bets, the round progresses with everyone checking, without further betting.
+- **Check**: A privilege given to the player who either must bet the minimum amount or is the first player to bet regardless of their hand. It allows them to pass their turn without adding more money to the pot.
 
-[**Call**] 
-Accepting the amount of money bet by the previous player.
+- **Bet**: The act of placing the first bet after card exchange or additional distribution. If no one bets, the round progresses with everyone checking, without further betting.
 
-[**Raise**] 
-Accepting the previous bet and adding more to it.
+- **Call**: Accepting the amount of money bet by the previous player.
 
-[**Fold**] 
-Surrendering the hand, resulting in the loss of any money bet before folding. Folding is employed to minimize further losses when a player assesses that their hand has little chance of winning.
+- **Raise**: Accepting the previous bet and adding more to it.
+
+- **Fold**: Surrendering the hand, resulting in the loss of any money bet before folding. Folding is employed to minimize further losses when a player assesses that their hand has little chance of winning.
+
+## Poker Hands
+
+### 1. Straight Flush Series
+
+- **Royal Straight Flush**: A combination of A and K cards of the same suit. It is the strongest hand.
+
+- **Back Straight Flush**: A combination of A and 2 cards of the same suit. Depending on the rules, it may be recognized as the second strongest hand.
+
+- **Straight Flush**: A combination of two consecutive numbers of the same suit. It is the third strongest hand.
+
+### 2. Pair
+
+- A pair consists of two cards with the same number or the same letter, such as J, Q, K.
+
+### 3. Straight Series
+
+- **Royal Straight (Mountain)**: A combination of A and K cards with different suits. It is one of the strongest combinations among straight hands.
+
+- **Back Straight**: It consists of A and 2 cards with different suits.
+
+- **Straight**: A combination of two consecutive numbers with different suits. In mini poker, similar to three of a kind, this hand is considered higher than a flush.
+
+### 4. Flush
+
+- A flush consists of two cards of the same suit.
+
+### 5. Top
+
+- The highest single card in a hand, not forming any particular combination. It does not contribute to any specific hand rank. An Ace (A) is the highest top card, and a 4 is the lowest. 

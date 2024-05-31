@@ -2,6 +2,7 @@ import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { WalletContextState } from "@suiet/wallet-kit";
 import { RSA } from "@/lib/rsa";
 
+
 const CARDGAME_PACKAGE_ID =
 	"0xdc0cc1fe1ff28dc7b89e203b69e88db3766ce122b0fda8cc6e0df070d9c293b5";
 const CASINO_ID =
@@ -10,6 +11,7 @@ const LOUNGE_ID =
 	"0xf8e14c75494f27d8fde4d980bba0a289c26686565e1cfa20ed62479f43f14343";
 const GAME_LOGIC_PACKAGE_ID =
 	"0x5b7719a55904a53ddddfb8f5833e382fb4cc46d46fa8cb7b29de875c6ab56f57";
+
 const MODULE = "cardgame";
 
 export const GAME_TABLE_TYPE = `${CARDGAME_PACKAGE_ID}::game_table::GameTable`;
