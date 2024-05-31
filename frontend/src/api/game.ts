@@ -2,15 +2,19 @@ import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { WalletContextState } from "@suiet/wallet-kit";
 import { RSA } from "@/lib/rsa";
 
-const PACKAGE_ID =
-	"0x9624ccf91b6c191a231e3538e9e6b533b7467aade40d16c7277119e2ea19240b";
+
+const CARDGAME_PACKAGE_ID =
+	"0xdc0cc1fe1ff28dc7b89e203b69e88db3766ce122b0fda8cc6e0df070d9c293b5";
 const CASINO_ID =
-	"0xfd404dd0b9af26e67a0b6e7265845fdea494973d2e31a583f41e48ed5f6b4dec";
+	"0xc6b576b148dbe7fda34cfeaa878ee4fc83ac15a75a14cb72f6ad17a6c70bc4f0";
 const LOUNGE_ID =
-	"0x7b1ae65ea82a5cb63da6864f331d6e03241cb10e4b25046bfe98d3920571f589";
+	"0xf8e14c75494f27d8fde4d980bba0a289c26686565e1cfa20ed62479f43f14343";
+const GAME_LOGIC_PACKAGE_ID =
+	"0x5b7719a55904a53ddddfb8f5833e382fb4cc46d46fa8cb7b29de875c6ab56f57";
+
 const MODULE = "cardgame";
 
-export const GAME_TABLE_TYPE = `${PACKAGE_ID}::game_table::GameTable`;
+export const GAME_TABLE_TYPE = `${CARDGAME_PACKAGE_ID}::game_table::GameTable`;
 
 // depositAmount - the amount of chips needed to enter the game
 const depositAmountInMist = 1000000;
@@ -25,7 +29,7 @@ export const enter = async (wallet: WalletContextState) => {
 	const [coin] = txb.splitCoins(txb.gas, [txb.pure(depositAmountInMist)]);
 
 	txb.moveCall({
-		target: `${PACKAGE_ID}::${MODULE}::enter`,
+		target: `${GAME_LOGIC_PACKAGE_ID}::${MODULE}::enter`,
 		arguments: [
 			// casino
 			txb.object(CASINO_ID),
@@ -59,7 +63,7 @@ export const enter = async (wallet: WalletContextState) => {
 export const exit = async (wallet: WalletContextState, gameTableId: string) => {
 	const txb = new TransactionBlock();
 	txb.moveCall({
-		target: `${PACKAGE_ID}::${MODULE}::exit`,
+		target: `${GAME_LOGIC_PACKAGE_ID}::${MODULE}::exit`,
 		arguments: [
 			txb.object(CASINO_ID), // casino
 			txb.object(LOUNGE_ID), // lounge
@@ -92,7 +96,7 @@ export const ante = async (wallet: WalletContextState, gameTableId: string) => {
 	txb.setGasBudget(gasBudgetInMist);
 
 	txb.moveCall({
-		target: `${PACKAGE_ID}::${MODULE}::ante`,
+		target: `${GAME_LOGIC_PACKAGE_ID}::${MODULE}::ante`,
 		arguments: [
 			// casino
 			txb.object(CASINO_ID),
@@ -130,7 +134,7 @@ export const start = async (
 	txb.setGasBudget(gasBudgetInMist);
 
 	txb.moveCall({
-		target: `${PACKAGE_ID}::${MODULE}::start`,
+		target: `${GAME_LOGIC_PACKAGE_ID}::${MODULE}::start`,
 		arguments: [
 			// casino
 			txb.object(CASINO_ID),
@@ -169,7 +173,7 @@ export const action = async (
 ) => {
 	const txb = new TransactionBlock();
 	txb.moveCall({
-		target: `${PACKAGE_ID}::${MODULE}::action`,
+		target: `${GAME_LOGIC_PACKAGE_ID}::${MODULE}::action`,
 		arguments: [
 			txb.object(CASINO_ID), // casino
 			txb.object(LOUNGE_ID), // lounge
@@ -204,7 +208,7 @@ export const settleUp = async (
 ) => {
 	const txb = new TransactionBlock();
 	txb.moveCall({
-		target: `${PACKAGE_ID}::${MODULE}::settle_up`,
+		target: `${GAME_LOGIC_PACKAGE_ID}::${MODULE}::settle_up`,
 		arguments: [
 			txb.object(CASINO_ID), // casino
 			txb.object(LOUNGE_ID), // lounge
