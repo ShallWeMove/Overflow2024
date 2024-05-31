@@ -17,7 +17,7 @@ Immerse yourself in the game interface, crafted to provide a smooth and captivat
 
 # Overview
 
-Shall We Move is a decentralized application (dApp) that brings the classic game of Blackjack to the Sui blockchain. All game functionalities, including card dealing, shuffling, and hiding are executed on-chain using encryption and randomness to ensure fairness and transparency.
+Shall We Move is a decentralized application (dApp) that brings the classic game of 2-card poker to the Sui blockchain. All game functionalities, including card dealing, shuffling, and hiding are executed on-chain using encryption and randomness to ensure fairness and transparency.
 
 # Features
 
