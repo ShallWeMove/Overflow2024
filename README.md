@@ -105,7 +105,7 @@ In contrast to traditional poker, which utilizes 5 cards, Mini Poker is played w
 
 ## Betting Rules
 ### Ante
-- The mandatory initial bet placed at the beginning of the game to ensure active participation and discourage excessive folding without betting. It serves to encourage more proactive betting behavior.
+The mandatory initial bet placed at the beginning of the game to ensure active participation and discourage excessive folding without betting. It serves to encourage more proactive betting behavior.
 
 **Check**
 - A privilege given to the player who either must bet the minimum amount or is the first player to bet regardless of their hand. It allows them to pass their turn without adding more money to the pot.
