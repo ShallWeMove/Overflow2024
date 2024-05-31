@@ -145,6 +145,6 @@ In contrast to traditional poker, which utilizes 5 cards, Mini Poker is played w
 
 - **Royal Straight (Mountain)**: A combination of A and K cards with different suits. It is one of the strongest combinations among straight hands.
 
-- **Back Straight**: It consists of A and 2 cards with different suits.
+- **Back Straight**: It consists of A and 2 cards with different suits.
 
 - **Straight**: A combination of two consecutive numbers with different suits. In mini poker, similar to three of a kind, this hand is considered higher than a flush.
