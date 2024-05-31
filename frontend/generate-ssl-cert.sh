@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Set the domain for the certificate
-DOMAIN=localhost
+DOMAIN=shallwemove
 
 # Check if SSL certificates already exist
 if [ ! -f ./nginx/${DOMAIN}.key ] || [ ! -f ./nginx/${DOMAIN}.crt ]; then

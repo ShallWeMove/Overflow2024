@@ -11,7 +11,7 @@ export const GameTable = () => {
 				totalBetAmount={tableInfo?.totalBetAmount}
 				callAmount={tableInfo?.callAmount}
 				players={tableInfo?.players ?? 0}
-				gameStatus={tableInfo?.gameStatus ?? 0}
+				gameStatus={tableInfo?.gamePlayingStatus ?? 0}
 				currentPlayerAddress={tableInfo?.currentPlayerAddress ?? ""}
 				betUnit={tableInfo?.betUnit}
 				anteAmount={tableInfo?.anteAmount}
