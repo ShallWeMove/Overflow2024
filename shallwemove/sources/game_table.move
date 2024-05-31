@@ -662,18 +662,6 @@ module shallwemove::game_table {
     return true
   }
 
-  fun is_game_able_to_continue(game_table : &GameTable) : bool {
-    // player 수가 2명 미만이면 진행 불가
-    if (game_table.number_of_players() < 2) {
-      return false
-    };
-    // IN_GAME이고 fold가 아닌 player가 2명 미만이면 진행 불가
-    if (game_table.game_status.game_playing_status() == game_status::CONST_IN_GAME() && game_table.number_of_players_not_folding() < 2) {
-      return false
-    };
-    return true
-  }
-
   fun is_round_over(game_table : &GameTable) : bool {
     game_table.game_status.max_round() <= game_table.game_status.current_round()
   }
