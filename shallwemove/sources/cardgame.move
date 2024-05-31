@@ -154,11 +154,8 @@ module shallwemove::cardgame {
   entry fun action(
     casino: &Casino, 
     lounge: &mut Lounge,
-    // game_table: &GameTable,
     game_table_id: ID,
-    // action_type: ActionType, // ante(요건 없애야 할 듯), check, bet, call, raise
     action_type: u8, // ante, check, bet, call, raise
-    // with_new_card: bool, // 새 카드를 받을지 
     chip_count: u64, // 몇 개의 칩을 베팅할지 (칩 하나가 ? SUI일지는 GameTable마다 다르다)
     ctx: &mut TxContext,
   ) : ID {
@@ -179,7 +176,6 @@ module shallwemove::cardgame {
   entry fun settle_up(
     casino: &Casino, 
     lounge: &mut Lounge,
-    // game_table: &GameTable,
     game_table_id: ID,
     ctx: &mut TxContext,
   ) : ID {
@@ -191,7 +187,7 @@ module shallwemove::cardgame {
     // game이 현재 GAME_FINISHED 일 때만 가능
     assert!(game_table.game_status().game_playing_status() == game_status::CONST_GAME_FINISHED(), 19);
 
-    // game_table.settle_up();
+    game_table.settle_up(ctx);
     
     return game_table.id()
   }

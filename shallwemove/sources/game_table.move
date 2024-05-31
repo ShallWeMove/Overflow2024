@@ -594,7 +594,7 @@ module shallwemove::game_table {
     // 모든 플레이어 카드 오픈
     game_table.open_all_player_card();
 
-    // winner player 결정하고 winner player에게 money box 돈 다 보내기
+    // winner player 결정하기 -> 이후 돈 보내는 것은 settle up에서 합시다
     let winner_player_index = game_table.check_winner_index();
     let winner_player_info = game_table.game_status.player_infos().borrow(winner_player_index);
     game_table.game_status.set_winner_player(winner_player_info.player_address());
@@ -829,6 +829,11 @@ module shallwemove::game_table {
       return
     };
   }
+
+  public fun settle_up(game_table : &mut GameTable, ctx : &mut TxContext) {
+  }
+
+
 
   // ============================================
   // ================ TEST ======================
