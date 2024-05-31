@@ -148,3 +148,7 @@ In contrast to traditional poker, which utilizes 5 cards, Mini Poker is played w
 - **Back Straight**: It consists of A and 2 cards with different suits.
 
 - **Straight**: A combination of two consecutive numbers with different suits. In mini poker, similar to three of a kind, this hand is considered higher than a flush.
+
+### Flush
+
+- A flush consists of two cards of the same suit.
