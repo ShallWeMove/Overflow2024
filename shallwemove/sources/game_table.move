@@ -552,8 +552,8 @@ module shallwemove::game_table {
       let card2 = player_seat.cards().borrow(1);
 
       let casino_n = encrypt::convert_vec_u8_to_u256(game_table.casino_public_key);
-      let decrypted_card_number1 = encrypt::encrypt_256(casino_n, card1.card_number());
-      let decrypted_card_number2 = encrypt::encrypt_256(casino_n, card2.card_number());
+      let decrypted_card_number1 = encrypt::decrypt_256(casino_n, card1.card_number());
+      let decrypted_card_number2 = encrypt::decrypt_256(casino_n, card2.card_number());
 
       player_score.push_back(mini_poker_logic::convert_card_combination_to_score(decrypted_card_number1, decrypted_card_number2));
 
