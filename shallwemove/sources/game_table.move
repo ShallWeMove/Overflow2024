@@ -26,6 +26,13 @@ module shallwemove::game_table {
   const PLAYER_NOT_FOUND : u64 = 101;
   const NEXT_PLAYER_NOT_FOUND : u64 = 102;
 
+  const FINISH_GAME_CASE : u64 = 100_000;
+  const NOT_FINISH_GAME_CASE : u64 = 0;
+
+  const FINISH_CASE_1 : u64 = 10_000;
+  const FINISH_CASE_2 : u64 = 20_000;
+  const FINISH_CASE_3 : u64 = 30_000;
+
   // ============================================
   // ============== STRUCTS =====================
 
@@ -79,6 +86,27 @@ module shallwemove::game_table {
   // =============================================================
   // ===================== Methods ===============================
 
+  public fun CONST_FINISH_GAME_CASE() : u64 {FINISH_GAME_CASE}
+  public fun CONST_NOT_FINISH_GAME_CASE() : u64 {NOT_FINISH_GAME_CASE}
+
+  public fun CONST_FINISH_CASE_1() : u64 {FINISH_CASE_1}
+  public fun CONST_FINISH_CASE_2() : u64 {FINISH_CASE_2}
+  public fun CONST_FINISH_CASE_3() : u64 {FINISH_CASE_3}
+
+  public fun game_status(game_table : &GameTable) : &GameStatus {&game_table.game_status}
+  public fun game_status_mut(game_table : &mut GameTable) : &mut GameStatus {&mut game_table.game_status}
+
+  public fun money_box(game_table : &GameTable) : &MoneyBox {&game_table.money_box}
+  public fun money_box_mut(game_table : &mut GameTable) : &mut MoneyBox {&mut game_table.money_box}
+
+  public fun card_deck(game_table : &GameTable) : &Option<CardDeck> {&game_table.card_deck}
+  public fun card_deck_mut(game_table : &mut GameTable) : &mut Option<CardDeck> {&mut game_table.card_deck}
+
+  public fun player_seats(game_table : &GameTable) : &vector<PlayerSeat> {&game_table.player_seats}
+  public fun player_seats_mut(game_table : &mut GameTable) : &mut vector<PlayerSeat> {&mut game_table.player_seats}
+
+  public fun casino_public_key(game_table : &GameTable) : vector<u8> {game_table.casino_public_key}
+
   // Create Methods ===============================
   fun create_player_seats(game_table : &mut GameTable, ctx: &mut TxContext) {
     let mut i = 0 as u8;
@@ -108,7 +136,7 @@ module shallwemove::game_table {
     };
   }
 
-  public fun exit(game_table : &mut GameTable, ctx : &mut TxContext) {
+  public fun exit(game_table : &mut GameTable, ctx : &mut TxContext) : u64 {
     let player_seat_index = game_table.find_player_seat_index(ctx);
     assert!(player_seat_index != PLAYER_NOT_FOUND, 104);
 
@@ -132,11 +160,13 @@ module shallwemove::game_table {
     // If current game status is IN_GAME and unable to play the game because there are 2 players left including exit player, -> finish game
     if (game_table.game_status.game_playing_status() == game_status::CONST_IN_GAME() 
     && game_table.number_of_players() == 2) {
-      game_table.finish_game(ctx);
+      // game_table.finish_game(ctx);
+      return FINISH_GAME_CASE
     };
 
     // Delete player info
     game_table.exit_player(player_seat_index, ctx);
+    return NOT_FINISH_GAME_CASE
   }
 
   public fun ante(game_table : &mut GameTable, ctx : &mut TxContext) {
@@ -162,7 +192,7 @@ module shallwemove::game_table {
     game_table.game_status.set_game_playing_status(game_status::CONST_IN_GAME());
   }
 
-  public fun action(game_table : &mut GameTable, action_type : u8, raise_chip_count : u64, ctx : &mut TxContext) {
+  public fun action(game_table : &mut GameTable, action_type : u8, raise_chip_count : u64, ctx : &mut TxContext) : u64 {
     assert!(game_table.game_status().is_current_turn(ctx), 113);
 
     // Is it the first betting? (is current turn index the same as previous turn?)
@@ -202,29 +232,26 @@ module shallwemove::game_table {
 
     // After the review process is completed, the actual action is carried out here
     if (action_type == player_info::CONST_CHECK()) {
-      game_table.check(ctx);
-      return
+      return game_table.check(ctx)
     };
 
     if (action_type == player_info::CONST_BET()) {
-      game_table.bet(ctx);
-      return
+      return game_table.bet(ctx)
     };
 
     if (action_type == player_info::CONST_CALL()) {
-      game_table.call(ctx);
-      return
+      return game_table.call(ctx)
     };
 
     if (action_type == player_info::CONST_RAISE()) {
-      game_table.raise(raise_chip_count, ctx);
-      return
+      return game_table.raise(raise_chip_count, ctx)
     };
 
     if (action_type == player_info::CONST_FOLD()) {
-      game_table.fold(ctx);
-      return
+      return game_table.fold(ctx)
     };
+
+    return NOT_FINISH_GAME_CASE
   }
 
   public fun settle_up(game_table : &mut GameTable, r : &Random, ctx : &mut TxContext) {
@@ -317,7 +344,7 @@ module shallwemove::game_table {
     game_table.game_status.increment_avail_seat();
   }
 
-  fun check(game_table : &mut GameTable, ctx : &mut TxContext) {
+  fun check(game_table : &mut GameTable, ctx : &mut TxContext) : u64 {
     let player_seat_index = game_table.find_player_seat_index(ctx);
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
 
@@ -326,20 +353,21 @@ module shallwemove::game_table {
     // After a CHECK, have all players who are PLAYING CHECKed? -> If not, next turn
     if (!game_table.is_all_player_check()) {
       game_table.next_turn(ctx);
-      return
+      return NOT_FINISH_GAME_CASE
     };
 
     // Can't play more because the round is over? -> end game
     if (game_table.is_round_over()){
-      game_table.finish_game(ctx);
-      return
+      // game_table.finish_game(ctx);
+      return FINISH_GAME_CASE
     };
 
     // Is there still a round left and can I play more? -> Next round
     game_table.next_round(ctx);
+    return NOT_FINISH_GAME_CASE
   }
 
-  fun bet(game_table : &mut GameTable, ctx : &mut TxContext) {
+  fun bet(game_table : &mut GameTable, ctx : &mut TxContext) : u64 {
     // Bet an amount equal to bet_unit.
     let player_seat_index = game_table.find_player_seat_index(ctx);
     let bet_unit = game_table.game_status.bet_unit();
@@ -352,10 +380,11 @@ module shallwemove::game_table {
 
     // Next turn
     game_table.next_turn(ctx);
+    return NOT_FINISH_GAME_CASE
   }
 
 
-  fun call(game_table : &mut GameTable, ctx : &mut TxContext) {
+  fun call(game_table : &mut GameTable, ctx : &mut TxContext) : u64 {
     let previous_player_seat_index = game_table.game_status.previous_turn_index() as u64;
     let previous_player_total_bet_amount = game_table.game_status.player_infos().borrow(previous_player_seat_index).total_bet_amount();
 
@@ -372,20 +401,21 @@ module shallwemove::game_table {
     // Have all players who are playing CALL and playing PLAYING got the same total amount of bets? -> Or next turn
     if (!game_table.is_all_player_bet_amount_same()) {
       game_table.next_turn(ctx);
-      return
+      return NOT_FINISH_GAME_CASE
     };
 
     // Can't play more because round is over? -> End the game
     if (game_table.is_round_over()){
-      game_table.finish_game(ctx);
-      return
+      // game_table.finish_game(ctx);
+      return FINISH_GAME_CASE
     };
 
     // Is the round still available to play further? -> Next round
     game_table.next_round(ctx);
+    return NOT_FINISH_GAME_CASE
   }
   
-  fun raise(game_table : &mut GameTable, raise_chip_count : u64, ctx : &mut TxContext) {
+  fun raise(game_table : &mut GameTable, raise_chip_count : u64, ctx : &mut TxContext) : u64 {
     let previous_player_seat_index = game_table.game_status.previous_turn_index() as u64;
     let previous_player_total_bet_amount = game_table.game_status.player_infos().borrow(previous_player_seat_index).total_bet_amount();
 
@@ -404,10 +434,10 @@ module shallwemove::game_table {
 
     // Next turn
     game_table.next_turn(ctx);
-
+    return NOT_FINISH_GAME_CASE
   }
 
-  fun fold(game_table : &mut GameTable, ctx : &mut TxContext) {
+  fun fold(game_table : &mut GameTable, ctx : &mut TxContext) : u64 {
     let player_seat_index = game_table.find_player_seat_index(ctx);
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
 
@@ -416,62 +446,59 @@ module shallwemove::game_table {
 
     // Cannot proceed if less than 2 players have not folded
     if (game_table.number_of_players_not_folding() < 2) {
-      game_table.finish_game(ctx);
-      return
+      // game_table.finish_game(ctx);
+      return FINISH_GAME_CASE
     };
 
     // After FOLD, the game can be played & all players who are PLAYING have CHECKed, and the round is over -> End the game.
     if (game_table.is_all_player_check() && game_table.is_round_over()) {
-      game_table.finish_game(ctx);
-      return
+      // game_table.finish_game(ctx);
+      return FINISH_GAME_CASE
     };
 
     // After FOLD, game can be played & all players who are PLAYING have CHECKed, is there a round left? -> Next round
     if (game_table.is_all_player_check() && !game_table.is_round_over()) {
       game_table.next_round(ctx);
-      return
+      return NOT_FINISH_GAME_CASE
     };
 
     // After the FOLD, the game can proceed & all remaining PLAYING players have equalized their bet totals, and the round is over -> End the game.
     if (game_table.is_all_player_action_not_none() && game_table.is_all_player_bet_amount_same() && game_table.is_round_over()) {
-      game_table.finish_game(ctx);
-      return
+      // game_table.finish_game(ctx);
+      return FINISH_GAME_CASE
     };
 
     // After FOLD, the game can proceed & all remaining PLAYING players have equalized their bet totals, is there a round left? -> Next round
     if (game_table.is_all_player_action_not_none() && game_table.is_all_player_bet_amount_same() && !game_table.is_round_over()) {
       game_table.next_round(ctx);
-      return
+      return NOT_FINISH_GAME_CASE
     };
 
     // If none of these are true, just use the next turn
     game_table.next_turn(ctx);
+    return NOT_FINISH_GAME_CASE
   }
 
-  fun finish_game(game_table : &mut GameTable, ctx : &mut TxContext) {
+  public fun finish_game(game_table : &mut GameTable, ctx : &mut TxContext) : u64 {
     let player_seat_index = game_table.find_player_seat_index(ctx);
     let player_info = game_table.game_status.player_infos().borrow(player_seat_index);
 
     // Determining the winner player -> sending money afterwards is done in settle up
     // If the game is not possible because there are 2 players left including the exit player -> the remaining player becomes the winner
     if (player_info.playing_action() == player_info::CONST_EXIT() && game_table.number_of_players() == 2) {
-      let next_player_seat_index = game_table.find_next_player_seat_index(ctx);
-      let next_player_seat = game_table.player_seats.borrow(next_player_seat_index);
-      game_table.game_status.set_winner_player(next_player_seat.player_address());
+      return FINISH_CASE_1
     } 
     // Is there 1 player left, excluding folds? -> the remaining player is the winner
     else if (game_table.number_of_players_not_folding() < 2) {
-      let next_player_seat_index = game_table.find_next_player_seat_index(ctx);
-      let next_player_seat = game_table.player_seats.borrow(next_player_seat_index);
-      game_table.game_status.set_winner_player(next_player_seat.player_address());
+      return FINISH_CASE_2
     } 
     // Other than those two cases, let the game logic decide the winner.
     else {
-      let winner_player_index = game_table.find_winner_index();
-      let winner_player_info = game_table.game_status.player_infos().borrow(winner_player_index);
-      game_table.game_status.set_winner_player(winner_player_info.player_address());
-    }; 
+      return FINISH_CASE_3
+    }
+  }
 
+  public fun after_finish_game_case(game_table : &mut GameTable, ctx : &mut TxContext)  {
     // Open all player cards
     game_table.open_all_player_card();
     
@@ -480,16 +507,33 @@ module shallwemove::game_table {
     game_table.game_status.set_game_playing_status(game_status::CONST_GAME_FINISHED());
   }
 
+  public fun finish_game_case_1(game_table : &mut GameTable, ctx : &mut TxContext)  {
+    let next_player_seat_index = game_table.find_next_player_seat_index(ctx);
+    let next_player_seat = game_table.player_seats.borrow(next_player_seat_index);
+    game_table.game_status.set_winner_player(next_player_seat.player_address());
+    game_table.after_finish_game_case(ctx);
+  }
+
+  public fun finish_game_case_2(game_table : &mut GameTable, ctx : &mut TxContext)  {
+    let next_player_seat_index = game_table.find_next_player_seat_index(ctx);
+    let next_player_seat = game_table.player_seats.borrow(next_player_seat_index);
+    game_table.game_status.set_winner_player(next_player_seat.player_address());
+    game_table.after_finish_game_case(ctx);
+  }
+
+  public fun finish_game_case_3(game_table : &mut GameTable, ctx : &mut TxContext)  {
+    let winner_player_index = game_table.find_winner_index();
+    let winner_player_info = game_table.game_status.player_infos().borrow(winner_player_index);
+    game_table.game_status.set_winner_player(winner_player_info.player_address());
+    game_table.after_finish_game_case(ctx);
+  }
+
   // Get Methods ===============================
   public fun id(game_table : &GameTable) : ID {object::id(game_table)}
 
   public fun lounge_id(game_table : &GameTable) : ID {game_table.lounge_id}
 
   fun used_card_decks(game_table : &GameTable) : vector<ID> {game_table.used_card_decks}
-
-  public fun game_status(game_table : &GameTable) : &GameStatus {
-    &game_table.game_status
-  }
 
   fun number_of_players(game_table : &GameTable) : u64 {
     (game_table.game_status.game_seats() - game_table.game_status.avail_game_seats()) as u64
