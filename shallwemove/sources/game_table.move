@@ -95,17 +95,13 @@ module shallwemove::game_table {
 
   // Public Methods ===============================
   public fun enter(game_table : &mut GameTable, public_key : vector<u8>, deposit : Coin<SUI>, ctx : &mut TxContext) {
-    // player가 속한 player_seat index 찾아내기
     let player_seat_index = game_table.find_player_seat_index(ctx);
 
-    // 못 찾는다면 enter 가능! 
     assert!(player_seat_index == PLAYER_NOT_FOUND, 103);
 
-    // game_table이 다 차서 enter를 못 하는 상황인지 체크한다.
     let empty_seat_index = game_table.find_empty_seat_index();
-
-    // game table이 꽉 찼으면 deposit은 다시 user address로 되돌려보낸다.
     if (empty_seat_index == GAME_TABLE_FULL) {
+      // game table이 꽉 찼으면 deposit은 다시 user address로 되돌려보낸다.
       transfer::public_transfer(deposit, tx_context::sender(ctx));
     } else {
       // game table에 참여할 수 있으면 참여 시킨다.
