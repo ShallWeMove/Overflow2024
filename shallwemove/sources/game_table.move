@@ -100,10 +100,10 @@ module shallwemove::game_table {
 
     let empty_seat_index = game_table.find_empty_seat_index();
     if (empty_seat_index == GAME_TABLE_FULL) {
-      // game table이 꽉 찼으면 deposit은 다시 user address로 되돌려보낸다.
+      // When the game table is full, deposit sends it back to the user address
       transfer::public_transfer(deposit, tx_context::sender(ctx));
     } else {
-      // game table에 참여할 수 있으면 참여 시킨다.
+      // If there is any seats left, let the player join the game
       game_table.enter_player(empty_seat_index, public_key, deposit, ctx);
     };
   }
@@ -114,7 +114,7 @@ module shallwemove::game_table {
 
     game_table.game_status.player_infos_mut().borrow_mut(player_seat_index).set_playing_action(player_info::CONST_EXIT());
 
-    // player가 해당 게임의 manager_player이면 다음으로 넘겨주거나 마지막 유저면 option::none()
+    // If the player is the manager_player of the game, hand it over to the next, or return option::none() if the last user.
     let next_player_seat_index = game_table.find_next_player_seat_index(ctx);
     if (next_player_seat_index == NEXT_PLAYER_NOT_FOUND) {
       game_table.game_status.set_manager_player(option::none());
@@ -129,13 +129,13 @@ module shallwemove::game_table {
       game_table.next_turn(ctx);
     };
 
-    // 만약 게임 중이고 남은 플레이어가 exit player 포함 2명이라 게임이 불가하면 -> 게임 종료
+    // If current game status is IN_GAME and unable to play the game because there are 2 players left including exit player, -> finish game
     if (game_table.game_status.game_playing_status() == game_status::CONST_IN_GAME() 
     && game_table.number_of_players() == 2) {
       game_table.finish_game(ctx);
     };
 
-    // player 정보 제거
+    // Delete player info
     game_table.exit_player(player_seat_index, ctx);
   }
 
@@ -146,7 +146,7 @@ module shallwemove::game_table {
     let ante_amount = game_table.game_status.ante_amount();
     game_table.bet_money(player_seat_index, ante_amount, ctx);
 
-    // READY 상태로 전환
+    // Switch to READY status
     game_table.game_status.player_infos_mut().borrow_mut(player_seat_index).set_playing_status(player_info::CONST_READY());
   }
 
@@ -156,8 +156,8 @@ module shallwemove::game_table {
     assert!(game_table.is_all_player_ready(), 107);
 
     game_table.draw_card_to_all_player();
-
-    // GameStatus 및 모든 플레이이어의 playing_status 업데이트
+    
+    // Update GamesStatus and playing status of all players
     game_table.set_all_player_playing_status(player_info::CONST_PLAYING());
     game_table.game_status.set_game_playing_status(game_status::CONST_IN_GAME());
   }
@@ -165,35 +165,35 @@ module shallwemove::game_table {
   public fun action(game_table : &mut GameTable, action_type : u8, raise_chip_count : u64, ctx : &mut TxContext) {
     assert!(game_table.game_status().is_current_turn(ctx), 113);
 
-    // 첫 베팅인가? (current turn index 랑 previous turn index 랑 같은가?)
+    // Is it the first betting? (is current turn index the same as previous turn?)
     if (game_table.game_status.current_turn_index() == game_table.game_status.previous_turn_index()){
-      // 한 라운드의 최초의 턴일 경우 CHECK or BET or FOLD 할 수 있음 -> CALL, RAISE 불가
+      // If it's the first turn of a round, you can do CHECK, BET or FOLD -> CALL, RAISE are unavailable
       assert!(action_type != player_info::CONST_CALL(), 114);
       assert!(action_type != player_info::CONST_RAISE(), 115);
     };
 
-    // previous turn index의 베팅이 CHECK인가? 
+    // Is the action on the previous turn CHECK?
     if (game_table.game_status.player_infos().borrow(game_table.game_status.previous_turn_index() as u64).playing_action() == player_info::CONST_CHECK()) {
-      // CHECK 다음에는 CHECK or BET or FOLD 할 수 있음 -> CALL, RAISE 불가
+      // You can do CHECK, BET or FOLD after doing CHECK -> CALL, RAISE are unavailable
       assert!(action_type != player_info::CONST_CALL(), 116);
       assert!(action_type != player_info::CONST_RAISE(), 117);
     };
 
-    // previous turn index의 베팅이 BET인가? 
+    // Is the action on previous turn BET?
     if (game_table.game_status.player_infos().borrow(game_table.game_status.previous_turn_index() as u64).playing_action() == player_info::CONST_BET()) {
-      // BET 다음 부터는 CALL or RAISE or FOLD 할 수 있음 -> CHECK, BET 불가
+      // You can do CALL, RAISE or FOLD after doing CHECK -> CALL, BET are unavailable
       assert!(action_type != player_info::CONST_CHECK(), 118);
       assert!(action_type != player_info::CONST_BET(), 119);
     };
 
-    // previous turn index의 베팅이 CALL인가? 
+    // Is the previous turn action CALL?
     if (game_table.game_status.player_infos().borrow(game_table.game_status.previous_turn_index() as u64).playing_action() == player_info::CONST_CALL()) {
-      // CALL 다음 부터는 CALL or RAISE or FOLD 할 수 있음 -> CHECK, BET 불가
+      // You can do CALL, RAISE or FOLD after doing CHECK -> CALL, BET are unavailable
       assert!(action_type != player_info::CONST_CHECK(), 120);
       assert!(action_type != player_info::CONST_BET(), 121);
     };
 
-    // 모든 검토 과정이 끝나고 결국 실제 action을 여기서 진행
+    // After the review process is completed, the actual action is carried out here
     if (action_type == player_info::CONST_CHECK()) {
       game_table.check(ctx);
       return
@@ -224,10 +224,10 @@ module shallwemove::game_table {
     assert!(game_table.game_status.game_playing_status() == game_status::CONST_GAME_FINISHED(), 122);
     assert!(game_table.game_status.is_winner_player(ctx), 122);
 
-    // 못 찾는다면 잘못된 game_table이라는 것. 
+    // If you can't find it, it's the wrong game_table.
     let winner_player_seat_index = game_table.find_player_seat_index(ctx);
     
-    // 먼저 모든 player seat 에서 카드를 card deck으로 수거한다.
+    // First, collect cards from all player seats into the card deck.
     let mut i = 0 ;
     while (i < game_table.game_status.game_seats() as u64) {
       let player_seat = game_table.player_seats.borrow_mut(i);
@@ -241,27 +241,27 @@ module shallwemove::game_table {
       i = i + 1;
     };
 
-    // card deck은 used_card_decks 로 옮긴다.
+    // Moves card deck to used_card_decks
     let used_card_deck = game_table.card_deck.extract();
     game_table.used_card_decks.push_back(used_card_deck.id());
     dynamic_object_field::add<ID, CardDeck>(&mut game_table.id, used_card_deck.id(), used_card_deck);
 
-    // 새로운 card deck을 생성해서 game table로 보낸다. 여기서 r 사용
+    // Create a new card deck and send it to the game table. Using Random here
     let mut card_deck = card_deck::new(game_table.casino_public_key, ctx);
     card_deck.fill_cards(&mut game_table.game_status, game_table.casino_public_key, r, ctx);
     option::fill(&mut game_table.card_deck, card_deck);
 
-    // Money box에 있는 돈을 모두 merge해서 winner player에게 준다.
+    // Merge all the money in the Money box and give it to the winner player.
     let winner_player_seat = game_table.player_seats.borrow_mut(winner_player_seat_index);
     game_table.money_box.send_all_money(winner_player_seat, &mut game_table.game_status, ctx);
 
-    // game info 초기화 한다.
-      // winner player를 manager player로 설정한다.
+    // Initialize game info.
+    // Set winner player to manager player.
     game_table.game_status.reset_game_info();
     game_table.game_status.set_manager_player(winner_player_seat.player_address());
     game_table.game_status.set_current_turn(winner_player_seat_index as u8);
 
-    // player info 초기화 한다.
+    // Initialize player info
     let mut i = 0 ;
     while (i < game_table.game_status.game_seats() as u64) {
       let player_info = game_table.game_status.player_infos_mut().borrow_mut(i);
@@ -286,13 +286,13 @@ module shallwemove::game_table {
 
     player_info.set_playing_status(player_info::CONST_ENTER());
 
-    // player가 해당 게임에 manage_player가 없으면 manager_player로 등록
+    // Register player as manager_player if there is no manager_player in the game
     if (game_table.game_status.manager_player() == option::none<address>()) {
       game_table.game_status.set_manager_player(option::some(tx_context::sender(ctx)));
       game_table.game_status.set_current_turn(0);
     };
 
-    // avail_seat 하나 감소
+    // Decrease avail_seat by one
     game_table.game_status.decrease_avail_seat();
   }
 
@@ -300,7 +300,7 @@ module shallwemove::game_table {
     let player_seat = game_table.player_seats.borrow_mut(player_seat_index);
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
     
-    // tx sender가 해당 player_seat 자리 주인이 아니면 assert!
+    // If tx sender is not the owner of the corresponding player_seat seat, assert!
     assert!(option::some(tx_context::sender(ctx)) == player_seat.player_address(), 101);
 
     player_seat.remove_deposit(player_info, ctx);
@@ -316,34 +316,34 @@ module shallwemove::game_table {
 
     player_info.set_playing_action(player_info::CONST_CHECK());
 
-    // CHECK 후 PLAYING 중인 모든 player가 CHECK를 했는가? -> 아니라면 다음 턴
+    // After a CHECK, have all players who are PLAYING CHECKed? -> If not, next turn
     if (!game_table.is_all_player_check()) {
       game_table.next_turn(ctx);
       return
     };
 
-    // round가 끝나서 게임을 더 진행할 수 없는가? -> 게임을 끝낸다
+    // Can't play more because the round is over? -> end game
     if (game_table.is_round_over()){
       game_table.finish_game(ctx);
       return
     };
 
-    // round가 아직 남아서 게임을 더 진행할 수 있는가? -> 다음 라운드
+    // Is there still a round left and can I play more? -> Next round
     game_table.next_round(ctx);
   }
 
   fun bet(game_table : &mut GameTable, ctx : &mut TxContext) {
-    // bet_unit 만큼의 금액을 베팅한다.
+    // Bet an amount equal to bet_unit.
     let player_seat_index = game_table.find_player_seat_index(ctx);
     let bet_unit = game_table.game_status.bet_unit();
     game_table.bet_money(player_seat_index, bet_unit , ctx);
 
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
 
-    // player action 은 BET
+    // Player's action is BET
     player_info.set_playing_action(player_info::CONST_BET());
 
-    // 그리고 다음 턴
+    // Next turn
     game_table.next_turn(ctx);
   }
 
@@ -355,26 +355,26 @@ module shallwemove::game_table {
     let player_seat_index = game_table.find_player_seat_index(ctx);
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
 
-    // player action 은 CALL
+    // player's action is CALL
     player_info.set_playing_action(player_info::CONST_CALL());
 
-    // 현재 플레이어의 총 베팅 금액을 직전 플레이어의 총 베팅 금액과 동일하게 맞춘다.
+    // Match the current player's total bet amount equal to the previous player's total bet amount.
     let bet_amount = previous_player_total_bet_amount - player_info.total_bet_amount();
     game_table.bet_money(player_seat_index, bet_amount, ctx);
 
-    // CALL을 하고 PLAYING 중인 모든 플레이어의 베팅 총액이 동일해 졌는가? ->아니라면 다음 턴
+    // Have all players who are playing CALL and playing PLAYING got the same total amount of bets? -> Or next turn
     if (!game_table.is_all_player_bet_amount_same()) {
       game_table.next_turn(ctx);
       return
     };
 
-    // round가 끝나서 게임을 더 진행할 수 없는가? -> 게임을 끝낸다
+    // Can't play more because round is over? -> End the game
     if (game_table.is_round_over()){
       game_table.finish_game(ctx);
       return
     };
 
-    // round가 아직 남아서 게임을 더 진행할 수 있는가? -> 다음 라운드
+    // Is the round still available to play further? -> Next round
     game_table.next_round(ctx);
   }
   
@@ -385,17 +385,17 @@ module shallwemove::game_table {
     let player_seat_index = game_table.find_player_seat_index(ctx);
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
 
-    // player action 은 RAISE
+    // player's action is RAISE
     player_info.set_playing_action(player_info::CONST_RAISE());
 
-    // FOLD를 제외한 현재 플레이어의 총 베팅 금액을 직전 플레이어의 총 베팅 금액과 동일하게 맞춘다.
-    // 추가로 chip_count X bet_unit 만큼 추가 베팅을 한다.
+    // Match the current player's total bet amount excluding FOLD to the previous player's total bet amount.
+    // Additionally, place an additional bet as much as chip_count * bet_unit.
     let call_bet_amount = previous_player_total_bet_amount - player_info.total_bet_amount();
     let raise_bet_amount = raise_chip_count * game_table.game_status.bet_unit();
     let bet_amount = call_bet_amount + raise_bet_amount;
     game_table.bet_money(player_seat_index, bet_amount, ctx);
 
-    // 그리고 다음 턴
+    // Next turn
     game_table.next_turn(ctx);
 
   }
@@ -404,40 +404,40 @@ module shallwemove::game_table {
     let player_seat_index = game_table.find_player_seat_index(ctx);
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
 
-    // player action 은 FOLD
+    // player's action is FOLD
     player_info.set_playing_action(player_info::CONST_FOLD());
 
-    // fold 안 한 player가 2명 미만이면 진행 불가
+    // Cannot proceed if less than 2 players have not folded
     if (game_table.number_of_players_not_folding() < 2) {
       game_table.finish_game(ctx);
       return
     };
 
-    // FOLD 후 게임 진행 가능 & PLAYING 중인 모든 player가 CHECK를 했고, round가 끝났나? -> 게임을 끝낸다.
+    // After FOLD, the game can be played & all players who are PLAYING have CHECKed, and the round is over -> End the game.
     if (game_table.is_all_player_check() && game_table.is_round_over()) {
       game_table.finish_game(ctx);
       return
     };
 
-    // FOLD 후 게임 진행 가능 & PLAYING 중인 모든 player가 CHECK를 했고, round가 남았나? -> 다음 라운드
+    // After FOLD, game can be played & all players who are PLAYING have CHECKed, is there a round left? -> Next round
     if (game_table.is_all_player_check() && !game_table.is_round_over()) {
       game_table.next_round(ctx);
       return
     };
 
-    // FOLD를 후 게임 진행 가능 & 남은 PLAYING 중인 모든 플레이어의 베팅 총액이 동일해 졌고, round가 끝났나? -> 게임을 끝낸다.
+    // After the FOLD, the game can proceed & all remaining PLAYING players have equalized their bet totals, and the round is over -> End the game.
     if (game_table.is_all_player_action_not_none() && game_table.is_all_player_bet_amount_same() && game_table.is_round_over()) {
       game_table.finish_game(ctx);
       return
     };
 
-    // FOLD를 후 게임 진행 가능 & 남은 PLAYING 중인 모든 플레이어의 베팅 총액이 동일해 졌고, round가 남았나? -> 다음 라운드
+    // After FOLD, the game can proceed & all remaining PLAYING players have equalized their bet totals, is there a round left? -> Next round
     if (game_table.is_all_player_action_not_none() && game_table.is_all_player_bet_amount_same() && !game_table.is_round_over()) {
       game_table.next_round(ctx);
       return
     };
 
-    // 모두 해당 안 된다면 그냥 다음 턴
+    // If none of these are true, just use the next turn
     game_table.next_turn(ctx);
   }
 
@@ -445,27 +445,27 @@ module shallwemove::game_table {
     let player_seat_index = game_table.find_player_seat_index(ctx);
     let player_info = game_table.game_status.player_infos().borrow(player_seat_index);
 
-    // winner player 결정하기 -> 이후 돈 보내는 것은 settle up에서 합시다
-    // 남은 플레이어가 exit player 포함 2명이라 게임이 불가하면 -> 남은 사람이 winner
+    // Determining the winner player -> sending money afterwards is done in settle up
+    // If the game is not possible because there are 2 players left including the exit player -> the remaining player becomes the winner
     if (player_info.playing_action() == player_info::CONST_EXIT() && game_table.number_of_players() == 2) {
       let next_player_seat_index = game_table.find_next_player_seat_index(ctx);
       let next_player_seat = game_table.player_seats.borrow(next_player_seat_index);
       game_table.game_status.set_winner_player(next_player_seat.player_address());
     } 
-    // fold를 제외한 남은 player가 1명인가? -> 남은 사람이 winner
+    // Is there 1 player left, excluding folds? -> the remaining player is the winner
     else if (game_table.number_of_players_not_folding() < 2) {
       let next_player_seat_index = game_table.find_next_player_seat_index(ctx);
       let next_player_seat = game_table.player_seats.borrow(next_player_seat_index);
       game_table.game_status.set_winner_player(next_player_seat.player_address());
     } 
-    // 위 두 케이스가 아닌 경우에는 게임 로직에 winner 결정
+    // Other than those two cases, let the game logic decide the winner.
     else {
       let winner_player_index = game_table.find_winner_index();
       let winner_player_info = game_table.game_status.player_infos().borrow(winner_player_index);
       game_table.game_status.set_winner_player(winner_player_info.player_address());
     }; 
 
-    // 모든 플레이어 카드 오픈
+    // Open all player cards
     game_table.open_all_player_card();
     
     // GAME FINISHED
@@ -566,7 +566,7 @@ module shallwemove::game_table {
         break
       };
 
-      // 만약 아무도 없어서 다시 돌아오면 break 즉, next turn 못하고 다시 제자리로
+      // If no one is there and you come back, break. This means that we can't take the next turn and return to our
       if (next_player_seat_index == player_seat_index) {
         return NEXT_PLAYER_NOT_FOUND
       };
@@ -701,9 +701,9 @@ module shallwemove::game_table {
 
   // Utils Methods ===============================
   fun next_round(game_table : &mut GameTable, ctx : &mut TxContext) {
-    game_table.draw_card_to_all_player(); // 남아있는 사람들은 카드를 더 받는다
-    game_table.set_all_player_playing_action(player_info::CONST_NONE()); // 모든 player의 playing action은 NONE으로 초기화
-    game_table.game_status.next_round(); // 그리고 다음 라운드, 다음 턴
+    game_table.draw_card_to_all_player(); // Those who stay get more cards
+    game_table.set_all_player_playing_action(player_info::CONST_NONE()); // Reset all players' playing actions to NONE
+    game_table.game_status.next_round(); // And the next round, the next turn
     game_table.next_turn(ctx);
   }
   
@@ -712,13 +712,13 @@ module shallwemove::game_table {
     let player_playing_action = game_table.game_status.player_infos().borrow(player_seat_index).playing_action();
     let next_player_seat_index = game_table.find_next_player_seat_index(ctx);
 
-    // (action이 Exit이고) current turn이 아니라면 안 넘겨줘도 됨
+    // (action is Exit,) need to pass if it's not the current turn
     if (player_playing_action == player_info::CONST_EXIT() && !game_table.game_status.is_current_turn(ctx)) {
       return
     };
 
-    // 여기선 웬만하면 player index == current turn index (Exit을 제외한 모든 action은 current turn일 때만 실행 가능) 
-    // 만약 fold 이고 첫 턴이다? -> current turn, previoust turn 둘 다 넘김
+    // player index == current turn index (all actions except Exit can only be executed when it's the current turn) 
+    // If fold and this is the first turn? -> flip both current turn and previoust turn
     if (player_playing_action == player_info::CONST_FOLD() 
     && game_table.game_status.current_turn_index() == game_table.game_status.previous_turn_index()) {
       game_table.game_status.set_previous_turn(next_player_seat_index as u8); 
@@ -726,14 +726,14 @@ module shallwemove::game_table {
       return
     };
 
-    // 만약 fold 이고 첫 턴이 아니다? -> current turn 만 넘김
+    // If fold and it's not the first turn? -> only flip the current turn
     if (player_playing_action == player_info::CONST_FOLD() 
     && game_table.game_status.current_turn_index() != game_table.game_status.previous_turn_index()) {
       game_table.game_status.set_current_turn(next_player_seat_index as u8);
       return
     }; 
 
-    // fold도 아니고 exit도 아니라면 현재 턴이 previous turn이 되어야 함
+    // If neither fold nor exit, current turn should be previous turn
     if (player_playing_action != player_info::CONST_FOLD() && player_playing_action != player_info::CONST_EXIT()) {
       game_table.game_status.set_previous_turn(player_seat_index as u8); 
       game_table.game_status.set_current_turn(next_player_seat_index as u8);
@@ -745,7 +745,7 @@ module shallwemove::game_table {
     let player_seat = game_table.player_seats.borrow_mut(player_seat_index);
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
 
-    //PlayerSeat의 deposit에서 money_amount 만큼 꺼내서 MoneyBox로 보내기
+    //Take money_amount from PlayerSeat's deposit and send it to MoneyBox
     let money_to_bet = player_seat.withdraw_money(player_info, money_amont, ctx);
     game_table.money_box.bet_money(player_info, money_to_bet);
     game_table.game_status.add_bet_amount(money_amont);
