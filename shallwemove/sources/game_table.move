@@ -721,7 +721,7 @@ module shallwemove::game_table {
   fun draw_card(game_table : &mut GameTable, player_seat_index : u64) {
     let player_seat = game_table.player_seats.borrow_mut(player_seat_index);
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
-    
+
     player_seat.receive_card(player_info, game_table.card_deck.borrow_mut().draw_card(game_table.casino_public_key));
     game_table.game_status.draw_card();
   }
@@ -741,6 +741,17 @@ module shallwemove::game_table {
   }
 
   fun open_all_player_card(game_table : &mut GameTable) {
+    let mut i = 0;
+    while (i < game_table.player_seats.length()) {
+      let player_seat = game_table.player_seats.borrow_mut(i);
+      if (player_seat.player_address() == option::none<address>()) {
+        i = i + 1;
+        continue
+      };
+      player_seat.open_cards(game_table.casino_public_key);
+      
+      i = i + 1;
+    };
 
   }
 

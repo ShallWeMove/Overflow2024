@@ -101,6 +101,16 @@ module shallwemove::player_seat {
       transfer::public_transfer(money_container, player_address);
   }
 
+  public fun open_cards(player_seat : &mut PlayerSeat, casino_public_key : vector<u8>) {
+    let mut i = 0;
+    while (i < player_seat.cards.length()) {
+      let card = player_seat.cards.borrow_mut(i);
+      card.decrypt_card_number(casino_public_key);
+
+      i = i + 1;
+    };
+  }
+
   public fun remove_cards(player_seat : &mut PlayerSeat,player_info : &mut PlayerInfo, card_deck : &mut CardDeck) {
     let mut i = player_seat.cards.length();
     while (i > 0) {
