@@ -444,27 +444,29 @@ module shallwemove::game_table {
   fun finish_game(game_table : &mut GameTable, ctx : &mut TxContext) {
     let player_seat_index = game_table.find_player_seat_index(ctx);
     let player_info = game_table.game_status.player_infos().borrow(player_seat_index);
-    // player 가 하나 남았나? (남은 플레이어가 Exit 했나?)
+
+    // winner player 결정하기 -> 이후 돈 보내는 것은 settle up에서 합시다
+    // 남은 플레이어가 exit player 포함 2명이라 게임이 불가하면 -> 남은 사람이 winner
     if (player_info.playing_action() == player_info::CONST_EXIT() && game_table.number_of_players() == 2) {
       let next_player_seat_index = game_table.find_next_player_seat_index(ctx);
       let next_player_seat = game_table.player_seats.borrow(next_player_seat_index);
       game_table.game_status.set_winner_player(next_player_seat.player_address());
-    };
-
-    // fold를 제외한 남은 player가 1명인가?
-    if (game_table.number_of_players_not_folding() < 2) {
+    } 
+    // fold를 제외한 남은 player가 1명인가? -> 남은 사람이 winner
+    else if (game_table.number_of_players_not_folding() < 2) {
       let next_player_seat_index = game_table.find_next_player_seat_index(ctx);
       let next_player_seat = game_table.player_seats.borrow(next_player_seat_index);
       game_table.game_status.set_winner_player(next_player_seat.player_address());
+    } 
+    // 위 두 케이스가 아닌 경우에는 게임 로직에 winner 결정
+    else {
+      let winner_player_index = game_table.check_winner_index();
+      let winner_player_info = game_table.game_status.player_infos().borrow(winner_player_index);
+      game_table.game_status.set_winner_player(winner_player_info.player_address());
     }; 
 
     // 모든 플레이어 카드 오픈
     game_table.open_all_player_card();
-
-    // winner player 결정하기 -> 이후 돈 보내는 것은 settle up에서 합시다
-    let winner_player_index = game_table.check_winner_index();
-    let winner_player_info = game_table.game_status.player_infos().borrow(winner_player_index);
-    game_table.game_status.set_winner_player(winner_player_info.player_address());
     
     // GAME FINISHED
     game_table.set_all_player_playing_status(player_info::CONST_GAME_END());
