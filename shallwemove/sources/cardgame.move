@@ -89,14 +89,14 @@ module shallwemove::cardgame {
     lounge: &mut Lounge, // It's necessary to access from parent
     game_table_id: ID, 
     ctx: &mut TxContext
-  ) {
+  ) : u64 {
     assert!(casino.id() == lounge.casino_id(), 5);
 
     let lounge_id = lounge.id();
     let game_table = lounge.borrow_mut_game_table(game_table_id);
     assert!(lounge_id == game_table.lounge_id(), 6);
     
-    game_table.exit(ctx);
+    game_table.exit(ctx)
   }
 
   // Money you pay at the start of the game.
@@ -155,7 +155,7 @@ module shallwemove::cardgame {
     action_type: u8, // ante, check, bet, call, raise
     chip_count: u64, // How many chips to bet (how many SUIs a chip will be depends on GameTable's bet_unit)
     ctx: &mut TxContext,
-  ) : ID {
+  ) : u64 {
     assert!(casino.id() == lounge.casino_id(), 14);
     let lounge_id = lounge.id();
     let game_table = lounge.borrow_mut_game_table(game_table_id);
@@ -164,9 +164,7 @@ module shallwemove::cardgame {
     //Only possible when current game status is IN_GAME
     assert!(game_table.game_status().game_playing_status() == game_status::CONST_IN_GAME(), 16);
 
-    game_table.action(action_type, chip_count, ctx);
-      
-    return game_table.id()
+    game_table.action(action_type, chip_count, ctx)
   }
 
   // Get a settlement (The winner must call the transaction at the end of the game)
