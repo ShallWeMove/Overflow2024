@@ -3,8 +3,8 @@ import { Box, Button, Typography, styled, Grid } from "@mui/material";
 import { PlayerInfo, PlayerSeat } from "@/lib/types";
 import { PlayerInfoPopover } from "./PlayerInfoPopover";
 import { StatusBadge } from "../pages/Game/GamePlayerSpace/StatusBadge";
-import { convertIntToActionType } from "@/api/game";
-import { convertIntToPlayingStatusType } from "@/api/game";
+import { GameStatusType, convertIntToActionType } from "@/api/game";
+import { convertIntToPlayingStatusType, convertGameStatusTypeToInt } from "@/api/game";
 import { useEffect } from "react";
 import { tableAtom } from "@/lib/states";
 import { useAtom } from "jotai";
@@ -91,13 +91,23 @@ export const CardPlaceHolder = ({
 						playerData.fields.cards &&
 						playerData.fields.cards.map((card, index) => {
 							let rsa = new RSA();
-							return (
-								(
-									<Grid item xs={2} key={index}>
-										{convertCardNumberToCardImage(rsa.decrypt_card_number(card.fields.cardNumberForUser))}
-									</Grid>
-								) ?? ""
-							);
+							if (tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.GAME_FINISHED)) {
+								return (
+									(
+										<Grid item xs={2} key={index}>
+											{convertCardNumberToCardImage(card.fields.cardNumber)}
+										</Grid>
+									) ?? ""
+								);
+							} else {
+								return (
+									(
+										<Grid item xs={2} key={index}>
+											{convertCardNumberToCardImage(rsa.decrypt_card_number(card.fields.cardNumberForUser))}
+										</Grid>
+									) ?? ""
+								);
+							}
 						})}
 				</CardWrapper>
 				<TotalBetAmount>
