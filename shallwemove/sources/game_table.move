@@ -93,7 +93,7 @@ module shallwemove::game_table {
     };
   }
 
-  // Play Game Methods ===============================
+  // Public Methods ===============================
   public fun enter(game_table : &mut GameTable, public_key : vector<u8>, deposit : Coin<SUI>, ctx : &mut TxContext) {
     // player가 속한 player_seat index 찾아내기
     let player_seat_index = game_table.find_player_seat_index(ctx);
@@ -314,6 +314,28 @@ module shallwemove::game_table {
     &game_table.game_status
   }
 
+  fun number_of_players(game_table : &GameTable) : u64 {
+    (game_table.game_status.game_seats() - game_table.game_status.avail_game_seats()) as u64
+  }
+
+  fun number_of_players_not_folding(game_table : &GameTable) : u64 {
+    let mut i = 0;
+    let mut number_of_not_fold_players = 0;
+    while (i < game_table.game_status.player_infos().length()) {
+      let player_info = game_table.game_status.player_infos().borrow(i);
+      if (player_info.player_address() == option::none<address>()) {
+        i = i + 1;
+        continue
+      };
+      if (player_info.playing_action() != player_info::CONST_FOLD()) {
+        number_of_not_fold_players = number_of_not_fold_players + 1;
+      };
+      i = i + 1;
+    };
+    number_of_not_fold_players
+  }
+
+  // Find Methods ===============================
   fun find_empty_seat_index(game_table : &GameTable) : u64 {
     let mut index = 0;
     while (index < game_table.game_status.game_seats() as u64) {
@@ -353,6 +375,7 @@ module shallwemove::game_table {
 
   fun find_next_player_seat_index(game_table : &GameTable, ctx : &mut TxContext) : u64 {
     let player_seat_index = game_table.find_player_seat_index(ctx);
+    assert!(player_seat_index != PLAYER_NOT_FOUND, 130);
     let mut next_player_seat_index = player_seat_index + 1;
     loop {
       if (next_player_seat_index == game_table.player_seats.length()) {
@@ -383,32 +406,11 @@ module shallwemove::game_table {
     next_player_seat_index
   }
 
-  fun number_of_players(game_table : &GameTable) : u64 {
-    let number_of_players = ( game_table.game_status.game_seats() - game_table.game_status.avail_game_seats() ) as u64;
-    return number_of_players
-  }
-
-  fun number_of_not_fold_players(game_table : &GameTable) : u64 {
-    let mut i = 0;
-    let mut number_of_not_fold_players = 0;
-    while (i < game_table.game_status.player_infos().length()) {
-      let player_info = game_table.game_status.player_infos().borrow(i);
-      if (player_info.player_address() == option::none<address>()) {
-        i = i + 1;
-        continue
-      };
-      if (player_info.playing_action() != player_info::CONST_FOLD()) {
-        number_of_not_fold_players = number_of_not_fold_players + 1;
-      };
-      i = i + 1;
-    };
-    number_of_not_fold_players
-  }
-
+  // Check Methods ===============================
   fun is_all_player_ready(game_table : &GameTable) : bool {
     let mut i = 0;
     let mut is_all_player_ready = true;
-    while (i < game_table.game_status.player_infos().length()) {
+    while (i < game_table.player_seats.length()) {
       let player_info = game_table.game_status.player_infos().borrow(i);
       if (player_info.player_address() == option::none<address>()) {
         i = i + 1;
@@ -443,7 +445,35 @@ module shallwemove::game_table {
     return true
   }
 
-  fun is_all_player_not_none_action(game_table : &GameTable) : bool {
+  fun is_all_player_bet_amount_same(game_table : &GameTable) : bool {
+    let mut i = 0;
+    let mut first_total_bet_amount = 0;
+    while(i < game_table.player_seats.length()){
+      if (game_table.game_status.player_infos().borrow(i).player_address() == option::none()) {
+        i = i + 1;
+        continue
+      };
+      if (game_table.game_status.player_infos().borrow(i).playing_action() == player_info::CONST_FOLD()) {
+        i = i + 1;
+        continue
+      };
+
+      if (first_total_bet_amount == 0) {
+        first_total_bet_amount = game_table.game_status.player_infos().borrow(i).total_bet_amount();
+      };
+
+      if (first_total_bet_amount > 0 && first_total_bet_amount != game_table.game_status.player_infos().borrow(i).total_bet_amount()) {
+        return false
+      };
+
+      i = i + 1;
+    };
+
+    return true
+  }
+
+
+  fun is_all_player_action_not_none(game_table : &GameTable) : bool {
     let mut i = 0;
     while(i < game_table.player_seats.length()){
       if (game_table.game_status.player_infos().borrow(i).player_address() == option::none()) {
@@ -470,7 +500,7 @@ module shallwemove::game_table {
       return false
     };
     // IN_GAME이고 fold가 아닌 player가 2명 미만이면 진행 불가
-    if (game_table.game_status.game_playing_status() == game_status::CONST_IN_GAME() && game_table.number_of_not_fold_players() < 2) {
+    if (game_table.game_status.game_playing_status() == game_status::CONST_IN_GAME() && game_table.number_of_players_not_folding() < 2) {
       return false
     };
     return true
@@ -478,35 +508,6 @@ module shallwemove::game_table {
 
   fun is_over_max_round(game_table : &GameTable) : bool {
     game_table.game_status.max_round() <= game_table.game_status.current_round()
-  }
-
-  fun is_all_player_bet_amount_same(game_table : &GameTable) : bool {
-    let mut i = 0;
-    let mut player_total_bet_amount_vetor = vector<u64>[];
-    while(i < game_table.player_seats.length()){
-      if (game_table.game_status.player_infos().borrow(i).player_address() == option::none()) {
-        i = i + 1;
-        continue
-      };
-      if (game_table.game_status.player_infos().borrow(i).playing_action() == player_info::CONST_FOLD()) {
-        i = i + 1;
-        continue
-      };
-
-      player_total_bet_amount_vetor.push_back(game_table.game_status.player_infos().borrow(i).total_bet_amount());
-      i = i + 1;
-    };
-
-    let first_total_bet_amount = player_total_bet_amount_vetor.borrow(0);
-    let mut j = 0;
-    while (j < player_total_bet_amount_vetor.length()) {
-      if (first_total_bet_amount != player_total_bet_amount_vetor.borrow(j)) {
-        return false
-      };
-      j = j + 1;
-    };
-
-    return true
   }
 
   // Set Methods ===============================
@@ -680,7 +681,7 @@ module shallwemove::game_table {
     // FOLD를 후 게임 진행 가능 & 남은 PLAYING 중인 모든 플레이어의 베팅 총액이 동일해 졌는가? -> 맞다면
       // round 돌고 turn 맨 처음 유저가 fold하면 여기가 걸리네..
       // 즉, 모든 플레이어가 action이 NONE이 아니고 베팅 총액이 동일해야 다음 라운드 조건이 성립됨!
-    if (game_table.is_all_player_not_none_action() && game_table.is_all_player_bet_amount_same() && is_game_able_to_continue) {
+    if (game_table.is_all_player_action_not_none() && game_table.is_all_player_bet_amount_same() && is_game_able_to_continue) {
       // 게임을 더 진행할 수 있는가? (round가 아직 남았나? == 아직 max round를 넘지 않았나?)
       if (!game_table.is_over_max_round()){
         game_table.next_round(ctx);
@@ -707,7 +708,7 @@ module shallwemove::game_table {
     };
 
     // fold를 제외한 남은 player가 1명인가?
-    if (game_table.number_of_not_fold_players() < 2) {
+    if (game_table.number_of_players_not_folding() < 2) {
       let next_player_seat_index = game_table.find_next_player_seat_index(ctx);
       let next_player_seat = game_table.player_seats.borrow(next_player_seat_index);
       game_table.game_status.set_winner_player(next_player_seat.player_address());
