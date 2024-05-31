@@ -385,9 +385,6 @@ module shallwemove::game_table {
     let player_seat_index = game_table.find_player_seat_index(ctx);
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
 
-    // tx sender가 해당 player_seat 자리 주인이 아니면 assert!
-    assert!(option::some(tx_context::sender(ctx)) == player_info.player_address(), 111);
-
     // player action 은 RAISE
     player_info.set_playing_action(player_info::CONST_RAISE());
 
