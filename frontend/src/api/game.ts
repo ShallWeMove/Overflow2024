@@ -197,6 +197,39 @@ export const action = async (
 	}
 };
 
+// settleUp - called after the game ends to calculate the winnings
+export const settleUp = async (
+	wallet: WalletContextState,
+	gameTableId: string
+) => {
+	const txb = new TransactionBlock();
+	txb.moveCall({
+		target: `${PACKAGE_ID}::${MODULE}::settle_up`,
+		arguments: [
+			txb.object(CASINO_ID), // casino
+			txb.object(LOUNGE_ID), // lounge
+			txb.pure(gameTableId), // game table
+			txb.object("0x0000000000000000000000000000000000000000000000000000000000000008") // random object
+		],
+	});
+
+	try {
+		const res = wallet.signAndExecuteTransactionBlock({
+			transactionBlock: txb,
+			options: {
+				showInput: true,
+				showEffects: true,
+				showEvents: true,
+				showObjectChanges: true,
+			},
+		});
+		console.log("settle_up transaction result: ", res);
+		return res;
+	} catch (e) {
+		console.error("'settle_up' transaction failed", e);
+	}
+};
+
 export enum GameStatusType {
 	PRE_GAME = "PRE GAME",
 	IN_GAME = "IN GAME",
@@ -298,26 +331,3 @@ export const convertIntToActionType = (
 	}
 };
 
-// settleUp - called after the game ends to calculate the winnings
-export const settleUp = async (
-	wallet: WalletContextState,
-	gameTableId: string
-) => {
-	const txb = new TransactionBlock();
-	txb.moveCall({
-		target: `${PACKAGE_ID}::${MODULE}::settle_up`,
-		arguments: [
-			txb.object(CASINO_ID), // casino
-			txb.object(gameTableId), // game table
-		],
-	});
-
-	try {
-		const res = wallet.signAndExecuteTransactionBlock({
-			transactionBlock: txb,
-		});
-		console.log("settle_up transaction result: ", res);
-	} catch (e) {
-		console.error("'settle_up' transaction failed", e);
-	}
-};
