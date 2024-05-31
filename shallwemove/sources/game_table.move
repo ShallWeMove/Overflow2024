@@ -79,6 +79,20 @@ module shallwemove::game_table {
   // =============================================================
   // ===================== Methods ===============================
 
+  public fun game_status(game_table : &GameTable) : &GameStatus {&game_table.game_status}
+  public fun game_status_mut(game_table : &mut GameTable) : &mut GameStatus {&mut game_table.game_status}
+
+  public fun money_box(game_table : &GameTable) : &MoneyBox {&game_table.money_box}
+  public fun money_box_mut(game_table : &mut GameTable) : &mut MoneyBox {&mut game_table.money_box}
+
+  public fun card_deck(game_table : &GameTable) : &Option<CardDeck> {&game_table.card_deck}
+  public fun card_deck_mut(game_table : &mut GameTable) : &mut Option<CardDeck> {&mut game_table.card_deck}
+
+  public fun player_seats(game_table : &GameTable) : &vector<PlayerSeat> {&game_table.player_seats}
+  public fun player_seats_mut(game_table : &mut GameTable) : &mut vector<PlayerSeat> {&mut game_table.player_seats}
+
+  public fun casino_public_key(game_table : &GameTable) : vector<u8> {game_table.casino_public_key}
+
   // Create Methods ===============================
   fun create_player_seats(game_table : &mut GameTable, ctx: &mut TxContext) {
     let mut i = 0 as u8;
@@ -486,10 +500,6 @@ module shallwemove::game_table {
   public fun lounge_id(game_table : &GameTable) : ID {game_table.lounge_id}
 
   fun used_card_decks(game_table : &GameTable) : vector<ID> {game_table.used_card_decks}
-
-  public fun game_status(game_table : &GameTable) : &GameStatus {
-    &game_table.game_status
-  }
 
   fun number_of_players(game_table : &GameTable) : u64 {
     (game_table.game_status.game_seats() - game_table.game_status.avail_game_seats()) as u64
