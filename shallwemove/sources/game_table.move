@@ -193,6 +193,13 @@ module shallwemove::game_table {
       assert!(action_type != player_info::CONST_BET(), 121);
     };
 
+    // Is the previous turn action RAISE?
+    if (game_table.game_status.player_infos().borrow(game_table.game_status.previous_turn_index() as u64).playing_action() == player_info::CONST_RAISE()) {
+      // You can do CALL, RAISE or FOLD after doing RAISE -> CALL, BET are unavailable
+      assert!(action_type != player_info::CONST_CHECK(), 120);
+      assert!(action_type != player_info::CONST_BET(), 121);
+    };
+
     // After the review process is completed, the actual action is carried out here
     if (action_type == player_info::CONST_CHECK()) {
       game_table.check(ctx);
