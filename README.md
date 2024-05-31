@@ -89,12 +89,11 @@ sui move create-lounge
 - casino address
 - lounge address
 
-`cd frontend` and create a `.env.local` file with the following content:
-
+`cd frontend` and update the top line of `src/api/game.ts` file with the following content:
 ```
-PACKAGE_ADDRESS=0x1234567890
-CASINO_ADDRESS=0x1234567890
-LOUNGE_ADDRESS=0x1234567890
+const PACKAGE_ID = "{YOUR PACKAGE ID}";
+const CASINO_ID = "{YOUR CASINO ID}";
+const LOUNGE_ID = "{YOUR LOUNGE ID}";
 ```
 
 ### Install Dependencies

@@ -26,11 +26,11 @@ To set up the project locally, follow these steps:
 - casino address
 - lounge address
 
-create a `.env.local` file with the following content:
+update the top line of `src/api/game.ts` file with the following content:
 ```
-PACKAGE_ADDRESS=0x1234567890
-CASINO_ADDRESS=0x1234567890
-LOUNGE_ADDRESS=0x1234567890
+const PACKAGE_ID = "{YOUR PACKAGE ID}";
+const CASINO_ID = "{YOUR CASINO ID}";
+const LOUNGE_ID = "{YOUR LOUNGE ID}";
 ```
 
 ### Install Dependencies
