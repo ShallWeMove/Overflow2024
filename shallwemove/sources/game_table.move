@@ -402,52 +402,42 @@ module shallwemove::game_table {
 
   fun fold(game_table : &mut GameTable, ctx : &mut TxContext) {
     let player_seat_index = game_table.find_player_seat_index(ctx);
-    {
-      let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
+    let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
 
-      // tx sender가 해당 player_seat 자리 주인이 아니면 assert!
-      assert!(option::some(tx_context::sender(ctx)) == player_info.player_address(), 112);
+    // player action 은 FOLD
+    player_info.set_playing_action(player_info::CONST_FOLD());
 
-      // player action 은 FOLD
-      player_info.set_playing_action(player_info::CONST_FOLD());
-    };
-
-    // FOLD 후 게임을 더 이상 진행할 수 없는가?
-    let is_game_able_to_continue = game_table.is_game_able_to_continue();
-    if (!game_table.is_game_able_to_continue()) {
+    // fold 안 한 player가 2명 미만이면 진행 불가
+    if (game_table.number_of_players_not_folding() < 2) {
       game_table.finish_game(ctx);
       return
     };
 
-    // FOLD 후 게임 진행 가능 & PLAYING 중인 모든 player가 CHECK를 했는가?
-    if ( game_table.is_all_player_check() && is_game_able_to_continue) {
-      // 게임을 더 진행할 수 있는가? (round가 아직 남았나? == 아직 max round를 넘지 않았나?)
-      if (!game_table.is_round_over()){
-        game_table.next_round(ctx);
-      } 
-      // 게임을 더 진행할 수 없는가? -> 남아있는 사람들은 카드를 오픈한다
-      else {
-        game_table.finish_game(ctx);
-      };
+    // FOLD 후 게임 진행 가능 & PLAYING 중인 모든 player가 CHECK를 했고, round가 끝났나? -> 게임을 끝낸다.
+    if (game_table.is_all_player_check() && game_table.is_round_over()) {
+      game_table.finish_game(ctx);
       return
     };
 
-    // FOLD를 후 게임 진행 가능 & 남은 PLAYING 중인 모든 플레이어의 베팅 총액이 동일해 졌는가? -> 맞다면
-      // round 돌고 turn 맨 처음 유저가 fold하면 여기가 걸리네..
-      // 즉, 모든 플레이어가 action이 NONE이 아니고 베팅 총액이 동일해야 다음 라운드 조건이 성립됨!
-    if (game_table.is_all_player_action_not_none() && game_table.is_all_player_bet_amount_same() && is_game_able_to_continue) {
-      // 게임을 더 진행할 수 있는가? (round가 아직 남았나? == 아직 max round를 넘지 않았나?)
-      if (!game_table.is_round_over()){
-        game_table.next_round(ctx);
-      } 
-      // 게임을 더 진행할 수 없는가? -> 남아있는 사람들은 카드를 오픈한다
-      else {
-        game_table.finish_game(ctx);
-      };
+    // FOLD 후 게임 진행 가능 & PLAYING 중인 모든 player가 CHECK를 했고, round가 남았나? -> 다음 라운드
+    if (game_table.is_all_player_check() && !game_table.is_round_over()) {
+      game_table.next_round(ctx);
       return
     };
 
-    // 그리고 다음 턴
+    // FOLD를 후 게임 진행 가능 & 남은 PLAYING 중인 모든 플레이어의 베팅 총액이 동일해 졌고, round가 끝났나? -> 게임을 끝낸다.
+    if (game_table.is_all_player_action_not_none() && game_table.is_all_player_bet_amount_same() && game_table.is_round_over()) {
+      game_table.finish_game(ctx);
+      return
+    };
+
+    // FOLD를 후 게임 진행 가능 & 남은 PLAYING 중인 모든 플레이어의 베팅 총액이 동일해 졌고, round가 남았나? -> 다음 라운드
+    if (game_table.is_all_player_action_not_none() && game_table.is_all_player_bet_amount_same() && !game_table.is_round_over()) {
+      game_table.next_round(ctx);
+      return
+    };
+
+    // 모두 해당 안 된다면 그냥 다음 턴
     game_table.next_turn(ctx);
   }
 
