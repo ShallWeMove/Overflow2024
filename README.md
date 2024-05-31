@@ -14,6 +14,7 @@ Immerse yourself in the game interface, crafted to provide a smooth and captivat
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Get Started](#get-started)
+- [Game Rules](#game-rules)
 
 # Overview
 
