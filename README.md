@@ -66,7 +66,21 @@ sui client publish
 you should see the casino and lounge addresses in the output after running the command above. Use these addresses to create your casino and lounge on the Sui blockchain.
 
 ```bash
-sui move create-casino
+### create-casino
+sui client call --package {package_address} --module cardgame --function create_casino --args {n_value_of_public_key} --gas-budget 1000000000
+ex)
+sui client call --package 0x9624ccf91b6c191a231e3538e9e6b533b7467aade40d16c7277119e2ea19240b --module cardgame --function create_casino --args 35263 --gas-budget 1000000000
+
+### create lounge
+sui client call --package {package_address} --module cardgame --function create_lounge --args {casino_id} {max_round} --gas-budget 1000000000
+ex)
+sui client call --package 0x9624ccf91b6c191a231e3538e9e6b533b7467aade40d16c7277119e2ea19240b --module cardgame --function create_lounge --args 0xfd404dd0b9af26e67a0b6e7265845fdea494973d2e31a583f41e48ed5f6b4dec 1 --gas-budget 1000000000
+
+### add game table to lounge
+sui client call --package {package_address} --module cardgame --function add_game_table --args {casino_id} {lounge_id} {ante_amount} {bet_unit} {game_seats} 0x0000000000000000000000000000000000000000000000000000000000000008 --gas-budget 1000000000
+ex)
+sui client call --package 0x9624ccf91b6c191a231e3538e9e6b533b7467aade40d16c7277119e2ea19240b --module cardgame --function add_game_table --args 0xfd404dd0b9af26e67a0b6e7265845fdea494973d2e31a583f41e48ed5f6b4dec 0x61fb61bb778d7554ff6490975470b6b10b3821ccc82092c430fcf7d939a37881 500 500 5 0x0000000000000000000000000000000000000000000000000000000000000008 --gas-budget 1000000000
+
 sui move create-lounge
 ```
 
