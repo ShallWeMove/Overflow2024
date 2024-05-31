@@ -709,36 +709,31 @@ module shallwemove::game_table {
   }
 
   fun bet_money(game_table : &mut GameTable, player_seat_index : u64, money_amont : u64, ctx : &mut TxContext) {
-    {
-      let player_seat = game_table.player_seats.borrow_mut(player_seat_index);
-      let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
+    let player_seat = game_table.player_seats.borrow_mut(player_seat_index);
+    let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
 
-      // tx sender가 해당 player_seat 자리 주인이 아니면 assert!
-      assert!(option::some(tx_context::sender(ctx)) == player_seat.player_address(), 102);
-
-      //PlayerSeat의 deposit에서 money_amount 만큼 꺼내서 MoneyBox로 보내기
-      let money_to_bet = player_seat.withdraw_money(player_info, money_amont, ctx);
-      game_table.money_box.bet_money(player_info, money_to_bet);
-    };
+    //PlayerSeat의 deposit에서 money_amount 만큼 꺼내서 MoneyBox로 보내기
+    let money_to_bet = player_seat.withdraw_money(player_info, money_amont, ctx);
+    game_table.money_box.bet_money(player_info, money_to_bet);
     game_table.game_status.add_bet_amount(money_amont);
   }
 
   fun draw_card(game_table : &mut GameTable, player_seat_index : u64) {
-    {
-      let player_seat = game_table.player_seats.borrow_mut(player_seat_index);
-      let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
-      // 자리 없으면 건너 뜀
-      if (player_seat.player_address() == option::none<address>() || player_info.player_address() == option::none<address>()){
-        return
-      };
-      player_seat.receive_card(player_info, game_table.card_deck.borrow_mut().draw_card(game_table.casino_public_key));
-    };
+    let player_seat = game_table.player_seats.borrow_mut(player_seat_index);
+    let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
+    
+    player_seat.receive_card(player_info, game_table.card_deck.borrow_mut().draw_card(game_table.casino_public_key));
     game_table.game_status.draw_card();
   }
 
   fun draw_card_to_all_player(game_table : &mut GameTable) {
     let mut player_seat_index = 0;
     while (player_seat_index < game_table.player_seats.length()) {
+      let player_seat = game_table.player_seats.borrow_mut(player_seat_index);
+      if (player_seat.player_address() == option::none<address>()){
+        player_seat_index = player_seat_index + 1;
+        continue
+      };
       game_table.draw_card(player_seat_index);
 
       player_seat_index = player_seat_index + 1;
