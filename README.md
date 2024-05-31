@@ -1,10 +1,10 @@
-# Shall We Move: Multiplayer Blackjack on Sui Blockchain
+# Entirely Blockchain-Powered Multiplayer Card Game:  _Play, Create, Share_
 
-Welcome to Shall We Move, a fully on-chain multiplayer Blackjack game implemented on the Sui blockchain. This project leverages the unique features of the Sui blockchain to provide secure, transparent, and decentralized gameplay.
+Welcome to Shall We Move, a fully on-chain multiplayer card game implemented on the Sui blockchain. This project leverages the unique features of the Sui blockchain to provide secure, transparent, and decentralized gameplay.
 
 ![Shall We Move Landing Page](images/landing.png)
 
-Dive into the game interface, designed to offer a seamless and engaging Blackjack experience with real-time multiplayer support.
+Immerse yourself in the game interface, crafted to provide a smooth and captivating card gaming experience with real-time multiplayer support.
 
 ![Shall We Move Game Page](images/game.png)
 
