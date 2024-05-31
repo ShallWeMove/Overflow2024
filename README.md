@@ -4,7 +4,7 @@ Welcome to Shall We Move, a fully on-chain multiplayer card game implemented on 
 
 ![Shall We Move Landing Page](images/landing.png)
 
-Dive into the game interface, designed to offer a seamless and engaging Blackjack experience with real-time multiplayer support.
+Immerse yourself in the game interface, crafted to provide a smooth and captivating card gaming experience with real-time multiplayer support.
 
 ![Shall We Move Game Page](images/game.png)
 
