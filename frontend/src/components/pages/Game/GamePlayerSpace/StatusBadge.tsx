@@ -23,9 +23,9 @@ function getBadgeColor(value: string) {
 	}
 }
 
-export const StatusBadge = ({ value, left = false, manager = false }: any) => {
+export const StatusBadge = ({ value, left = false, bottom = false }: any) => {
 	return (
-		<Container color={"white"} left={left} manager={manager}>
+		<Container color={"white"} left={left} bottom={bottom}>
 			<AmountWrapper value={value}>
 				<Typography color={getBadgeColor(value)} fontWeight={700}>
 					{value}
@@ -34,10 +34,10 @@ export const StatusBadge = ({ value, left = false, manager = false }: any) => {
 		</Container>
 	);
 };
-const Container = styled(Box)<{ left: boolean, manager: boolean }>(({ left, manager }) => ({
+const Container = styled(Box)<{ left: boolean, bottom: boolean }>(({ left, bottom }) => ({
 	position: "absolute",
 	borderRadius: 4,
-	top: manager ? 50 :-25,
+	top: bottom ? 50 :-25,
 	left: left ? -25 : 65,
 	flexGrow: 1,
 	fontSize: 24,

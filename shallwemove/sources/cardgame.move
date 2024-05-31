@@ -66,7 +66,7 @@ module shallwemove::cardgame {
 
       // Deposit is a certain amount -> 100 times the bet_unit of game_table
       // Get an available game table
-      let mut available_game_table_id = lounge.get_available_game_table_id();
+      let mut available_game_table_id = lounge.find_available_game_table_id();
       assert!(available_game_table_id != option::none(), 3);
 
       let avail_game_table = lounge.borrow_mut_game_table(available_game_table_id.extract());
@@ -141,7 +141,7 @@ module shallwemove::cardgame {
     // Cannot execute start() if not the manager player
     assert!(game_table.game_status().is_manager_player(ctx), 13);
     
-    game_table.start();
+    game_table.start(ctx);
 
     return game_table.id()
   }
