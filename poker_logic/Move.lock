@@ -2,7 +2,7 @@
 
 [move]
 version = 2
-manifest_digest = "71BCE416E1E5D5D141702485909DAA4EAEF987FD80302DEE7F2A5C1CC4D6CF58"
+manifest_digest = "5FF9D244C8C6F502349A65AF119E472A33FF622F85235A9E3E168F70BFAE06F6"
 deps_digest = "3C4103934B1E040BB6B23F1D610B4EF9F2F1166A50A104EADCF77467C004C600"
 dependencies = [
   { name = "Sui" },
@@ -23,7 +23,7 @@ dependencies = [
 
 [[move.package]]
 name = "shallwemove"
-source = { git = "https://github.com/ShallWeMove/Overflow2024", rev = "main", subdir = "shallwemove" }
+source = { git = "https://github.com/ShallWeMove/Overflow2024", rev = "feat/move-module", subdir = "shallwemove" }
 
 dependencies = [
   { name = "Sui" },
@@ -38,6 +38,6 @@ flavor = "sui"
 
 [env.testnet_nodeinfra]
 chain-id = "4c78adac"
-original-published-id = "0x052a5b49a5dc896ac8a4af15cb0835ffd5bee0abb541f30a9a7da20daabdf329"
-latest-published-id = "0x052a5b49a5dc896ac8a4af15cb0835ffd5bee0abb541f30a9a7da20daabdf329"
+original-published-id = "0x5b7719a55904a53ddddfb8f5833e382fb4cc46d46fa8cb7b29de875c6ab56f57"
+latest-published-id = "0x5b7719a55904a53ddddfb8f5833e382fb4cc46d46fa8cb7b29de875c6ab56f57"
 published-version = "1"
