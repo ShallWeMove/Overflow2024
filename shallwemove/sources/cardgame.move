@@ -26,7 +26,7 @@ module shallwemove::cardgame {
 
   // --------- For Game Owner ---------
 
-  // This function will be executed in the Backend
+  // This function will be executed in the Sui client, Sui RPC or Backend.
   // game owner or anyone who wanna be a game owner can create new game
   // Casino object is essential to play game
   entry fun create_casino(public_key : vector<u8>, ctx: &mut TxContext) {
@@ -54,28 +54,27 @@ module shallwemove::cardgame {
 
   // --------- For Player ---------
 
-  // 게임 입장
+  // Enter game
   entry fun enter(
     casino : &Casino, 
     lounge : &mut Lounge, 
     public_key : vector<u8>,
     deposit : Coin<SUI>,
     ctx : &mut TxContext) : ID {
-      //casino id 와 lounge의 casino id가 같은지 체크
+      // Check that casino id is the same as the casino id of the round
       assert!(casino.id() == lounge.casino_id(), 2);
 
-      // deposit은 일정량 -> game_table의 bet_unit의 100배
-
-      // available한 GameTable 가져온다
+      // Deposit is a certain amount -> 100 times the bet_unit of game_table
+      // Get an available game table
       let mut available_game_table_id = lounge.get_available_game_table_id();
       assert!(available_game_table_id != option::none(), 3);
 
       let avail_game_table = lounge.borrow_mut_game_table(available_game_table_id.extract());
 
-      // game이 현재 PRE_GAME 일 때만 가능
+      // Only possible when current game status is PRE_GAME
       assert!(avail_game_table.game_status().game_playing_status() == game_status::CONST_PRE_GAME(), 4);
 
-      // player를 GameTable에 참여 시킨다.
+      // Join the player in the GameTable
       avail_game_table.enter(public_key, deposit, ctx);
       debug::print(avail_game_table);
 
@@ -84,10 +83,10 @@ module shallwemove::cardgame {
   }
 
 
-  // 게임 퇴장
+  // Exit game
   entry fun exit(
     casino: &Casino, 
-    lounge: &mut Lounge, // 필요 없을 수도 => 무조건 필요함... parent에서 접근해야 함
+    lounge: &mut Lounge, // It's necessary to access from parent
     game_table_id: ID, 
     ctx: &mut TxContext
   ) {
@@ -100,7 +99,8 @@ module shallwemove::cardgame {
     game_table.exit(ctx);
   }
 
-  // 최초 게임 시작 시 내는 돈. 게임 준비 상태 전환.
+  // Money you pay at the start of the game.
+  // transition status to game ready
   entry fun ante(
     casino: &Casino,
     lounge: &mut Lounge,
@@ -113,7 +113,8 @@ module shallwemove::cardgame {
     let game_table = lounge.borrow_mut_game_table(game_table_id);
     assert!(lounge_id == game_table.lounge_id(), 8);
 
-    // game이 현재 PRE_GAME 일 때만 가능
+
+    // Only possible when the current game status is PRE_GAME
     assert!(game_table.game_status().game_playing_status() == game_status::CONST_PRE_GAME(), 9);
 
     game_table.ante(ctx);
@@ -121,7 +122,7 @@ module shallwemove::cardgame {
     return game_table.id()
   }
 
-  // 게임 시작
+  // Start game
   entry fun start(
     casino: &Casino, 
     lounge: &mut Lounge,
@@ -133,10 +134,11 @@ module shallwemove::cardgame {
     let game_table = lounge.borrow_mut_game_table(game_table_id);
     assert!(lounge_id == game_table.lounge_id(), 11);
 
-    // game이 현재 PRE_GAME 일 때만 가능
+    
+    // Only possible when the current game status is PRE_GAME
     assert!(game_table.game_status().game_playing_status() == game_status::CONST_PRE_GAME(), 12);
 
-    // manager player가 아니면 start() 실행 불가
+    // Cannot execute start() if not the manager player
     assert!(game_table.game_status().is_manager_player(ctx), 13);
     
     game_table.start();
@@ -144,13 +146,14 @@ module shallwemove::cardgame {
     return game_table.id()
   }
 
-  // 플레이어 콜 => 마지막 턴의 액션이면 Move에서 알아서 게임 종료해줌
+  // Called by a player.
+  // If it's the last turn's action, the game would be automatically ended by the Smart contract.
   entry fun action(
     casino: &Casino, 
     lounge: &mut Lounge,
     game_table_id: ID,
     action_type: u8, // ante, check, bet, call, raise
-    chip_count: u64, // 몇 개의 칩을 베팅할지 (칩 하나가 ? SUI일지는 GameTable마다 다르다)
+    chip_count: u64, // How many chips to bet (how many SUIs a chip will be depends on GameTable's bet_unit)
     ctx: &mut TxContext,
   ) : ID {
     assert!(casino.id() == lounge.casino_id(), 14);
@@ -158,7 +161,7 @@ module shallwemove::cardgame {
     let game_table = lounge.borrow_mut_game_table(game_table_id);
     assert!(lounge_id == game_table.lounge_id(), 15);
 
-    // game이 현재 IN_GAME 일 때만 가능
+    //Only possible when current game status is IN_GAME
     assert!(game_table.game_status().game_playing_status() == game_status::CONST_IN_GAME(), 16);
 
     game_table.action(action_type, chip_count, ctx);
@@ -166,7 +169,7 @@ module shallwemove::cardgame {
     return game_table.id()
   }
 
-  // 정산 받기 (승자가 트랜잭션 콜 해야 함)
+  // Get a settlement (The winner must call the transaction at the end of the game)
   entry fun settle_up(
     casino: &Casino, 
     lounge: &mut Lounge,
@@ -179,7 +182,7 @@ module shallwemove::cardgame {
     let game_table = lounge.borrow_mut_game_table(game_table_id);
     assert!(lounge_id == game_table.lounge_id(), 18);
 
-    // game이 현재 GAME_FINISHED 일 때만 가능
+    // Only possible when the current game status is GAME_FINISHED
     assert!(game_table.game_status().game_playing_status() == game_status::CONST_GAME_FINISHED(), 19);
 
     game_table.settle_up(r, ctx);
@@ -215,7 +218,7 @@ module shallwemove::cardgame {
   #[test_only]
   public fun exit_test(
     casino: &Casino, 
-    lounge: &mut Lounge, // 필요 없을 수도 => 무조건 필요함... parent에서 접근해야 함
+    lounge: &mut Lounge,
     game_table_id: ID, 
     ctx: &mut TxContext
   ) {
@@ -252,14 +255,13 @@ module shallwemove::cardgame {
     return game_table.id()
   }
 
-  // 플레이어 콜 => 마지막 턴의 액션이면 Move에서 알아서 게임 종료해줌
   #[test_only]
   public fun action_test(
     casino: &Casino, 
     lounge: &mut Lounge,
     game_table_id: ID,
     action_type: u8, // ante, check, bet, call, raise
-    chip_count: u64, // 몇 개의 칩을 베팅할지 (칩 하나가 ? SUI일지는 GameTable마다 다르다)
+    chip_count: u64,
     ctx: &mut TxContext,
   ) : ID {
     action(casino, lounge, game_table_id, action_type, chip_count, ctx);
