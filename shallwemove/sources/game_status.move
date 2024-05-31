@@ -124,7 +124,7 @@ module shallwemove::game_status {
     game_status.game_info.current_round = game_status.game_info.current_round + 1; 
   }
 
-  fun winner_player(game_status : &GameStatus) : Option<address> {game_status.game_info.winner_player}
+  public fun winner_player(game_status : &GameStatus) : Option<address> {game_status.game_info.winner_player}
 
   public fun set_winner_player(game_status : &mut GameStatus, player_address : Option<address>) {
     game_status.game_info.winner_player = player_address;
@@ -182,6 +182,15 @@ module shallwemove::game_status {
     game_status.game_info.avail_game_seats = game_status.game_info.avail_game_seats - 1; 
   }
 
+  public fun reset_game_info(game_status : &mut GameStatus) {
+    game_status.game_info.game_playing_status = PRE_GAME;
+    game_status.game_info.manager_player = option::none();
+    game_status.game_info.current_round = 0;
+    game_status.game_info.current_turn_index = 0;
+    game_status.game_info.previous_turn_index = 0;
+    game_status.game_info.winner_player = option::none();
+  }
+
   // --------- MoneyBoxInfo ---------
   public fun money_box_info(game_status : &mut GameStatus) : &mut MoneyBoxInfo {
     &mut game_status.money_box_info
@@ -192,8 +201,8 @@ module shallwemove::game_status {
     game_status.money_box_info.total_bet_amount = game_status.money_box_info.total_bet_amount + bet_amount;
   }
 
-  public fun discard_money(game_status : &mut GameStatus, money : &Coin<SUI>) {
-    game_status.money_box_info.total_bet_amount = game_status.money_box_info.total_bet_amount - money.value();
+  public fun discard_money(game_status : &mut GameStatus, money_amount : u64) {
+    game_status.money_box_info.total_bet_amount = game_status.money_box_info.total_bet_amount - money_amount;
   }
   
 

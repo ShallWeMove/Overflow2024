@@ -171,6 +171,7 @@ module shallwemove::cardgame {
     casino: &Casino, 
     lounge: &mut Lounge,
     game_table_id: ID,
+    r : &Random,
     ctx: &mut TxContext,
   ) : ID {
     assert!(casino.id() == lounge.casino_id(), 17);
@@ -181,7 +182,7 @@ module shallwemove::cardgame {
     // game이 현재 GAME_FINISHED 일 때만 가능
     assert!(game_table.game_status().game_playing_status() == game_status::CONST_GAME_FINISHED(), 19);
 
-    game_table.settle_up(ctx);
+    game_table.settle_up(r, ctx);
     
     return game_table.id()
   }

@@ -829,8 +829,64 @@ module shallwemove::game_table {
       return
     };
   }
+  
 
-  public fun settle_up(game_table : &mut GameTable, ctx : &mut TxContext) {
+  public fun settle_up(game_table : &mut GameTable, r : &Random, ctx : &mut TxContext) {
+    // settle up 은 게임 종료 상태 이후 
+    assert!(game_table.game_status.game_playing_status() == game_status::CONST_GAME_FINISHED(), 122);
+
+    // 못 찾는다면 잘못된 game_table이라는 것. 
+    let winner_player_seat_index = game_table.find_player_seat_index(ctx);
+    assert!(winner_player_seat_index != PLAYER_NOT_FOUND, 123);
+
+
+    // winner player 만 실행 가능
+    let winner_player_address = game_table.game_status.winner_player();
+    assert!(winner_player_address == game_table.player_seats.borrow_mut(winner_player_seat_index).player_address(), 124);
+    
+    // 먼저 모든 player seat 에서 카드를 card deck으로 수거한다.
+    let mut i = 0 ;
+    while (i < game_table.game_status.game_seats() as u64) {
+      let player_seat = game_table.player_seats.borrow_mut(i);
+      let player_info = game_table.game_status.player_infos_mut().borrow_mut(i);
+      if (player_seat.player_address() == option::none()) {
+        i = i + 1;
+        continue
+      };
+
+      player_seat.remove_cards(player_info, game_table.card_deck.borrow_mut());
+      i = i + 1;
+    };
+
+    // card deck은 used_card_decks 로 옮긴다.
+    let used_card_deck = game_table.card_deck.extract();
+    game_table.used_card_decks.push_back(used_card_deck.id());
+    dynamic_object_field::add<ID, CardDeck>(&mut game_table.id, used_card_deck.id(), used_card_deck);
+    // 새로운 card deck을 생성해서 game table로 보낸다. 여기서 r 사용
+    let mut card_deck = card_deck::new(game_table.casino_public_key, ctx);
+    card_deck.fill_cards(&mut game_table.game_status, game_table.casino_public_key, r, ctx);
+    option::fill(&mut game_table.card_deck, card_deck);
+
+    // Money box에 있는 돈을 모두 merge해서 winner player에게 준다.
+    let winner_player_seat = game_table.player_seats.borrow_mut(winner_player_seat_index);
+    game_table.money_box.send_all_money(winner_player_seat, &mut game_table.game_status, ctx);
+
+    // game info 초기화 한다.
+      // winner player를 manager player로 설정한다.
+    game_table.game_status.reset_game_info();
+    game_table.game_status.set_manager_player(winner_player_address, winner_player_seat_index);
+    // player info 초기화 한다.
+    let mut i = 0 ;
+    while (i < game_table.game_status.game_seats() as u64) {
+      let player_info = game_table.game_status.player_infos_mut().borrow_mut(i);
+      if (player_info.player_address() == option::none()) {
+        i = i + 1;
+        continue
+      };
+
+      player_info.reset_player_info();
+      i = i + 1;
+    };
   }
 
 

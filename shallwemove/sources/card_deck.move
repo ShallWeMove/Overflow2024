@@ -37,7 +37,7 @@ module shallwemove::card_deck {
   // ===================== Methods ===============================
   // --------- CardDeck ---------
 
-  fun id(card_deck : &CardDeck) : ID {object::id(card_deck)}
+  public fun id(card_deck : &CardDeck) : ID {object::id(card_deck)}
 
   public fun fill_cards(card_deck : &mut CardDeck, game_status : &mut GameStatus, casino_public_key : vector<u8>, r: &Random, ctx : &mut TxContext) {
     let mut card_numbers_array : vector<u256> = utils::get_52_numbers_array();

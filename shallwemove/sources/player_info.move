@@ -144,6 +144,14 @@ module shallwemove::player_info {
     player_info.total_bet_amount = 0;
   }
 
+  public fun reset_player_info(player_info : &mut PlayerInfo) {
+    player_info.playing_status = EMPTY;
+    player_info.playing_action = NONE;
+
+    player_info.previous_bet_amount = 0;
+    player_info.total_bet_amount = 0;
+  }
+
 
   public fun add_deposit(player_info : &mut PlayerInfo, deposit_amount : u64) {
     player_info.deposit = player_info.deposit + deposit_amount;
