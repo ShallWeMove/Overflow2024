@@ -55,7 +55,7 @@ module shallwemove::cardgame {
   // --------- For Player ---------
 
   // Enter game
-  entry fun enter(
+  entry public fun enter(
     casino : &Casino, 
     lounge : &mut Lounge, 
     public_key : vector<u8>,
@@ -84,7 +84,7 @@ module shallwemove::cardgame {
 
 
   // Exit game
-  entry fun exit(
+  entry public fun exit(
     casino: &Casino, 
     lounge: &mut Lounge, // It's necessary to access from parent
     game_table_id: ID, 
@@ -101,7 +101,7 @@ module shallwemove::cardgame {
 
   // Money you pay at the start of the game.
   // transition status to game ready
-  entry fun ante(
+  entry public fun ante(
     casino: &Casino,
     lounge: &mut Lounge,
     game_table_id: ID,
@@ -123,7 +123,7 @@ module shallwemove::cardgame {
   }
 
   // Start game
-  entry fun start(
+  entry public fun start(
     casino: &Casino, 
     lounge: &mut Lounge,
     game_table_id: ID,
@@ -148,7 +148,7 @@ module shallwemove::cardgame {
 
   // Called by a player.
   // If it's the last turn's action, the game would be automatically ended by the Smart contract.
-  entry fun action(
+  entry public fun action(
     casino: &Casino, 
     lounge: &mut Lounge,
     game_table_id: ID,
@@ -170,7 +170,7 @@ module shallwemove::cardgame {
   }
 
   // Get a settlement (The winner must call the transaction at the end of the game)
-  entry fun settle_up(
+  entry public fun settle_up(
     casino: &Casino, 
     lounge: &mut Lounge,
     game_table_id: ID,
