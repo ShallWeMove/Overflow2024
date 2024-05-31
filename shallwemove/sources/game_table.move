@@ -110,25 +110,30 @@ module shallwemove::game_table {
   }
 
   public fun exit(game_table : &mut GameTable, ctx : &mut TxContext) {
-    // player가 속한 player_seat index 찾아내기
     let player_seat_index = game_table.find_player_seat_index(ctx);
 
-    // 못 찾는다면 잘못된 game_table이라는 것. 
     assert!(player_seat_index != PLAYER_NOT_FOUND, 104);
 
     game_table.game_status.player_infos_mut().borrow_mut(player_seat_index).set_playing_action(player_info::CONST_EXIT());
 
     // player가 해당 게임의 manager_player이면 다음으로 넘겨주거나 마지막 유저면 option::none()
-    game_table.update_manager_player(ctx);
+    let next_player_seat_index = game_table.find_next_player_seat_index(ctx);
+    if (next_player_seat_index == NEXT_PLAYER_NOT_FOUND) {
+      game_table.game_status.set_manager_player(option::none());
+      game_table.game_status.set_current_turn(0);
+    } else {
+      game_table.game_status.set_manager_player(game_table.player_seats.borrow_mut(next_player_seat_index).player_address());
+      game_table.game_status.set_current_turn(next_player_seat_index as u8);
+    };
     
-    // 게임 중인가?? 그리고 지금 exit 하는 유저가 current turn인가?? -> next turn
-    if (game_table.game_status.game_playing_status() == game_status::CONST_IN_GAME() && game_table.game_status.is_current_turn(ctx)) {
+    if (game_table.game_status.game_playing_status() == game_status::CONST_IN_GAME() 
+    && game_table.game_status.is_current_turn(ctx)) {
       game_table.next_turn(ctx);
     };
 
-    // 만약 게임 중이고 남은 플레이어가 exit player 포함 2명이라 게임이 불가하면
-    if (game_table.game_status.game_playing_status() == game_status::CONST_IN_GAME() && game_table.number_of_players() == 2) {
-      // 게임 종료
+    // 만약 게임 중이고 남은 플레이어가 exit player 포함 2명이라 게임이 불가하면 -> 게임 종료
+    if (game_table.game_status.game_playing_status() == game_status::CONST_IN_GAME() 
+    && game_table.number_of_players() == 2) {
       game_table.finish_game(ctx);
     };
 
@@ -732,43 +737,36 @@ module shallwemove::game_table {
   
   public fun next_turn(game_table : &mut GameTable, ctx : &mut TxContext) {
     let player_seat_index = game_table.find_player_seat_index(ctx);
-    let playing_action = game_table.game_status.player_infos().borrow(player_seat_index).playing_action();
+    let player_playing_action = game_table.game_status.player_infos().borrow(player_seat_index).playing_action();
+    let next_player_seat_index = game_table.find_next_player_seat_index(ctx);
 
-    // action을 하는 player index와 current turn index는 다를 수 있다. (exit은 언제든 할 수 있기 때문)
-      // 현재 유저가 current turn 이라면 넘겨주고
-      // (action이 Exit이고) current turn이 아니라면 안 넘겨줘도 됨
-    if (playing_action == player_info::CONST_EXIT() && player_seat_index != (game_table.game_status.current_turn_index() as u64)) {
+    // (action이 Exit이고) current turn이 아니라면 안 넘겨줘도 됨
+    if (player_playing_action == player_info::CONST_EXIT() && !game_table.game_status.is_current_turn(ctx)) {
       return
     };
 
     // 여기선 웬만하면 player index == current turn index (Exit을 제외한 모든 action은 current turn일 때만 실행 가능) 
-    // fold도 아니고 exit도 아니라면 현재 턴이 previous turn이 되어야 함
-    if (playing_action != player_info::CONST_FOLD() && playing_action != player_info::CONST_EXIT()) {
-      game_table.game_status.set_previous_turn(player_seat_index as u8); 
-    };
-  
-    // 다음 플레이어로 턴 넘겨 줌
-    let next_player_seat_index = game_table.find_next_player_seat_index(ctx);
-    game_table.game_status.set_current_turn(next_player_seat_index as u8);
-
-    if (playing_action == player_info::CONST_FOLD() && game_table.game_status.current_turn_index() == game_table.game_status.previous_turn_index()) {
+    // 만약 fold 이고 첫 턴이다? -> current turn, previoust turn 둘 다 넘김
+    if (player_playing_action == player_info::CONST_FOLD() 
+    && game_table.game_status.current_turn_index() == game_table.game_status.previous_turn_index()) {
       game_table.game_status.set_previous_turn(next_player_seat_index as u8); 
-    } else if (playing_action == player_info::CONST_FOLD() && game_table.game_status.current_turn_index() != game_table.game_status.previous_turn_index()) {
-      return
-    };
-  }
-
-  fun update_manager_player(game_table : &mut GameTable, ctx : &mut TxContext) {
-    let next_player_seat_index = game_table.find_next_player_seat_index(ctx);
-
-    if (next_player_seat_index == NEXT_PLAYER_NOT_FOUND) {
-      game_table.game_status.set_manager_player(option::none());
-      game_table.game_status.set_current_turn(0);
+      game_table.game_status.set_current_turn(next_player_seat_index as u8);
       return
     };
 
-    game_table.game_status.set_manager_player(game_table.player_seats.borrow_mut(next_player_seat_index).player_address());
-    game_table.game_status.set_current_turn(next_player_seat_index as u8);
+    // 만약 fold 이고 첫 턴이 아니다? -> current turn 만 넘김
+    if (player_playing_action == player_info::CONST_FOLD() 
+    && game_table.game_status.current_turn_index() != game_table.game_status.previous_turn_index()) {
+      game_table.game_status.set_current_turn(next_player_seat_index as u8);
+      return
+    }; 
+
+    // fold도 아니고 exit도 아니라면 현재 턴이 previous turn이 되어야 함
+    if (player_playing_action != player_info::CONST_FOLD() && player_playing_action != player_info::CONST_EXIT()) {
+      game_table.game_status.set_previous_turn(player_seat_index as u8); 
+      game_table.game_status.set_current_turn(next_player_seat_index as u8);
+      return
+    };
   }
 
   fun bet_money(game_table : &mut GameTable, player_seat_index : u64, money_amont : u64, ctx : &mut TxContext) {
