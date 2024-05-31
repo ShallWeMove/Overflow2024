@@ -3,11 +3,11 @@ import { WalletContextState } from "@suiet/wallet-kit";
 import { RSA } from "@/lib/rsa";
 
 const PACKAGE_ID =
-	"0x2cd72dc15b121fec2d4fed5a82893845b5c3b83c7a64ef1c0a9259c89b030ffd";
+	"0x98eeb8041c62ddfe26ed7e424657aa0ae6b59e4ecab65fce6a38ddc31e390873";
 const CASINO_ID =
-	"0x4938daa73949bec7632a9ca589056955e46157c8dcf30bd3bbdd8ce0d8748f09";
+	"0x9427386a66f4e14919a67c249dff7238d758b878c29746ce006d7b51a36ee99a";
 const LOUNGE_ID =
-	"0xf9ab682ec3c434d9d00078fc33df0ce5f99fcdb33348f9e7232cfbd5ee9c0275";
+	"0xbfd926cc432f76cf0acb59921d12eac17048249eb65d95443efa9421b6cafb52";
 const MODULE = "cardgame";
 
 export const GAME_TABLE_TYPE = `${PACKAGE_ID}::game_table::GameTable`;
