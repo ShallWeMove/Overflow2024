@@ -37,12 +37,6 @@ module shallwemove::cardgame {
     lounge::create(casino,max_round, ctx);
   }
 
-  entry fun clean_up_lounge(casino : &Casino, lounge : &mut Lounge, ctx: &mut TxContext) {
-    assert!(casino.admin() == tx_context::sender(ctx), 0);
-
-    lounge.clean_up();
-  }
-
   entry fun add_game_table(
     casino : &Casino, 
     lounge : &mut Lounge, 
