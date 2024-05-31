@@ -314,9 +314,6 @@ module shallwemove::game_table {
     let player_seat_index = game_table.find_player_seat_index(ctx);
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
 
-    // tx sender가 해당 player_seat 자리 주인이 아니면 assert!
-    assert!(option::some(tx_context::sender(ctx)) == player_info.player_address(), 108);
-
     player_info.set_playing_action(player_info::CONST_CHECK());
 
     // CHECK 후 PLAYING 중인 모든 player가 CHECK를 했는가? -> 아니라면 다음 턴
@@ -341,9 +338,7 @@ module shallwemove::game_table {
     let bet_unit = game_table.game_status.bet_unit();
     game_table.bet_money(player_seat_index, bet_unit , ctx);
 
-    // tx sender가 해당 player_seat 자리 주인이 아니면 assert!
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
-    assert!(option::some(tx_context::sender(ctx)) == player_info.player_address(), 109);
 
     // player action 은 BET
     player_info.set_playing_action(player_info::CONST_BET());
@@ -360,29 +355,27 @@ module shallwemove::game_table {
     let player_seat_index = game_table.find_player_seat_index(ctx);
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
 
-    // tx sender가 해당 player_seat 자리 주인이 아니면 assert!
-    assert!(option::some(tx_context::sender(ctx)) == player_info.player_address(), 110);
-
     // player action 은 CALL
     player_info.set_playing_action(player_info::CONST_CALL());
 
     // 현재 플레이어의 총 베팅 금액을 직전 플레이어의 총 베팅 금액과 동일하게 맞춘다.
     let bet_amount = previous_player_total_bet_amount - player_info.total_bet_amount();
     game_table.bet_money(player_seat_index, bet_amount, ctx);
-    
+
     // CALL을 하고 PLAYING 중인 모든 플레이어의 베팅 총액이 동일해 졌는가? ->아니라면 다음 턴
-    if (game_table.is_all_player_bet_amount_same()) {
-      // 게임을 더 진행할 수 있는가? (round가 아직 남았나? == 아직 max round를 넘지 않았나?)
-      if (!game_table.is_round_over()){
-        game_table.next_round(ctx);
-      } 
-      // 게임을 더 진행할 수 없는가? -> 남아있는 사람들은 카드를 오픈한다
-      else {
-        game_table.finish_game(ctx);
-      };
-    } else {
+    if (!game_table.is_all_player_bet_amount_same()) {
       game_table.next_turn(ctx);
+      return
     };
+
+    // round가 끝나서 게임을 더 진행할 수 없는가? -> 게임을 끝낸다
+    if (game_table.is_round_over()){
+      game_table.finish_game(ctx);
+      return
+    };
+
+    // round가 아직 남아서 게임을 더 진행할 수 있는가? -> 다음 라운드
+    game_table.next_round(ctx);
   }
   
   fun raise(game_table : &mut GameTable, raise_chip_count : u64, ctx : &mut TxContext) {
