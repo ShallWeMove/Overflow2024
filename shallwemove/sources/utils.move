@@ -3,13 +3,14 @@ module shallwemove::utils {
   use sui::random::{Self, Random};
 
   public fun get_52_numbers_array() : vector<u256> {
-    let mut fifty_two_numbers_array = vector<u256>[];
-    let mut i = 52;
-    while (i > 0) {
-      fifty_two_numbers_array.push_back(i);
-      i = i - 1;
+    let mut numbers_array = vector<u256>[];
+    let mut i = 0;
+    while (i < 52) {
+      numbers_array.push_back(i);
+      i = i + 1;
     };
-    fifty_two_numbers_array
+    numbers_array.reverse();
+    numbers_array
   }
 
   public fun shuffle(number_array : &mut vector<u256>, r: &Random, ctx: &mut TxContext){
