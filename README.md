@@ -111,7 +111,7 @@ The mandatory initial bet placed at the beginning of the game to ensure active p
 A privilege given to the player who either must bet the minimum amount or is the first player to bet regardless of their hand. It allows them to pass their turn without adding more money to the pot.
 
 [**Bet**] 
-The act of placing the first bet after card exchange or additional distribution. If no one bets, the round progresses with everyone checking, without further betting.
+/n The act of placing the first bet after card exchange or additional distribution. If no one bets, the round progresses with everyone checking, without further betting.
 
 [**Call**] 
 Accepting the amount of money bet by the previous player.
