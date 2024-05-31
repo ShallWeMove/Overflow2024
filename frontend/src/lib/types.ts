@@ -67,6 +67,7 @@ export type Card = {
 		id: string;
 		index: number;
 		cardNumber: number;
+		cardNumberForUser : number;
 	};
 };
 
