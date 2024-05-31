@@ -166,44 +166,37 @@ module shallwemove::game_table {
   }
 
   public fun action(game_table : &mut GameTable, action_type : u8, raise_chip_count : u64, ctx : &mut TxContext) {
-    // 현재 턴인 player만 실행 가능
     assert!(game_table.game_status().is_current_turn(ctx), 113);
 
     // 첫 베팅인가? (current turn index 랑 previous turn index 랑 같은가?)
     if (game_table.game_status.current_turn_index() == game_table.game_status.previous_turn_index()){
-      // 한 라운드의 최초의 턴일 경우 CHECK or BET or FOLD 할 수 있음
-      // 최초 턴 -> CALL, RAISE 불가
+      // 한 라운드의 최초의 턴일 경우 CHECK or BET or FOLD 할 수 있음 -> CALL, RAISE 불가
       assert!(action_type != player_info::CONST_CALL(), 114);
       assert!(action_type != player_info::CONST_RAISE(), 115);
     };
 
     // previous turn index의 베팅이 CHECK인가? 
-    // CHECK 다음에는 CHECK or BET or FOLD(이건 action에서 커버 치는게 아님) 할 수 있음
-      // CHECK 다음에는 CALL, RAISE 불가
     if (game_table.game_status.player_infos().borrow(game_table.game_status.previous_turn_index() as u64).playing_action() == player_info::CONST_CHECK()) {
+      // CHECK 다음에는 CHECK or BET or FOLD 할 수 있음 -> CALL, RAISE 불가
       assert!(action_type != player_info::CONST_CALL(), 116);
       assert!(action_type != player_info::CONST_RAISE(), 117);
     };
 
     // previous turn index의 베팅이 BET인가? 
-    // BET 다음 부터는 CALL or RAISE or FOLD 할 수 있음
-      // RAISE는 CALL 만큼 베팅 금액에 추가 베팅을 하는 거임
-      // BET 다음 부터는 CHECK, BET 불가
     if (game_table.game_status.player_infos().borrow(game_table.game_status.previous_turn_index() as u64).playing_action() == player_info::CONST_BET()) {
+      // BET 다음 부터는 CALL or RAISE or FOLD 할 수 있음 -> CHECK, BET 불가
       assert!(action_type != player_info::CONST_CHECK(), 118);
       assert!(action_type != player_info::CONST_BET(), 119);
     };
 
     // previous turn index의 베팅이 CALL인가? 
-    // CALL 다음 부터는 CALL or RAISE or FOLD 할 수 있음
-      // CALL 다음 부터는 CHECK, BET 불가
     if (game_table.game_status.player_infos().borrow(game_table.game_status.previous_turn_index() as u64).playing_action() == player_info::CONST_CALL()) {
+      // CALL 다음 부터는 CALL or RAISE or FOLD 할 수 있음 -> CHECK, BET 불가
       assert!(action_type != player_info::CONST_CHECK(), 120);
       assert!(action_type != player_info::CONST_BET(), 121);
     };
 
     // 모든 검토 과정이 끝나고 결국 실제 action을 여기서 진행
-
     if (action_type == player_info::CONST_CHECK()) {
       game_table.check(ctx);
       return
