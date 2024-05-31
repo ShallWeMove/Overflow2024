@@ -242,7 +242,6 @@ module shallwemove::game_table {
       return
     };
   }
-  
 
   public fun settle_up(game_table : &mut GameTable, r : &Random, ctx : &mut TxContext) {
     // settle up 은 게임 종료 상태 이후 
@@ -303,215 +302,7 @@ module shallwemove::game_table {
     };
   }
 
-  // Get Methods ===============================
-  public fun id(game_table : &GameTable) : ID {object::id(game_table)}
-
-  public fun lounge_id(game_table : &GameTable) : ID {game_table.lounge_id}
-
-  fun used_card_decks(game_table : &GameTable) : vector<ID> {game_table.used_card_decks}
-
-  public fun game_status(game_table : &GameTable) : &GameStatus {
-    &game_table.game_status
-  }
-
-  fun number_of_players(game_table : &GameTable) : u64 {
-    (game_table.game_status.game_seats() - game_table.game_status.avail_game_seats()) as u64
-  }
-
-  fun number_of_players_not_folding(game_table : &GameTable) : u64 {
-    let mut i = 0;
-    let mut number_of_not_fold_players = 0;
-    while (i < game_table.game_status.player_infos().length()) {
-      let player_info = game_table.game_status.player_infos().borrow(i);
-      if (player_info.player_address() == option::none<address>()) {
-        i = i + 1;
-        continue
-      };
-      if (player_info.playing_action() != player_info::CONST_FOLD()) {
-        number_of_not_fold_players = number_of_not_fold_players + 1;
-      };
-      i = i + 1;
-    };
-    number_of_not_fold_players
-  }
-
-  // Find Methods ===============================
-  fun find_empty_seat_index(game_table : &GameTable) : u64 {
-    let mut index = 0;
-    while (index < game_table.game_status.game_seats() as u64) {
-      let player_seat = game_table.player_seats.borrow(index);
-
-      if (player_seat.player_address() == option::none<address>()) {
-        break
-      };
-      index = index + 1;
-    };
-
-    if (index == game_table.game_status.game_seats() as u64) {
-      index = GAME_TABLE_FULL;
-    };
-
-    index
-  }
-
-  fun find_player_seat_index(game_table : &GameTable, ctx : &mut TxContext) : u64 {
-    let mut index = 0;
-    while (index < game_table.player_seats.length()) {
-      let player_seat = game_table.player_seats.borrow(index);
-      if (player_seat.player_address() == option::none<address>()) {
-        index = index + 1;
-        continue
-      };
-
-      if (game_table.player_seats.borrow(index).player_address() == option::some(tx_context::sender(ctx))) {
-        return index
-      };
-
-      index = index + 1;
-    };
-
-    PLAYER_NOT_FOUND
-  }
-
-  fun find_next_player_seat_index(game_table : &GameTable, ctx : &mut TxContext) : u64 {
-    let player_seat_index = game_table.find_player_seat_index(ctx);
-    assert!(player_seat_index != PLAYER_NOT_FOUND, 130);
-    let mut next_player_seat_index = player_seat_index + 1;
-    loop {
-      if (next_player_seat_index == game_table.player_seats.length()) {
-        next_player_seat_index = 0;
-      };
-
-      let player_info = game_table.game_status.player_infos().borrow(next_player_seat_index);
-      if (player_info.player_address() == option::none<address>()) {
-        next_player_seat_index = next_player_seat_index + 1;
-        continue
-      };
-      if (player_info.playing_action() == player_info::CONST_FOLD()) {
-        next_player_seat_index = next_player_seat_index + 1;
-        continue
-      };
-
-      if (player_info.player_address() != option::none<address>()) {
-        break
-      };
-
-      // 만약 아무도 없어서 다시 돌아오면 break 즉, next turn 못하고 다시 제자리로
-      if (next_player_seat_index == player_seat_index) {
-        return NEXT_PLAYER_NOT_FOUND
-      };
-
-      next_player_seat_index = next_player_seat_index + 1;
-    };
-    next_player_seat_index
-  }
-
-  // Check Methods ===============================
-  fun is_all_player_ready(game_table : &GameTable) : bool {
-    let mut i = 0;
-    let mut is_all_player_ready = true;
-    while (i < game_table.player_seats.length()) {
-      let player_info = game_table.game_status.player_infos().borrow(i);
-      if (player_info.player_address() == option::none<address>()) {
-        i = i + 1;
-        continue
-      };
-      if (player_info.playing_status() != player_info::CONST_READY()) {
-        is_all_player_ready = false;
-      };
-      i = i + 1;
-    };
-    is_all_player_ready
-  }
-
-  fun is_all_player_check(game_table : &GameTable) : bool {
-    let mut i = 0;
-    while(i < game_table.player_seats.length()){
-      if (game_table.game_status.player_infos().borrow(i).player_address() == option::none()) {
-        i = i + 1;
-        continue
-      };
-      if (game_table.game_status.player_infos().borrow(i).playing_action() == player_info::CONST_FOLD()) {
-        i = i + 1;
-        continue
-      };
-      if (game_table.game_status.player_infos().borrow(i).playing_action() != player_info::CONST_CHECK()) {
-        return false
-      };
-
-      i = i + 1;
-    };
-
-    return true
-  }
-
-  fun is_all_player_bet_amount_same(game_table : &GameTable) : bool {
-    let mut i = 0;
-    let mut first_total_bet_amount = 0;
-    while(i < game_table.player_seats.length()){
-      if (game_table.game_status.player_infos().borrow(i).player_address() == option::none()) {
-        i = i + 1;
-        continue
-      };
-      if (game_table.game_status.player_infos().borrow(i).playing_action() == player_info::CONST_FOLD()) {
-        i = i + 1;
-        continue
-      };
-
-      if (first_total_bet_amount == 0) {
-        first_total_bet_amount = game_table.game_status.player_infos().borrow(i).total_bet_amount();
-      };
-
-      if (first_total_bet_amount > 0 && first_total_bet_amount != game_table.game_status.player_infos().borrow(i).total_bet_amount()) {
-        return false
-      };
-
-      i = i + 1;
-    };
-
-    return true
-  }
-
-
-  fun is_all_player_action_not_none(game_table : &GameTable) : bool {
-    let mut i = 0;
-    while(i < game_table.player_seats.length()){
-      if (game_table.game_status.player_infos().borrow(i).player_address() == option::none()) {
-        i = i + 1;
-        continue
-      };
-      if (game_table.game_status.player_infos().borrow(i).playing_action() == player_info::CONST_FOLD()) {
-        i = i + 1;
-        continue
-      };
-      if (game_table.game_status.player_infos().borrow(i).playing_action() == player_info::CONST_NONE()) {
-        return false
-      };
-
-      i = i + 1;
-    };
-
-    return true
-  }
-
-  fun is_game_able_to_continue(game_table : &GameTable) : bool {
-    // player 수가 2명 미만이면 진행 불가
-    if (game_table.number_of_players() < 2) {
-      return false
-    };
-    // IN_GAME이고 fold가 아닌 player가 2명 미만이면 진행 불가
-    if (game_table.game_status.game_playing_status() == game_status::CONST_IN_GAME() && game_table.number_of_players_not_folding() < 2) {
-      return false
-    };
-    return true
-  }
-
-  fun is_over_max_round(game_table : &GameTable) : bool {
-    game_table.game_status.max_round() <= game_table.game_status.current_round()
-  }
-
-  // Set Methods ===============================
-
+  // Game Play Methods ===============================
   fun enter_player(game_table : &mut GameTable, empty_seat_index : u64, public_key : vector<u8>, deposit : Coin<SUI>, ctx : &mut TxContext) {
     let player_info = game_table.game_status.player_infos_mut().borrow_mut(empty_seat_index);
     let player_seat = game_table.player_seats.borrow_mut(empty_seat_index);
@@ -727,6 +518,213 @@ module shallwemove::game_table {
     game_table.game_status.set_game_playing_status(game_status::CONST_GAME_FINISHED());
   }
 
+  // Get Methods ===============================
+  public fun id(game_table : &GameTable) : ID {object::id(game_table)}
+
+  public fun lounge_id(game_table : &GameTable) : ID {game_table.lounge_id}
+
+  fun used_card_decks(game_table : &GameTable) : vector<ID> {game_table.used_card_decks}
+
+  public fun game_status(game_table : &GameTable) : &GameStatus {
+    &game_table.game_status
+  }
+
+  fun number_of_players(game_table : &GameTable) : u64 {
+    (game_table.game_status.game_seats() - game_table.game_status.avail_game_seats()) as u64
+  }
+
+  fun number_of_players_not_folding(game_table : &GameTable) : u64 {
+    let mut i = 0;
+    let mut number_of_not_fold_players = 0;
+    while (i < game_table.game_status.player_infos().length()) {
+      let player_info = game_table.game_status.player_infos().borrow(i);
+      if (player_info.player_address() == option::none<address>()) {
+        i = i + 1;
+        continue
+      };
+      if (player_info.playing_action() != player_info::CONST_FOLD()) {
+        number_of_not_fold_players = number_of_not_fold_players + 1;
+      };
+      i = i + 1;
+    };
+    number_of_not_fold_players
+  }
+
+  // Find Methods ===============================
+  fun find_empty_seat_index(game_table : &GameTable) : u64 {
+    let mut index = 0;
+    while (index < game_table.game_status.game_seats() as u64) {
+      let player_seat = game_table.player_seats.borrow(index);
+
+      if (player_seat.player_address() == option::none<address>()) {
+        break
+      };
+      index = index + 1;
+    };
+
+    if (index == game_table.game_status.game_seats() as u64) {
+      index = GAME_TABLE_FULL;
+    };
+
+    index
+  }
+
+  fun find_player_seat_index(game_table : &GameTable, ctx : &mut TxContext) : u64 {
+    let mut index = 0;
+    while (index < game_table.player_seats.length()) {
+      let player_seat = game_table.player_seats.borrow(index);
+      if (player_seat.player_address() == option::none<address>()) {
+        index = index + 1;
+        continue
+      };
+
+      if (game_table.player_seats.borrow(index).player_address() == option::some(tx_context::sender(ctx))) {
+        return index
+      };
+
+      index = index + 1;
+    };
+
+    PLAYER_NOT_FOUND
+  }
+
+  fun find_next_player_seat_index(game_table : &GameTable, ctx : &mut TxContext) : u64 {
+    let player_seat_index = game_table.find_player_seat_index(ctx);
+    assert!(player_seat_index != PLAYER_NOT_FOUND, 130);
+    let mut next_player_seat_index = player_seat_index + 1;
+    loop {
+      if (next_player_seat_index == game_table.player_seats.length()) {
+        next_player_seat_index = 0;
+      };
+
+      let player_info = game_table.game_status.player_infos().borrow(next_player_seat_index);
+      if (player_info.player_address() == option::none<address>()) {
+        next_player_seat_index = next_player_seat_index + 1;
+        continue
+      };
+      if (player_info.playing_action() == player_info::CONST_FOLD()) {
+        next_player_seat_index = next_player_seat_index + 1;
+        continue
+      };
+
+      if (player_info.player_address() != option::none<address>()) {
+        break
+      };
+
+      // 만약 아무도 없어서 다시 돌아오면 break 즉, next turn 못하고 다시 제자리로
+      if (next_player_seat_index == player_seat_index) {
+        return NEXT_PLAYER_NOT_FOUND
+      };
+
+      next_player_seat_index = next_player_seat_index + 1;
+    };
+    next_player_seat_index
+  }
+
+  // Check Methods ===============================
+  fun is_all_player_ready(game_table : &GameTable) : bool {
+    let mut i = 0;
+    let mut is_all_player_ready = true;
+    while (i < game_table.player_seats.length()) {
+      let player_info = game_table.game_status.player_infos().borrow(i);
+      if (player_info.player_address() == option::none<address>()) {
+        i = i + 1;
+        continue
+      };
+      if (player_info.playing_status() != player_info::CONST_READY()) {
+        is_all_player_ready = false;
+      };
+      i = i + 1;
+    };
+    is_all_player_ready
+  }
+
+  fun is_all_player_check(game_table : &GameTable) : bool {
+    let mut i = 0;
+    while(i < game_table.player_seats.length()){
+      if (game_table.game_status.player_infos().borrow(i).player_address() == option::none()) {
+        i = i + 1;
+        continue
+      };
+      if (game_table.game_status.player_infos().borrow(i).playing_action() == player_info::CONST_FOLD()) {
+        i = i + 1;
+        continue
+      };
+      if (game_table.game_status.player_infos().borrow(i).playing_action() != player_info::CONST_CHECK()) {
+        return false
+      };
+
+      i = i + 1;
+    };
+
+    return true
+  }
+
+  fun is_all_player_bet_amount_same(game_table : &GameTable) : bool {
+    let mut i = 0;
+    let mut first_total_bet_amount = 0;
+    while(i < game_table.player_seats.length()){
+      if (game_table.game_status.player_infos().borrow(i).player_address() == option::none()) {
+        i = i + 1;
+        continue
+      };
+      if (game_table.game_status.player_infos().borrow(i).playing_action() == player_info::CONST_FOLD()) {
+        i = i + 1;
+        continue
+      };
+
+      if (first_total_bet_amount == 0) {
+        first_total_bet_amount = game_table.game_status.player_infos().borrow(i).total_bet_amount();
+      };
+
+      if (first_total_bet_amount > 0 && first_total_bet_amount != game_table.game_status.player_infos().borrow(i).total_bet_amount()) {
+        return false
+      };
+
+      i = i + 1;
+    };
+
+    return true
+  }
+
+  fun is_all_player_action_not_none(game_table : &GameTable) : bool {
+    let mut i = 0;
+    while(i < game_table.player_seats.length()){
+      if (game_table.game_status.player_infos().borrow(i).player_address() == option::none()) {
+        i = i + 1;
+        continue
+      };
+      if (game_table.game_status.player_infos().borrow(i).playing_action() == player_info::CONST_FOLD()) {
+        i = i + 1;
+        continue
+      };
+      if (game_table.game_status.player_infos().borrow(i).playing_action() == player_info::CONST_NONE()) {
+        return false
+      };
+
+      i = i + 1;
+    };
+
+    return true
+  }
+
+  fun is_game_able_to_continue(game_table : &GameTable) : bool {
+    // player 수가 2명 미만이면 진행 불가
+    if (game_table.number_of_players() < 2) {
+      return false
+    };
+    // IN_GAME이고 fold가 아닌 player가 2명 미만이면 진행 불가
+    if (game_table.game_status.game_playing_status() == game_status::CONST_IN_GAME() && game_table.number_of_players_not_folding() < 2) {
+      return false
+    };
+    return true
+  }
+
+  fun is_over_max_round(game_table : &GameTable) : bool {
+    game_table.game_status.max_round() <= game_table.game_status.current_round()
+  }
+
+  // Utils Methods ===============================
   fun next_round(game_table : &mut GameTable, ctx : &mut TxContext) {
     game_table.draw_card_to_all_player(); // 남아있는 사람들은 카드를 더 받는다
     game_table.game_status.next_round(); // 그리고 다음 라운드, 다음 턴
