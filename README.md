@@ -1,6 +1,6 @@
 # Entirely Blockchain-Powered Multiplayer Card Game:  _Play, Create, Share_
 
-Welcome to **Shall We Move**, a fully on-chain multiplayer card game implemented on the Sui blockchain. This project leverages the unique features of the Sui blockchain to provide secure, transparent, and decentralized gameplay.
+Welcome to __**Shall We Move**__, a fully on-chain multiplayer card game implemented on the Sui blockchain. This project leverages the unique features of the Sui blockchain to provide secure, transparent, and decentralized gameplay.
 
 ![Shall We Move Landing Page](images/landing.png)
 
