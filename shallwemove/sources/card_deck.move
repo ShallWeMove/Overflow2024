@@ -68,7 +68,7 @@ module shallwemove::card_deck {
 
   public fun draw_card(card_deck : &mut CardDeck, casino_public_key : vector<u8>) : Card {
     let mut card = card_deck.avail_cards.pop_back();
-    decrypt_card_number(&mut card, casino_public_key);
+    decrypt_card_number_for_user(&mut card, casino_public_key);
     card
   }
 
@@ -88,6 +88,11 @@ module shallwemove::card_deck {
   }
 
   public fun decrypt_card_number(card : &mut Card, casino_public_key : vector<u8>) {
+    let casino_n = encrypt::convert_vec_u8_to_u256(casino_public_key);
+    card.card_number = encrypt::decrypt_256(casino_n, card.card_number);
+  }
+
+  public fun decrypt_card_number_for_user(card : &mut Card, casino_public_key : vector<u8>) {
     let casino_n = encrypt::convert_vec_u8_to_u256(casino_public_key);
     card.card_number_for_user = encrypt::decrypt_256(casino_n, card.card_number_for_user);
   }
