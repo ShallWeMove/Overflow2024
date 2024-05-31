@@ -163,15 +163,8 @@ module shallwemove::game_status {
     game_status.game_info.game_playing_status = game_playing_status
   }
 
-  public fun set_manager_player(game_status: &mut GameStatus, manager_player_address : Option<address>, player_seat_index : u64) {
+  public fun set_manager_player(game_status: &mut GameStatus, manager_player_address : Option<address>) {
     game_status.game_info.manager_player = manager_player_address;
-
-    if (manager_player_address == option::none()) {
-      game_status.set_current_turn(0);
-      return
-    };
-    
-    game_status.set_current_turn(player_seat_index as u8);
   }
 
   public fun increment_avail_seat(game_status : &mut GameStatus) {
