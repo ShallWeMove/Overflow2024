@@ -127,3 +127,17 @@ In contrast to traditional poker, which utilizes 5 cards, Mini Poker is played w
 - **Raise**: Accepting the previous bet and adding more to it.
 
 - **Fold**: Surrendering the hand, resulting in the loss of any money bet before folding. Folding is employed to minimize further losses when a player assesses that their hand has little chance of winning.
+
+## Poker Hands
+
+### Straight Flush Series
+
+- **Royal Straight Flush**: A combination of A and K cards of the same suit. It is the strongest hand.
+
+- **Back Straight Flush**: A combination of A and 2 cards of the same suit. Depending on the rules, it may be recognized as the second strongest hand.
+
+- **Straight Flush**: A combination of two consecutive numbers of the same suit. It is the third strongest hand.
+
+### Pair
+
+- A pair consists of two cards with the same number or the same letter, such as J, Q, K.
