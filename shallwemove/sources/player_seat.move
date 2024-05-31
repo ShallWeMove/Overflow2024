@@ -42,6 +42,8 @@ module shallwemove::player_seat {
 
   fun id(player_seat : &PlayerSeat) : ID {object::id(player_seat)}
 
+  public fun index(player_seat : &PlayerSeat) : u8 {player_seat.index}
+
   public fun player_address(player_seat : &PlayerSeat) : Option<address> {player_seat.player_address}
 
   fun public_key(player_seat : &PlayerSeat) : vector<u8> {player_seat.public_key}

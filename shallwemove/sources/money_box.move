@@ -43,14 +43,18 @@ module shallwemove::money_box {
     player_info.add_bet_amount(money_value);
   }
 
-  public fun send_all_money(money_box : &mut MoneyBox, player_seat : &mut PlayerSeat, player_info : &mut PlayerInfo) {
+  public fun send_all_money(money_box : &mut MoneyBox, player_seat : &mut PlayerSeat, game_status : &mut GameStatus, ctx : &mut TxContext) {
     let mut i = money_box.money.length();
+    let mut money_container = coin::zero<SUI>(ctx);
     while (i > 0) {
       let money = money_box.money.pop_back();
-      // MoneyBoxInfo의 total bet amount 도 감소시켜 줘야지...ㅜ
-      player_seat.add_money(player_info, money);
+      game_status.discard_money(money.value());
+      coin::join<SUI>(&mut money_container, money);
+      
       i = i - 1;
     };
+    let player_info = game_status.player_infos_mut().borrow_mut(player_seat.index() as u64);
+    player_seat.add_money(player_info, money_container);
 
 
   }

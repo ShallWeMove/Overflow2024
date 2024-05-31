@@ -83,15 +83,6 @@ module shallwemove::mini_poker_logic {
 
     let total_score = combination_score + number_score + shape_score;
 
-    debug::print(&string::utf8(b"combination"));
-    debug::print(&combination_score);
-    debug::print(&string::utf8(b"number"));
-    debug::print(&number_score);
-    debug::print(&string::utf8(b"shape"));
-    debug::print(&shape_score);
-    debug::print(&string::utf8(b"total"));
-    debug::print(&total_score);
-
     total_score as u64
   }
 

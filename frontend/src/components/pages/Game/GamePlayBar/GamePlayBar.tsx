@@ -7,22 +7,41 @@ import { FoldButton } from "./FoldButton";
 import { ExitButton } from "./ExitButton";
 import { AnteButton } from "./AnteButton";
 import { StartButton } from "@/components/pages/Game/GamePlayBar/StartButton";
+import { SettleUpButton } from "./SettleUpButton";
+import { playersInfoDataAtom, tableAtom, userSpaceAtom } from "@/lib/states";
+import { useAtom } from "jotai";
+import { GameStatusType, PlayingStatusType, convertGameStatusTypeToInt, convertPlayingStatusTypeToInt } from "@/api/game";
 
 interface GamePlayBarProps {
 	gameTableId: string;
 }
 
 export const GamePlayBar = ({ gameTableId }: GamePlayBarProps) => {
+	const [tableInfo] = useAtom(tableAtom);
+	const [playerInfo] = useAtom(userSpaceAtom);
+	const [playerInfos] = useAtom(playersInfoDataAtom);
+
 	return (
 		<Container>
-			<StartButton gameTableId={gameTableId} />
-			<AnteButton gameTableId={gameTableId} />
-			<FoldButton gameTableId={gameTableId} />
-			<BetButton gameTableId={gameTableId} />
-			<CheckButton gameTableId={gameTableId} />
-			<CallButton gameTableId={gameTableId} />
-			<RaiseButton gameTableId={gameTableId} />
+			{tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.PRE_GAME)
+			&& playerInfo?.fields.playingStatus == convertPlayingStatusTypeToInt(PlayingStatusType.ENTER)
+			&&<AnteButton gameTableId={gameTableId} />}
+			{tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.PRE_GAME)
+			&& tableInfo.managerPlayerAddress == playerInfo?.fields.playerAddress
+			&& <StartButton gameTableId={gameTableId} />}
+			{tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.IN_GAME)
+			&&<BetButton gameTableId={gameTableId} />}
+			{tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.IN_GAME)
+			&&<CheckButton gameTableId={gameTableId} />}
+			{tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.IN_GAME)
+			&&<CallButton gameTableId={gameTableId} />}
+			{tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.IN_GAME)
+			&&<RaiseButton gameTableId={gameTableId} />}
+			{tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.IN_GAME)
+			&&<FoldButton gameTableId={gameTableId} />}
 			<ExitButton gameTableId={gameTableId} />
+			{tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.GAME_FINISHED)
+			&&<SettleUpButton gameTableId={gameTableId} />}
 		</Container>
 	);
 };
