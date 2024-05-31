@@ -26,6 +26,7 @@ export const CardPlaceHolder = ({
 	const [tableInfo] = useAtom(tableAtom);
 	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 	const [isTurn, setIsTurn] = useState(false);
+	const [isWinner, setIsWinner] = useState(false);
 	const [isManagerPlayer, setIsManagerPlayer] = useState(false);
 
 	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -45,6 +46,9 @@ export const CardPlaceHolder = ({
     setIsManagerPlayer(
       tableInfo.managerPlayerAddress == playerData?.fields.playerAddress
     );
+    setIsWinner(
+      tableInfo.winnerPlayer == playerData?.fields.playerAddress
+    );
 	}, [playerData]);
 
 	return (
@@ -61,7 +65,7 @@ export const CardPlaceHolder = ({
 				{playerData?.fields.playerAddress && isManagerPlayer && <StatusBadge
 				value={"Manager"} 
 				left={true} 
-				manager={true}
+				bottom={true}
 				/>}
 				<StatusBadge
 					value={
@@ -69,6 +73,11 @@ export const CardPlaceHolder = ({
 						convertIntToActionType(playerInfo?.fields.playingAction)
 					}
 				/>
+				{playerData?.fields.playerAddress && isWinner && <StatusBadge
+				value={"Winner"} 
+				left={false} 
+				bottom={true}
+				/>}
 				<TotalBetAmountBadge value={playerInfo?.fields.totalBetAmount}/>
 				<Typography>
 					{playerData && playerData.fields.playerAddress?.slice(0, 5)}
