@@ -68,7 +68,7 @@ export const tableAtom = atom((get) => {
 	const callAmount = Number(playerInfo?.fields.previousBetAmount) ?? 0;
 	// const players = gameTable?.fields.playerSeats?.length ?? 0;
 	const players = numberOfPlayers;
-	const gameStatus =
+	const gamePlayingStatus =
 		gameTable?.fields.gameStatus?.fields.gameInfo.fields.gamePlayingStatus;
 	const currentPlayerAddress =
 		gameTable?.fields.gameStatus?.fields.playerInfos[currentTurnIndex].fields
@@ -83,7 +83,7 @@ export const tableAtom = atom((get) => {
 		totalBetAmount,
 		callAmount,
 		players,
-		gameStatus,
+		gamePlayingStatus,
 		currentPlayerAddress,
 		managerPlayerAddress,
 		betUnit,

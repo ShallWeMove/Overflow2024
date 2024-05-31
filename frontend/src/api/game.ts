@@ -268,6 +268,41 @@ export const convertIntToGameStatusType = (
 			throw new Error("Invalid game status type number");
 	}
 };
+
+export const convertGameStatusTypeToInt = (
+	gameStatusType: GameStatusType
+): number => {
+	switch (gameStatusType) {
+		case GameStatusType.PRE_GAME:
+			return 0;
+		case GameStatusType.IN_GAME:
+			return 1;
+		case GameStatusType.GAME_FINISHED:
+			return 2;
+		default:
+			throw new Error("Invalid game status type");
+	}
+};
+
+export const convertPlayingStatusTypeToInt = (
+	playingStatusType: PlayingStatusType
+): number => {
+	switch (playingStatusType) {
+		case PlayingStatusType.EMPTY:
+			return 10;
+		case PlayingStatusType.ENTER:
+			return 11;
+		case PlayingStatusType.READY:
+			return 12;
+		case PlayingStatusType.PLAYING:
+			return 13;
+		case PlayingStatusType.GAME_END:
+			return 14;
+		default:
+			throw new Error("Invalid playing status type");
+	}
+};
+
 export const convertIntToPlayingStatusType = (
 	playingStatusTypeNumber: number
 ): PlayingStatusType => {
