@@ -142,19 +142,15 @@ module shallwemove::game_table {
   }
 
   public fun ante(game_table : &mut GameTable, ctx : &mut TxContext) {
-    // player가 속한 player_seat index 찾아내기
     let player_seat_index = game_table.find_player_seat_index(ctx);
 
-    // 못 찾는다면 잘못된 game_table이라는 것. enter 하지 않았다는 뜻
     assert!(player_seat_index != PLAYER_NOT_FOUND, 105);
 
-    // PlayerSeat의 deposit에서 ante 만큼 꺼내서 MoneyBox 로 보내기
     let ante_amount = game_table.game_status.ante_amount();
     game_table.bet_money(player_seat_index, ante_amount, ctx);
 
     // READY 상태로 전환
-    let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
-    player_info.set_playing_status(player_info::CONST_READY());
+    game_table.game_status.player_infos_mut().borrow_mut(player_seat_index).set_playing_status(player_info::CONST_READY());
   }
 
   public fun start(game_table : &mut GameTable) {
