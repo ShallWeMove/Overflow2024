@@ -16,7 +16,7 @@ module shallwemove::mini_poker_logic {
   const NUMBER_SCORE_BASE : u64 = 4;
 
 
-  public fun convert_card_combination_to_score(card_number1 : u256, card_number2 : u256 ) : u64 {
+  public fun get_card_combination_score(card_number1 : u256, card_number2 : u256 ) : u64 {
     assert!(card_number1 < 52 && card_number2 < 52, 500);
     assert!(card_number1 != card_number2 , 501);
     let mut combination_score : u64 = 0;
@@ -101,11 +101,11 @@ module shallwemove::mini_poker_logic {
       // 12 -> A
     let card_number1 = 0;
     let card_number2 = 51;
-    let score = convert_card_combination_to_score(card_number1, card_number2);
+    let score = get_card_combination_score(card_number1, card_number2);
 
     let card_number3 = 37;
     let card_number4 = 25;
-    let score = convert_card_combination_to_score(card_number3, card_number4);
+    let score = get_card_combination_score(card_number3, card_number4);
   }
   
 }

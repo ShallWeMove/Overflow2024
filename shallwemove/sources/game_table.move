@@ -595,11 +595,11 @@ module shallwemove::game_table {
       let decrypted_card_number2 = encrypt::decrypt_256(casino_n, card2.card_number());
 
       if (highest_score == 0) {
-        highest_score = mini_poker_logic::convert_card_combination_to_score(decrypted_card_number1, decrypted_card_number2);
+        highest_score = mini_poker_logic::get_card_combination_score(decrypted_card_number1, decrypted_card_number2);
       };
 
-      if (highest_score < mini_poker_logic::convert_card_combination_to_score(decrypted_card_number1, decrypted_card_number2)) {
-        highest_score = mini_poker_logic::convert_card_combination_to_score(decrypted_card_number1, decrypted_card_number2);
+      if (highest_score < mini_poker_logic::get_card_combination_score(decrypted_card_number1, decrypted_card_number2)) {
+        highest_score = mini_poker_logic::get_card_combination_score(decrypted_card_number1, decrypted_card_number2);
         highest_score_player_index = i;
       };
 
