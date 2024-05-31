@@ -29,7 +29,7 @@ export const AnteButton = ({ gameTableId }: AnteButtonProps) => {
 			onClick={handleClick}
 			disabled={disabled}
 			title={"ANTE"}
-			color="blue"
+			color="skyblue"
 		/>
 	);
 };
