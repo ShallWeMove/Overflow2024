@@ -669,11 +669,9 @@ module shallwemove::game_table {
   // Utils Methods ===============================
   fun next_round(game_table : &mut GameTable, ctx : &mut TxContext) {
     game_table.draw_card_to_all_player(); // 남아있는 사람들은 카드를 더 받는다
+    game_table.set_all_player_playing_action(player_info::CONST_NONE()); // 모든 player의 playing action은 NONE으로 초기화
     game_table.game_status.next_round(); // 그리고 다음 라운드, 다음 턴
     game_table.next_turn(ctx);
-    game_table.set_all_player_playing_action(player_info::CONST_NONE()); // 모든 player의 playing action은 NONE으로 초기화
-    let current_turn_index = game_table.game_status.current_turn_index();
-    game_table.game_status.set_previous_turn(current_turn_index); // 그리고 previous turn은 current turn과 동일하게 초기화
   }
   
   public fun next_turn(game_table : &mut GameTable, ctx : &mut TxContext) {
