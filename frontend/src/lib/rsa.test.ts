@@ -54,7 +54,7 @@ describe('RSA', () => {
         if(publicKey && privateKey && expiration) {
             const parsedPublicKey = JSON.parse(publicKey);
             const parsedPrivateKey = JSON.parse(privateKey);
-            expect(parsedPublicKey['e']).toEqual(rsa['publicKey']);
+            expect(parsedPublicKey['e']).toEqual(65537);
             expect(parsedPublicKey['n']).toEqual(rsa['n']);
             expect(parsedPrivateKey['d']).toEqual(rsa['privateKey']);
         }
@@ -64,7 +64,7 @@ describe('RSA', () => {
         const rsa1 = new RSA();
         const rsa2 = new RSA();
 
-        expect(rsa2['publicKey']).toEqual(rsa1['publicKey']);
+        expect(rsa2['exp']).toEqual(65537);
         expect(rsa2['privateKey']).toEqual(rsa1['privateKey']);
         expect(rsa2['n']).toEqual(rsa1['n']);
     });
