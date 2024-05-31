@@ -129,7 +129,7 @@ In contrast to traditional poker, which utilizes 5 cards, Mini Poker is played w
 
 ## Poker Hands
 
-### Straight Flush Series
+1. ### Straight Flush Series
 
 - **Royal Straight Flush**: A combination of A and K cards of the same suit. It is the strongest hand.
 
@@ -137,11 +137,11 @@ In contrast to traditional poker, which utilizes 5 cards, Mini Poker is played w
 
 - **Straight Flush**: A combination of two consecutive numbers of the same suit. It is the third strongest hand.
 
-### Pair
+2. ### Pair
 
 - A pair consists of two cards with the same number or the same letter, such as J, Q, K.
 
-### Straight Series
+3. ### Straight Series
 
 - **Royal Straight (Mountain)**: A combination of A and K cards with different suits. It is one of the strongest combinations among straight hands.
 
@@ -149,10 +149,10 @@ In contrast to traditional poker, which utilizes 5 cards, Mini Poker is played w
 
 - **Straight**: A combination of two consecutive numbers with different suits. In mini poker, similar to three of a kind, this hand is considered higher than a flush.
 
-### Flush
+4. ### Flush
 
 - A flush consists of two cards of the same suit.
 
-### Top
+5. ### Top
 
 - The highest single card in a hand, not forming any particular combination. It does not contribute to any specific hand rank. An Ace (A) is the highest top card, and a 4 is the lowest. 
