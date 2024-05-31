@@ -339,10 +339,10 @@ module shallwemove::game_table {
     // bet_unit 만큼의 금액을 베팅한다.
     let player_seat_index = game_table.find_player_seat_index(ctx);
     let bet_unit = game_table.game_status.bet_unit();
-    game_table.bet_money(player_seat_index,bet_unit , ctx);
-    let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
+    game_table.bet_money(player_seat_index, bet_unit , ctx);
 
     // tx sender가 해당 player_seat 자리 주인이 아니면 assert!
+    let player_info = game_table.game_status.player_infos_mut().borrow_mut(player_seat_index);
     assert!(option::some(tx_context::sender(ctx)) == player_info.player_address(), 109);
 
     // player action 은 BET
