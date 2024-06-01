@@ -79,8 +79,6 @@ ex) sui client call --package 0xdc0cc1fe1ff28dc7b89e203b69e88db3766ce122b0fda8cc
 ### add game table to lounge
 sui client call --package {package_address} --module cardgame --function add_game_table --args {casino_id} {lounge_id} {ante_amount} {bet_unit} {game_seats} 0x0000000000000000000000000000000000000000000000000000000000000008 --gas-budget 1000000000
 ex) sui client call --package 0xdc0cc1fe1ff28dc7b89e203b69e88db3766ce122b0fda8cc6e0df070d9c293b5 --module cardgame --function add_game_table --args 0xc6b576b148dbe7fda34cfeaa878ee4fc83ac15a75a14cb72f6ad17a6c70bc4f0 0xf8e14c75494f27d8fde4d980bba0a289c26686565e1cfa20ed62479f43f14343 500 500 5 0x0000000000000000000000000000000000000000000000000000000000000008 --gas-budget 1000000000
-
-sui move create-lounge
 ```
 
 ## Frontend
