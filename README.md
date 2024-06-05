@@ -62,6 +62,12 @@ you should see the package address in the output after running the command below
 cd shallwemove
 sui client publish
 ```
+after update shallwemove/Move.toml
+
+```bash
+cd ../poker_logic
+sui client publish
+```
 
 ### Create your Casino & Lounge on the Sui Blockchain
 
