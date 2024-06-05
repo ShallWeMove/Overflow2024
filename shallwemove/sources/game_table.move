@@ -613,14 +613,15 @@ module shallwemove::game_table {
         continue
       };
 
-      if (player_info.player_address() != option::none<address>()) {
-        break
-      };
-
       // If no one is there and you come back, break. This means that we can't take the next turn and return to our
       if (next_player_seat_index == player_seat_index) {
         return NEXT_PLAYER_NOT_FOUND
       };
+
+      if (player_info.player_address() != option::none<address>()) {
+        break
+      };
+
 
       next_player_seat_index = next_player_seat_index + 1;
     };
