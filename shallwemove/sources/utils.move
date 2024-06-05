@@ -17,4 +17,12 @@ module shallwemove::utils {
     let mut generator = random::new_generator(r, ctx);
     random::shuffle(&mut generator, number_array);
   }
+
+  #[test_only]
+  public fun shuffle_for_testing(number_array : &mut vector<u256>, ctx: &mut TxContext){
+
+    // let mut generator = random::new_generator(r, ctx);
+    let mut generator = random::new_generator_for_testing();
+    random::shuffle(&mut generator, number_array);
+  }
 }

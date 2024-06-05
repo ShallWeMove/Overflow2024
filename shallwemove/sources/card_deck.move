@@ -6,6 +6,8 @@ module shallwemove::card_deck {
   use shallwemove::encrypt;
   use shallwemove::game_status::{Self, GameStatus};
   use sui::random::{Self, Random};
+  use std::string::{Self, String};
+  use std::debug;
   
   // ============================================
   // ============== STRUCTS =====================
@@ -99,5 +101,29 @@ module shallwemove::card_deck {
 
   // ============================================
   // ================ TEST ======================
+  #[test_only]
+  public fun fill_cards_for_testing(card_deck : &mut CardDeck, game_status : &mut GameStatus, casino_public_key : vector<u8>, ctx : &mut TxContext) {
+    let mut card_numbers_array : vector<u256> = utils::get_52_numbers_array();
+    // 한 번 섞기
+    utils::shuffle_for_testing(&mut card_numbers_array, ctx);
+
+    // encrypted 된 숫자로 card 생성
+    let casino_n = encrypt::convert_vec_u8_to_u256(casino_public_key);
+    let mut i = 0;
+    while (i < card_numbers_array.length()) {
+      let card = Card {
+        id : object::new(ctx),
+        index : (i as u8),
+        card_number : encrypt::encrypt_256(casino_n, card_numbers_array[i]),
+        card_number_for_user : encrypt::encrypt_256(casino_n, card_numbers_array[i])
+      };
+
+      card_deck.avail_cards.push_back(card);
+      game_status.add_card();
+
+      i = i + 1;
+    };
+  }
+
 
 }

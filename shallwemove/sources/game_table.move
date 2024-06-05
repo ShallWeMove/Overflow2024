@@ -885,4 +885,37 @@ module shallwemove::game_table {
 
   }
 
+  #[test_only]
+  public fun new_for_testing(
+    lounge_id : ID,
+    casino_public_key : vector<u8>,
+    max_round : u8,
+    ante_amount : u64, 
+    bet_unit : u64, 
+    game_seats : u8, 
+    ctx : &mut TxContext) : GameTable {
+
+    let mut game_status = game_status::new(max_round, ante_amount, bet_unit, game_seats);
+    let money_box = money_box::new(ctx);
+    let mut card_deck = card_deck::new(casino_public_key, ctx);
+
+    card_deck.fill_cards_for_testing(&mut game_status, casino_public_key, ctx);
+
+    let mut game_table = GameTable {
+      id : object::new(ctx),
+      lounge_id : lounge_id,
+      casino_public_key : casino_public_key,
+      game_status : game_status,
+      money_box : money_box,
+      card_deck : option::some(card_deck),
+      used_card_decks : vector[],
+      player_seats : vector[]
+    };
+
+    game_table.create_player_seats(ctx);
+
+    game_table
+  }
+
+
 }

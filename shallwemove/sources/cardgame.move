@@ -198,9 +198,12 @@ module shallwemove::cardgame {
     ante_amount : u64, 
     bet_unit : u64, 
     game_seats : u8, 
-    r: &Random,
     ctx : &mut TxContext) {
-      add_game_table(casino, lounge, ante_amount, bet_unit, game_seats, r, ctx);
+    assert!(casino.admin() == tx_context::sender(ctx), 1);
+
+    let game_table = game_table::new_for_testing(lounge.id(), casino.public_key(), lounge.max_round(), ante_amount, bet_unit, game_seats, ctx);
+
+    lounge.add_game_table(game_table);
     }
 
   #[test_only]
