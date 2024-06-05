@@ -9,8 +9,8 @@ Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-fram
 
 # For remote import, use the `{ git = "...", subdir = "...", rev = "..." }`.
 # Revision can be a branch, a tag, and a commit hash.
-# shallwemove = { git = "https://github.com/ShallWeMove/Overflow2024", subdir = "shallwemove", rev = "main" }
-shallwemove = { git = "https://github.com/ShallWeMove/Overflow2024", subdir = "shallwemove", rev = "feat/move-module" }
+shallwemove = { git = "https://github.com/ShallWeMove/Overflow2024", subdir = "shallwemove", rev = "main" }
+# shallwemove = { git = "https://github.com/ShallWeMove/Overflow2024", subdir = "shallwemove", rev = "feat/move-module" }
 
 # For local dependencies use `local = path`. Path is relative to the package root
 # Local = { local = "../path/to" }
