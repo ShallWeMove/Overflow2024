@@ -70,15 +70,15 @@ you should see the casino and lounge addresses in the output after running the c
 ```bash
 ### create-casino
 sui client call --package {package_address} --module cardgame --function create_casino --args {n_value_of_public_key} --gas-budget 1000000000
-ex) sui client call --package 0xdc0cc1fe1ff28dc7b89e203b69e88db3766ce122b0fda8cc6e0df070d9c293b5 --module cardgame --function create_casino --args 35263 --gas-budget 1000000000
+ex) sui client call --package 0xd10b25e4b34a013949d22666cf115cd01c2b0714585cd260122cb3e627893b63 --module cardgame --function create_casino --args 35263 --gas-budget 1000000000
 
 ### create lounge
 sui client call --package {package_address} --module cardgame --function create_lounge --args {casino_id} {max_round} --gas-budget 1000000000
-ex) sui client call --package 0xdc0cc1fe1ff28dc7b89e203b69e88db3766ce122b0fda8cc6e0df070d9c293b5 --module cardgame --function create_lounge --args 0xc6b576b148dbe7fda34cfeaa878ee4fc83ac15a75a14cb72f6ad17a6c70bc4f0 1 --gas-budget 1000000000
+ex) sui client call --package 0xd10b25e4b34a013949d22666cf115cd01c2b0714585cd260122cb3e627893b63 --module cardgame --function create_lounge --args 0xd3b23a73870de6f5958e33fa18801757c826ee1dab6762bb412842fa9f8b233c 1 --gas-budget 1000000000
 
 ### add game table to lounge
 sui client call --package {package_address} --module cardgame --function add_game_table --args {casino_id} {lounge_id} {ante_amount} {bet_unit} {game_seats} 0x0000000000000000000000000000000000000000000000000000000000000008 --gas-budget 1000000000
-ex) sui client call --package 0xdc0cc1fe1ff28dc7b89e203b69e88db3766ce122b0fda8cc6e0df070d9c293b5 --module cardgame --function add_game_table --args 0xc6b576b148dbe7fda34cfeaa878ee4fc83ac15a75a14cb72f6ad17a6c70bc4f0 0xf8e14c75494f27d8fde4d980bba0a289c26686565e1cfa20ed62479f43f14343 500 500 5 0x0000000000000000000000000000000000000000000000000000000000000008 --gas-budget 1000000000
+ex) sui client call --package 0xd10b25e4b34a013949d22666cf115cd01c2b0714585cd260122cb3e627893b63 --module cardgame --function add_game_table --args 0xd3b23a73870de6f5958e33fa18801757c826ee1dab6762bb412842fa9f8b233c 0x287ee1df5522907fe9aad6a47ff03dfa1b868cbb82c17118ea625140c63e7847 500 500 5 0x0000000000000000000000000000000000000000000000000000000000000008 --gas-budget 1000000000
 ```
 
 ## Frontend
@@ -91,7 +91,7 @@ ex) sui client call --package 0xdc0cc1fe1ff28dc7b89e203b69e88db3766ce122b0fda8cc
 
 `cd frontend` and update the top line of `src/api/game.ts` file with the following content:
 ```
-const CARDGAME_PACKAGE_ID = "0xdc0cc1fe1ff28dc7b89e203b69e88db3766ce122b0fda8cc6e0df070d9c293b5"; // shallwemove package
+const CARDGAME_PACKAGE_ID = "0xd10b25e4b34a013949d22666cf115cd01c2b0714585cd260122cb3e627893b63"; // shallwemove package
 const CASINO_ID = "{YOUR CASINO ID}";
 const LOUNGE_ID = "{YOUR LOUNGE ID}";
 const GAME_LOGIC_PACKAGE_ID = "{YOUR PACKAGE ID}";
