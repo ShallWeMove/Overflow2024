@@ -116,7 +116,10 @@ ex) sui client call --package 0xd10b25e4b34a013949d22666cf115cd01c2b0714585cd260
 `cd frontend` and update the top line of `src/api/game.ts` file with the following content:
 
 ```
-const CARDGAME_PACKAGE_ID = "0xd10b25e4b34a013949d22666cf115cd01c2b0714585cd260122cb3e627893b63"; // shallwemove package
+const ORIGINAL_CARDGAME_PACKAGE_ID =
+	"0xd10b25e4b34a013949d22666cf115cd01c2b0714585cd260122cb3e627893b63";
+const LATEST_CARDGAME_PACKAGE_ID =
+	"{LATEST SHALLWEMOVE PACKAGE ID}";
 const CASINO_ID = "{YOUR CASINO ID}";
 const LOUNGE_ID = "{YOUR LOUNGE ID}";
 const GAME_LOGIC_PACKAGE_ID = "{YOUR PACKAGE ID}";
