@@ -76,6 +76,9 @@ module shallwemove::lounge {
     let mut game_tables = lounge.game_tables;
     game_tables.reverse();
 
+    // Originally, game tables were supposed to be assigned randomly, 
+    // but due to a shortage of participants, 
+    // we are currently assigning game tables sequentially to ensure the games can proceed
     while (!game_tables.is_empty()) {
       let game_table_id = game_tables.pop_back();
       let game_table = dynamic_object_field::borrow<ID, GameTable> (&lounge.id, game_table_id);
