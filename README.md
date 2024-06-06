@@ -11,7 +11,7 @@ Immerse yourself in the game interface, crafted to provide a smooth and captivat
 ![Shall We Move Game Page](images/game.png)
 <br><br>
 
-## Watch the Demo Video
+## Demo Video
 [Watch this video on YouTube](https://youtube.com/playlist?list=PLsZNRVNR3wUxKXUe_5FjZcV0g90825sxl&si=o_1raNUMIIC5UCAd)
 <br><br>
 
