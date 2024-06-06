@@ -141,10 +141,13 @@ In contrast to traditional poker, which utilizes 5 cards, Mini Poker is played w
 - **Check**
   - A privilege given to the player who either must bet the minimum amount or is the first player to bet regardless of their hand. It allows them to pass their turn without adding more money to the pot.<br><br>
 - **Bet**
-  The act of placing the first bet after card exchange or additional distribution. If no one bets, the round progresses with everyone checking, without further betting.<br><br>
-- **Call**: Accepting the amount of money bet by the previous player.<br><br>
-- **Raise**: Accepting the previous bet and adding more to it.<br><br>
-- **Fold**: Surrendering the hand, resulting in the loss of any money bet before folding. Folding is employed to minimize further losses when a player assesses that their hand has little chance of winning.
+  - The act of placing the first bet after card exchange or additional distribution. If no one bets, the round progresses with everyone checking, without further betting.<br><br>
+- **Call**
+  - Accepting the amount of money bet by the previous player.<br><br>
+- **Raise**
+  - Accepting the previous bet and adding more to it.<br><br>
+- **Fold**
+  - Surrendering the hand, resulting in the loss of any money bet before folding. Folding is employed to minimize further losses when a player assesses that their hand has little chance of winning.
 <br><br>
 
 ## Hand Rankings
