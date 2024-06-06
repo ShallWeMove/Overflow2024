@@ -8,7 +8,7 @@ Immerse yourself in the game interface, crafted to provide a smooth and captivat
 
 ![Shall We Move Game Page](images/game.png)
 
-## Watch the Video
+**Watch the Demo Video**
 [Watch this video on YouTube](https://youtube.com/playlist?list=PLsZNRVNR3wUxKXUe_5FjZcV0g90825sxl&si=o_1raNUMIIC5UCAd)
 
 [![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=styu12)](https://github.com/anuraghazra/github-readme-stats)
