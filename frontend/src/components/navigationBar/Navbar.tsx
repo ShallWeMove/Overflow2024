@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography";
 import WalletButton from "./WalletButton";
 import InfoIcon from '@mui/icons-material/Info';
 import {useState} from "react";
-import GameRulesPopup from "@/components/navigationBar/GameRulesPopUp";
+import GameRulesPopup from "./GameRulesPopUp";
 
 const Navbar = () => {
 	const [showRules, setShowRules] = useState(false);
