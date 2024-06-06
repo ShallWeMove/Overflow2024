@@ -3,18 +3,20 @@ import { WalletContextState } from "@suiet/wallet-kit";
 import { RSA } from "@/lib/rsa";
 
 
-const CARDGAME_PACKAGE_ID =
+const ORIGINAL_CARDGAME_PACKAGE_ID =
 	"0xd10b25e4b34a013949d22666cf115cd01c2b0714585cd260122cb3e627893b63";
+const LATEST_CARDGAME_PACKAGE_ID =
+	"0x40ac31cb39dfb38ca7953f62bdd430c3d1a2e671047de0b91fbaafe32275eb17";
 const CASINO_ID =
-	"0xd3b23a73870de6f5958e33fa18801757c826ee1dab6762bb412842fa9f8b233c";
+	"0x6a7880707b5edcda161d695e98ded49ac18596d9e22d50e8cbc62583cd54d452";
 const LOUNGE_ID =
-	"0x287ee1df5522907fe9aad6a47ff03dfa1b868cbb82c17118ea625140c63e7847";
+	"0xba94f4539a865d578076d1e9800bf49219beda80e1d67e570ec016f08a6d3a90";
 const GAME_LOGIC_PACKAGE_ID =
-	"0xd64a4c34b69e00c9bf6a738cec6769461b70e3532c51c465f2bfa86d3e0f8ad1";
+	"0x4fe20afdac0b60838296679d777f7418348d6d99f9a8c38c318eb480c9df7508";
 
 const MODULE = "cardgame";
 
-export const GAME_TABLE_TYPE = `${CARDGAME_PACKAGE_ID}::game_table::GameTable`;
+export const GAME_TABLE_TYPE = `${ORIGINAL_CARDGAME_PACKAGE_ID}::game_table::GameTable`;
 
 // depositAmount - the amount of chips needed to enter the game
 const depositAmountInMist = 1000000;
