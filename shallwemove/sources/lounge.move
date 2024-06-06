@@ -5,6 +5,7 @@ module shallwemove::lounge {
 
   use shallwemove::casino::{Self, Casino};
   use shallwemove::game_table::{Self, GameTable};
+  use shallwemove::game_status::{Self};
   use sui::dynamic_object_field;
   use std::string::{Self, String};
   use std::debug;
@@ -78,6 +79,9 @@ module shallwemove::lounge {
     while (!game_tables.is_empty()) {
       let game_table_id = game_tables.pop_back();
       let game_table = dynamic_object_field::borrow<ID, GameTable> (&lounge.id, game_table_id);
+      if (game_table.game_status().game_playing_status() != game_status::CONST_PRE_GAME()) {
+        continue
+      };
       if (game_table.game_status().avail_game_seats() > 0) {
         debug::print(&string::utf8(b"게임을 찾았다!"));
         return option::some(game_table_id)
