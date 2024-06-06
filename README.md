@@ -120,6 +120,17 @@ pnpm dev
 ## Overview of Rules
 In contrast to traditional poker, which utilizes 5 cards, Mini Poker is played with only 2 cards, forming combinations to create hands (poker hands). Following the 2-card rule, players are dealt one card each, engage in betting, then receive the second card and proceed with another round of betting before revealing their hands to determine the winner. The draw rule is applied, ensuring that players' cards remain undisclosed throughout the game.
 
+## Wallet Setup
+- Connect your Sui wallet.
+- In the wallet settings, set the Network to Testnet, as only Testnet is supported.
+- If you don't have any Testnet Sui Tokens, click the "Request Testnet Sui Tokens" button.
+
+## Starting the Game
+- To join the game, click the "Enter Game" button on the homepage.
+- Press the "Ante" button to indicate your intention to participate.
+- The game requires at least 2 players to start and can accommodate up to 5 players.
+- Once 2 or more players have joined and pressed the "Ante" button, the Manager can click the "Start Game" button to begin.
+
 ## Betting Rules
 
 - **Ante**: The mandatory initial bet placed at the beginning of the game to ensure active participation and discourage excessive folding without betting. It serves to encourage more proactive betting behavior.
@@ -134,7 +145,7 @@ In contrast to traditional poker, which utilizes 5 cards, Mini Poker is played w
 
 - **Fold**: Surrendering the hand, resulting in the loss of any money bet before folding. Folding is employed to minimize further losses when a player assesses that their hand has little chance of winning.
 
-## Poker Hands
+## Hand Rankings
 
 ### 1. Straight Flush Series
 
