@@ -58,7 +58,6 @@ To run the project locally, follow these steps:
 ```bash
 git clone https://github.com/ShallWeMove/Overflow2024.git
 ```
-<br>
 
 ## Smart Contracts
 ### Publish the Smart Contracts
@@ -89,6 +88,7 @@ ex) sui client call --package 0xd10b25e4b34a013949d22666cf115cd01c2b0714585cd260
 sui client call --package {package_address} --module cardgame --function add_game_table --args {casino_id} {lounge_id} {ante_amount} {bet_unit} {game_seats} 0x0000000000000000000000000000000000000000000000000000000000000008 --gas-budget 1000000000
 ex) sui client call --package 0xd10b25e4b34a013949d22666cf115cd01c2b0714585cd260122cb3e627893b63 --module cardgame --function add_game_table --args 0xd3b23a73870de6f5958e33fa18801757c826ee1dab6762bb412842fa9f8b233c 0x287ee1df5522907fe9aad6a47ff03dfa1b868cbb82c17118ea625140c63e7847 500 500 5 0x0000000000000000000000000000000000000000000000000000000000000008 --gas-budget 1000000000
 ```
+<br><br>
 
 ## Frontend
 ### Set Environment Variables
