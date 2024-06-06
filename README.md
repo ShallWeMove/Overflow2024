@@ -58,6 +58,7 @@ To run the project locally, follow these steps:
 ```bash
 git clone https://github.com/ShallWeMove/Overflow2024.git
 ```
+<br><br>
 
 ## Smart Contracts
 ### Publish the Smart Contracts
@@ -73,6 +74,7 @@ after update shallwemove/Move.toml
 cd ../poker_logic
 sui client publish
 ```
+<br>
 
 ### Create your Casino & Lounge on the Sui Blockchain
 you should see the casino and lounge addresses in the output after running the command above. Use these addresses to create your casino and lounge on the Sui blockchain.
@@ -117,7 +119,7 @@ pnpm install
 ```bash
 pnpm dev
 ```
-<br>
+<br><br>
 
 # Mini Poker: Instructions, Rules, and Hand Rankings
 ## Overview
