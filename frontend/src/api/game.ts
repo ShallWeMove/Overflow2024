@@ -16,6 +16,8 @@ const GAME_LOGIC_PACKAGE_ID =
 
 const MODULE = "cardgame";
 
+export const LOCAL_STORAGE_ONGOING_GAME_KEY = 'ongoingGameId';
+
 export const GAME_TABLE_TYPE = `${ORIGINAL_CARDGAME_PACKAGE_ID}::game_table::GameTable`;
 
 // depositAmount - the amount of chips needed to enter the game
