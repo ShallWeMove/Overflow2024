@@ -3,8 +3,8 @@ import { useRouter } from "next/router";
 import { enter, GAME_TABLE_TYPE } from "@/api/game";
 import { useAtomValue } from "jotai/index";
 import { walletAtom } from "@/lib/states";
-import {useState} from "react";
-import {Loading} from "@/components/UI/Loading";
+import { useState } from "react";
+import { Loading } from "@/components/UI/Loading";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -16,7 +16,7 @@ const Landing = () => {
 
 	const enterGame = async () => {
 		try {
-			setLoading(true)
+			setLoading(true);
 
 			const response = await enter(wallet);
 
@@ -54,57 +54,57 @@ const Landing = () => {
 				alignItems: "center",
 			}}
 		>
-			{
-				loading ? <Loading /> : (
-					<Container>
-						<Box sx={{ display: "flex", flexDirection: "column" }}>
-							<Typography color="black" fontWeight={700} fontSize={32}>
-								Welcome to Shall We Move,
-							</Typography>
-							<Typography color="black" fontWeight={700} fontSize={20}>
-								a fully on-chain multiplayer Blackjack game implemented on the Sui
-								blockchain.
-							</Typography>
-							<Typography color="black" fontWeight={700} fontSize={20}>
-								This demo leverages the unique features of the Sui blockchain to
-								provide secure,
-							</Typography>
-							<Typography color="black" fontWeight={700} fontSize={20}>
-								transparent, and decentralized gameplay experience.
-							</Typography>
-						</Box>
-						<ButtonWrapper>
-							<Button
-								onClick={enterGame}
-								variant="contained"
-								color="secondary"
-								sx={{
-									padding: "16px 20px",
-									fontSize: "1rem",
-									borderRadius: "40px",
-									fontWeight: 700,
-									boxShadow: "none",
-								}}
-							>
-								Enter Game
-							</Button>
-							<Button
-								onClick={() => router.push("https://sui.io")}
-								sx={{
-									padding: "16px 20px",
-									fontSize: "1rem",
-									color: "white",
-									fontWeight: 700,
-									borderRadius: "40px",
-									backgroundColor: "#0272E6",
-								}}
-							>
-								Learn about SUI
-							</Button>
-						</ButtonWrapper>
-					</Container>
-				)
-			}
+			{loading ? (
+				<Loading />
+			) : (
+				<Container>
+					<Box sx={{ display: "flex", flexDirection: "column" }}>
+						<Typography color="black" fontWeight={700} fontSize={32}>
+							Welcome to Shall We Move,
+						</Typography>
+						<Typography color="black" fontWeight={700} fontSize={20}>
+							a fully on-chain multiplayer card game implemented on the Sui
+							blockchain.
+						</Typography>
+						<Typography color="black" fontWeight={700} fontSize={20}>
+							This project leverages the unique features of the Sui blockchain
+							to provide secure,
+						</Typography>
+						<Typography color="black" fontWeight={700} fontSize={20}>
+							transparent, and decentralized gameplay.
+						</Typography>
+					</Box>
+					<ButtonWrapper>
+						<Button
+							onClick={enterGame}
+							variant="contained"
+							color="secondary"
+							sx={{
+								padding: "16px 20px",
+								fontSize: "1rem",
+								borderRadius: "40px",
+								fontWeight: 700,
+								boxShadow: "none",
+							}}
+						>
+							Enter Game
+						</Button>
+						<Button
+							onClick={() => router.push("https://sui.io")}
+							sx={{
+								padding: "16px 20px",
+								fontSize: "1rem",
+								color: "white",
+								fontWeight: 700,
+								borderRadius: "40px",
+								backgroundColor: "#0272E6",
+							}}
+						>
+							Learn about SUI
+						</Button>
+					</ButtonWrapper>
+				</Container>
+			)}
 		</Box>
 	);
 };
