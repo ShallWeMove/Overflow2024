@@ -1,5 +1,4 @@
 <img src="https://capsule-render.vercel.app/api?type=waving&color=BDBDC8&height=150&section=header" />
-<img src="https://capsule-render.vercel.app/api?type=waving&color=BDBDC8&height=150&section=footer" />
 
 # Entirely Blockchain-Powered Multiplayer Card Game:  _Play, Create, Share_
 
@@ -177,3 +176,5 @@ In contrast to traditional poker, which utilizes 5 cards, Mini Poker is played w
 ### 5. Top
 
 - The highest single card in a hand, not forming any particular combination. It does not contribute to any specific hand rank. An Ace (A) is the highest top card, and a 4 is the lowest. 
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=BDBDC8&height=150&section=footer" />
