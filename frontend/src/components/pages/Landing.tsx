@@ -1,10 +1,11 @@
 import { Box, Button, Typography, styled } from "@mui/material";
 import { useRouter } from "next/router";
-import { enter, GAME_TABLE_TYPE } from "@/api/game";
+import {enter, GAME_TABLE_TYPE, LOCAL_STORAGE_ONGOING_GAME_KEY} from "@/api/game";
 import { useAtomValue } from "jotai/index";
 import { walletAtom } from "@/lib/states";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { Loading } from "@/components/UI/Loading";
+import OngoingGamePopUp from "@/components/pages/OngoingGamePopUp";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -12,7 +13,15 @@ const Landing = () => {
 	const router = useRouter();
 	const wallet = useAtomValue(walletAtom);
 
+	const [ongoingGameExists, setOngoingGameExists] = useState(false);
 	const [loading, setLoading] = useState(false);
+
+	useEffect(() => {
+		const ongoingGameId = localStorage.getItem(LOCAL_STORAGE_ONGOING_GAME_KEY);
+		if (ongoingGameId) {
+			setOngoingGameExists(true);
+		}
+	}, []);
 
 	const enterGame = async () => {
 		try {
@@ -28,6 +37,9 @@ const Landing = () => {
 						objectChange.objectType === GAME_TABLE_TYPE
 					) {
 						const gameTableId = objectChange.objectId;
+
+						// if user enters new game successfully, save the ongoing game id to local storage
+						localStorage.setItem(LOCAL_STORAGE_ONGOING_GAME_KEY, gameTableId);
 						await sleep(2000);
 						setLoading(false);
 						await router.push(`/game/${gameTableId}`);
@@ -54,57 +66,61 @@ const Landing = () => {
 				alignItems: "center",
 			}}
 		>
-			{loading ? (
-				<Loading />
-			) : (
-				<Container>
-					<Box sx={{ display: "flex", flexDirection: "column" }}>
-						<Typography color="black" fontWeight={700} fontSize={32}>
-							Welcome to Shall We Move,
-						</Typography>
-						<Typography color="black" fontWeight={700} fontSize={20}>
-							a fully on-chain multiplayer card game implemented on the Sui
-							blockchain.
-						</Typography>
-						<Typography color="black" fontWeight={700} fontSize={20}>
-							This project leverages the unique features of the Sui blockchain
-							to provide secure,
-						</Typography>
-						<Typography color="black" fontWeight={700} fontSize={20}>
-							transparent, and decentralized gameplay.
-						</Typography>
-					</Box>
-					<ButtonWrapper>
-						<Button
-							onClick={enterGame}
-							variant="contained"
-							color="secondary"
-							sx={{
-								padding: "16px 20px",
-								fontSize: "1rem",
-								borderRadius: "40px",
-								fontWeight: 700,
-								boxShadow: "none",
-							}}
-						>
-							Enter Game
-						</Button>
-						<Button
-							onClick={() => router.push("https://sui.io")}
-							sx={{
-								padding: "16px 20px",
-								fontSize: "1rem",
-								color: "white",
-								fontWeight: 700,
-								borderRadius: "40px",
-								backgroundColor: "#0272E6",
-							}}
-						>
-							Learn about SUI
-						</Button>
-					</ButtonWrapper>
-				</Container>
-			)}
+			{
+				ongoingGameExists ? (
+					<OngoingGamePopUp onClose={() => setOngoingGameExists(false)} />
+				) : loading ? (
+					<Loading />
+				) : (
+					<Container>
+						<Box sx={{ display: "flex", flexDirection: "column" }}>
+							<Typography color="black" fontWeight={700} fontSize={32}>
+								Welcome to Shall We Move,
+							</Typography>
+							<Typography color="black" fontWeight={700} fontSize={20}>
+								a fully on-chain multiplayer card game implemented on the Sui
+								blockchain.
+							</Typography>
+							<Typography color="black" fontWeight={700} fontSize={20}>
+								This project leverages the unique features of the Sui blockchain
+								to provide secure,
+							</Typography>
+							<Typography color="black" fontWeight={700} fontSize={20}>
+								transparent, and decentralized gameplay.
+							</Typography>
+						</Box>
+						<ButtonWrapper>
+							<Button
+								onClick={enterGame}
+								variant="contained"
+								color="secondary"
+								sx={{
+									padding: "16px 20px",
+									fontSize: "1rem",
+									borderRadius: "40px",
+									fontWeight: 700,
+									boxShadow: "none",
+								}}
+							>
+								Enter Game
+							</Button>
+							<Button
+								onClick={() => router.push("https://sui.io")}
+								sx={{
+									padding: "16px 20px",
+									fontSize: "1rem",
+									color: "white",
+									fontWeight: 700,
+									borderRadius: "40px",
+									backgroundColor: "#0272E6",
+								}}
+							>
+								Learn about SUI
+							</Button>
+						</ButtonWrapper>
+					</Container>
+				)
+			}
 		</Box>
 	);
 };

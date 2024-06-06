@@ -19,12 +19,12 @@ export const SettleUpButton = ({ gameTableId }: FoldButtonProps) => {
 			const response = await settleUp(wallet, gameTableId);
 
 			if (response?.effects?.status?.status === "failure") {
-				alert("Failed to exit");
+				alert("Failed to settle up");
 			}
 
-			console.log("exit response: ", response);
+			console.log("settle up response: ", response);
 		} catch (error) {
-			console.error("Failed to exit:", error);
+			console.error("Failed to settle up:", error);
 		}
 	};
 
