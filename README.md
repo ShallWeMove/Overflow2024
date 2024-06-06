@@ -10,9 +10,10 @@ Immerse yourself in the game interface, crafted to provide a smooth and captivat
 ## Game Interface
 ![Shall We Move Game Page](images/game.png)
 
-**Watch the Demo Video**
+## Watch the Demo Video
 [Watch this video on YouTube](https://youtube.com/playlist?list=PLsZNRVNR3wUxKXUe_5FjZcV0g90825sxl&si=o_1raNUMIIC5UCAd)
 
+## Languages
 [![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=styu12)](https://github.com/anuraghazra/github-readme-stats)
 
 # Table of Contents
