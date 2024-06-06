@@ -136,11 +136,11 @@ In contrast to traditional poker, which utilizes 5 cards, Mini Poker is played w
 <br><br>
 
 ## Betting Rules
-- **Ante**: The mandatory initial bet placed at the beginning of the game to ensure active participation and discourage excessive folding without betting. It serves to encourage more proactive betting behavior.
-- **Check**: A privilege given to the player who either must bet the minimum amount or is the first player to bet regardless of their hand. It allows them to pass their turn without adding more money to the pot.
-- **Bet**: The act of placing the first bet after card exchange or additional distribution. If no one bets, the round progresses with everyone checking, without further betting.
-- **Call**: Accepting the amount of money bet by the previous player.
-- **Raise**: Accepting the previous bet and adding more to it.
+- **Ante**: The mandatory initial bet placed at the beginning of the game to ensure active participation and discourage excessive folding without betting. It serves to encourage more proactive betting behavior.<br>
+- **Check**: A privilege given to the player who either must bet the minimum amount or is the first player to bet regardless of their hand. It allows them to pass their turn without adding more money to the pot.<br>
+- **Bet**: The act of placing the first bet after card exchange or additional distribution. If no one bets, the round progresses with everyone checking, without further betting.<br>
+- **Call**: Accepting the amount of money bet by the previous player.<br>
+- **Raise**: Accepting the previous bet and adding more to it.<br>
 - **Fold**: Surrendering the hand, resulting in the loss of any money bet before folding. Folding is employed to minimize further losses when a player assesses that their hand has little chance of winning.
 <br><br>
 
