@@ -115,7 +115,7 @@ pnpm install
 pnpm dev
 ```
 
-# Mini Poker Rules
+# Mini Poker: Instructions, Rules, and Hand Rankings
 
 ## Overview of Rules
 In contrast to traditional poker, which utilizes 5 cards, Mini Poker is played with only 2 cards, forming combinations to create hands (poker hands). Following the 2-card rule, players are dealt one card each, engage in betting, then receive the second card and proceed with another round of betting before revealing their hands to determine the winner. The draw rule is applied, ensuring that players' cards remain undisclosed throughout the game.
