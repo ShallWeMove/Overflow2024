@@ -15,9 +15,10 @@ module three_cards_poker::three_cards_poker {
   // ============================================
   // ============== CONSTANTS ===================
   
-  const PAIR : u64 = 400_000_000;
+  const TRIPLE : u64 = 400_000_000;
   const STRAIGHT : u64 = 300_000_000;
   const FLUSH : u64 = 200_000_000;
+  const PAIR : u64 = 100_000_000;
   const NUMBER_SCORE_BASE : u64 = 4;
 
   entry fun test(r: &Random, ctx: &mut TxContext) {
@@ -85,8 +86,16 @@ module three_cards_poker::three_cards_poker {
     let mut shape_score : u64 = 0;
     let mut has_combination = false;
     
+    // TRIPLE
+    if (card_number1 % 13 == card_number2 % 13 && card_number2 % 13 == card_number3 % 13) {
+      // combination score
+      combination_score = combination_score + TRIPLE;
+      has_combination = true;
+      // number score
+      number_score = number_score + math::pow(NUMBER_SCORE_BASE ,(card_number1 % 13 + 1) as u8);
+    } 
     // PAIR
-    if (card_number1 % 13 == card_number2 % 13) {
+    else if (card_number1 % 13 == card_number2 % 13 || card_number2 % 13 == card_number3 % 13 || card_number1 % 13 == card_number3 % 13) {
       // combination score
       combination_score = combination_score + PAIR;
       has_combination = true;
