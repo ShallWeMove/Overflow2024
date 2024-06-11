@@ -209,6 +209,11 @@ module shallwemove::game_status {
 
   fun number_of_used_cards(game_status : &GameStatus) : u8 {game_status.card_info.number_of_used_cards}
 
+  public fun reset_card_info(game_status : &mut GameStatus) {
+    game_status.card_info.number_of_avail_cards = 0;
+    game_status.card_info.number_of_used_cards = 0;
+  }
+
   public fun add_card(game_status : &mut GameStatus) {
     game_status.card_info.number_of_avail_cards = game_status.card_info.number_of_avail_cards + 1;
   }
