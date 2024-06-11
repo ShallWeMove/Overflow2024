@@ -147,10 +147,12 @@ module three_cards_poker::three_cards_poker {
     };
 
     // shape score
-    if (card_number1 / 13 > card_number2 / 13) {
+    if (card_number1 / 13 >= card_number2 / 13 && card_number1 / 13 >= card_number3 / 13) {
       shape_score = shape_score + (card_number1 as u64) / 13 ;
-    } else if (card_number2 / 13 > card_number1 / 13) {
+    } else if (card_number2 / 13 >= card_number1 / 13 && card_number2 / 13 >= card_number3 / 13) {
       shape_score = shape_score + (card_number2 as u64) / 13;
+    } else if (card_number3 / 13 >= card_number1 / 13 && card_number3 / 13 >= card_number2 / 13) {
+      shape_score = shape_score + (card_number3 as u64) / 13;
     };
 
     let total_score = combination_score + number_score + shape_score;
