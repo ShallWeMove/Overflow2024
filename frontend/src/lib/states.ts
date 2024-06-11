@@ -1,5 +1,8 @@
 import { atom } from "jotai";
 import { Casino, Lounge, GameTable } from "./types";
+import { GameConfig } from "../../config/config";
+
+export const gameConfigAtom = atom<GameConfig | null>(null);
 
 export const walletAtom = atom<any>(null);
 
