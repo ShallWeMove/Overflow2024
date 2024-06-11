@@ -139,10 +139,12 @@ module three_cards_poker::three_cards_poker {
 
     if (!has_combination) {
       // number score
-      if (card_number1 % 13 > card_number2 % 13) {
+      if (card_number1 % 13 >= card_number2 % 13 && card_number1 % 13 >= card_number3 % 13) {
         number_score = number_score + math::pow(NUMBER_SCORE_BASE, (card_number1 % 13 + 1) as u8);
-      } else if (card_number2 % 13 > card_number1 % 13) {
+      } else if (card_number2 % 13 >= card_number1 % 13 && card_number2 % 13 >= card_number3 % 13) {
         number_score = number_score + math::pow(NUMBER_SCORE_BASE, (card_number2 % 13 + 1) as u8);
+      } else if (card_number3 % 13 >= card_number1 % 13 && card_number3 % 13 >= card_number2 % 13) {
+        number_score = number_score + math::pow(NUMBER_SCORE_BASE, (card_number3 % 13 + 1) as u8);
       };
     };
 
