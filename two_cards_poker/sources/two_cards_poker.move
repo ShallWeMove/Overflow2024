@@ -1,5 +1,5 @@
 /// Module: poker_logic
-module poker_logic::poker_logic {
+module two_cards_poker::two_cards_poker {
   // ============================================
   // ============= IMPORTS ======================
 
