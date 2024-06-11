@@ -3,13 +3,13 @@ import { WalletContextState } from "@suiet/wallet-kit";
 import { RSA } from "@/lib/rsa";
 import config, { GameConfig } from "../../config/config";
 
-
 const CASINO_ID =
-	"0x6a7880707b5edcda161d695e98ded49ac18596d9e22d50e8cbc62583cd54d452";
+	"0x02a394910e21ce11f32891d8f33232651c5d84b126ef5a7d606476afd07a1304";
 const LOUNGE_ID =
-	"0xba94f4539a865d578076d1e9800bf49219beda80e1d67e570ec016f08a6d3a90";
+	"0x4169e06afb311216ef5c001adfd6f5b185434896ed7ec9871dea20dc3ad97aea";
 const GAME_LOGIC_PACKAGE_ID =
-	"0x4fe20afdac0b60838296679d777f7418348d6d99f9a8c38c318eb480c9df7508";
+	// "0x4fe20afdac0b60838296679d777f7418348d6d99f9a8c38c318eb480c9df7508";
+	"0x83375f7ddf8e848befd0febc4d05599faeef7c161e1b2c0b52fdbbf1a3d5d39c"; // three card poker
 
 const MODULE = "cardgame";
 

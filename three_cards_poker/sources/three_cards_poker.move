@@ -76,7 +76,7 @@ module three_cards_poker::three_cards_poker {
     return highest_score_player_index
   }
 
-    fun get_card_combination_score(card_number1 : u256, card_number2 : u256, card_number3 : u256 ) : u64 {
+  fun get_card_combination_score(card_number1 : u256, card_number2 : u256, card_number3 : u256 ) : u64 {
     assert!(card_number1 < 52 && card_number2 < 52 && card_number3 < 52, 500);
     assert!(card_number1 != card_number2 , 501);
     assert!(card_number2 != card_number3 , 501);
@@ -104,52 +104,54 @@ module three_cards_poker::three_cards_poker {
     };
 
     // STRAIGHT
-    let mut straight_card_numbers = vector<u256>[];
+    let mut straight_card_number1 = 0;
+    let mut straight_card_number2 = 0;
+    let mut straight_card_number3 = 0;
 
-    if (card_number1 % 13 > card_number2 % 13 && card_number2 % 13 > card_number3) {
-      straight_card_numbers.push_back(card_number1);
-      straight_card_numbers.push_back(card_number2);
-      straight_card_numbers.push_back(card_number3);
-    } else if (card_number1 % 13 > card_number3 % 13 && card_number3 % 13 > card_number2) {
-      straight_card_numbers.push_back(card_number1);
-      straight_card_numbers.push_back(card_number3);
-      straight_card_numbers.push_back(card_number2);
-    } else if (card_number2 % 13 > card_number1 % 13 && card_number1 % 13 > card_number3) {
-      straight_card_numbers.push_back(card_number2);
-      straight_card_numbers.push_back(card_number1);
-      straight_card_numbers.push_back(card_number3);
-    } else if (card_number2 % 13 > card_number3 % 13 && card_number3 % 13 > card_number1) {
-      straight_card_numbers.push_back(card_number2);
-      straight_card_numbers.push_back(card_number3);
-      straight_card_numbers.push_back(card_number1);
-    } else if (card_number3 % 13 > card_number1 % 13 && card_number1 % 13 > card_number2) {
-      straight_card_numbers.push_back(card_number3);
-      straight_card_numbers.push_back(card_number1);
-      straight_card_numbers.push_back(card_number2);
-    } else if (card_number3 % 13 > card_number2 % 13 && card_number2 % 13 > card_number1) {
-      straight_card_numbers.push_back(card_number3);
-      straight_card_numbers.push_back(card_number2);
-      straight_card_numbers.push_back(card_number1);
+    if (card_number1 % 13 > card_number2 % 13 && card_number2 % 13 > card_number3 % 13) {
+      straight_card_number1 = card_number1;
+      straight_card_number2 = card_number2;
+      straight_card_number3 = card_number3;
+    } else if (card_number1 % 13 > card_number3 % 13 && card_number3 % 13 > card_number2 % 13) {
+      straight_card_number1 = card_number1;
+      straight_card_number2 = card_number3;
+      straight_card_number3 = card_number2;
+    } else if (card_number2 % 13 > card_number1 % 13 && card_number1 % 13 > card_number3 % 13) {
+      straight_card_number1 = card_number2;
+      straight_card_number2 = card_number1;
+      straight_card_number3 = card_number3;
+    } else if (card_number2 % 13 > card_number3 % 13 && card_number3 % 13 > card_number1 % 13) {
+      straight_card_number1 = card_number2;
+      straight_card_number2 = card_number3;
+      straight_card_number3 = card_number1;
+    } else if (card_number3 % 13 > card_number1 % 13 && card_number1 % 13 > card_number2 % 13) {
+      straight_card_number1 = card_number3;
+      straight_card_number2 = card_number1;
+      straight_card_number3 = card_number2;
+    } else if (card_number3 % 13 > card_number2 % 13 && card_number2 % 13 > card_number1 % 13) {
+      straight_card_number1 = card_number3;
+      straight_card_number2 = card_number2;
+      straight_card_number3 = card_number1;
     };
 
-    if (straight_card_numbers[0] % 13 == straight_card_numbers[1] % 13 + 1 && straight_card_numbers[1] % 13 == straight_card_numbers[2] % 13 + 1) {
+    if (straight_card_number1 % 13 == straight_card_number2 % 13 + 1 && straight_card_number2 % 13 == straight_card_number3 % 13 + 1) {
       // combination score
       combination_score = combination_score + STRAIGHT;
       has_combination = true;
       // number score
-      number_score = number_score + math::pow(NUMBER_SCORE_BASE, (straight_card_numbers[0] % 13 + 1) as u8);
-    } else if (straight_card_numbers[0] % 13 == straight_card_numbers[1] % 13 + 1 && straight_card_numbers[0] % 13 == straight_card_numbers[2] + 12) {
+      number_score = number_score + math::pow(NUMBER_SCORE_BASE, (straight_card_number1 % 13 + 1) as u8);
+    } else if (straight_card_number1 % 13 == straight_card_number2 % 13 + 1 && straight_card_number1 % 13 == straight_card_number3 % 13 + 12) {
       // combination score
       combination_score = combination_score + STRAIGHT;
       has_combination = true;
       // number score
-      number_score = number_score + math::pow(NUMBER_SCORE_BASE, (straight_card_numbers[0] % 13 + 1) as u8);
-    } else if (straight_card_numbers[0] % 13 == straight_card_numbers[1] % 13 + 11 && straight_card_numbers[0] % 13 == straight_card_numbers[2] + 12){
+      number_score = number_score + math::pow(NUMBER_SCORE_BASE, (straight_card_number1 % 13 + 1) as u8);
+    } else if (straight_card_number1 % 13 == straight_card_number2 % 13 + 11 && straight_card_number1 % 13 == straight_card_number3 % 13 + 12){
       // combination score
       combination_score = combination_score + STRAIGHT;
       has_combination = true;
       // number score
-      number_score = number_score + math::pow(NUMBER_SCORE_BASE, (straight_card_numbers[0] % 13 + 1) as u8);
+      number_score = number_score + math::pow(NUMBER_SCORE_BASE, (straight_card_number1 % 13 + 1) as u8);
     };
 
     // FLUSH

@@ -279,6 +279,7 @@ module shallwemove::game_table {
     let used_card_deck = game_table.card_deck.extract();
     game_table.used_card_decks.push_back(used_card_deck.id());
     dynamic_object_field::add<ID, CardDeck>(&mut game_table.id, used_card_deck.id(), used_card_deck);
+    game_table.game_status_mut().reset_card_info();
 
     // Create a new card deck and send it to the game table. Using Random here
     let mut card_deck = card_deck::new(game_table.casino_public_key, ctx);

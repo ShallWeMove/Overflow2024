@@ -2,8 +2,8 @@
 name = "shallwemove"
 edition = "2024.beta" # edition = "legacy" to use legacy (pre-2024) Move
 # latest version package address
-published-at = "0x811a203f17389f11e08436991efa74add1abe6f4422d1edaddbd1e20d3f949ac"
-### upgrade capability : 0x5c6bcb30a386bb3da64a264318749914c2255eba64b7caccec95930d3a546b65
+published-at = "0xbb82f18ff31baf24223bac5176f2c272fdf296cfef5ef32b255af200f161b3ea"
+### upgrade capability : 0xbfaeb6b4695ddb978bba3f0099d54ccdb02112c47d3584ea3ba6846346d27129
 # license = ""           # e.g., "MIT", "GPL", "Apache 2.0"
 # authors = ["..."]      # e.g., ["Joe Smith (joesmith@noemail.com)", "John Snow (johnsnow@noemail.com)"]
 
@@ -23,7 +23,7 @@ Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-fram
 
 [addresses]
 ## original package(version 1) address
-shallwemove = "0xd10b25e4b34a013949d22666cf115cd01c2b0714585cd260122cb3e627893b63"
+shallwemove = "0xbb82f18ff31baf24223bac5176f2c272fdf296cfef5ef32b255af200f161b3ea"
 # shallwemove = "0x0"
 
 # Named addresses will be accessible in Move as `@name`. They're also exported:
