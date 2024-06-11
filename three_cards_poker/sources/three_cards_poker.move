@@ -53,17 +53,19 @@ module three_cards_poker::three_cards_poker {
 
       let card1 = player_seat.cards().borrow(0);
       let card2 = player_seat.cards().borrow(1);
+      let card3 = player_seat.cards().borrow(2);
 
       let casino_n = encrypt::convert_vec_u8_to_u256(game_table.casino_public_key());
       let decrypted_card_number1 = encrypt::decrypt_256(casino_n, card1.card_number());
       let decrypted_card_number2 = encrypt::decrypt_256(casino_n, card2.card_number());
+      let decrypted_card_number3 = encrypt::decrypt_256(casino_n, card3.card_number());
 
       if (highest_score == 0) {
-        highest_score = get_card_combination_score(decrypted_card_number1, decrypted_card_number2);
+        highest_score = get_card_combination_score(decrypted_card_number1, decrypted_card_number2, decrypted_card_number3);
       };
 
-      if (highest_score < get_card_combination_score(decrypted_card_number1, decrypted_card_number2)) {
-        highest_score = get_card_combination_score(decrypted_card_number1, decrypted_card_number2);
+      if (highest_score < get_card_combination_score(decrypted_card_number1, decrypted_card_number2, decrypted_card_number3)) {
+        highest_score = get_card_combination_score(decrypted_card_number1, decrypted_card_number2, decrypted_card_number3);
         highest_score_player_index = i;
       };
 
@@ -73,9 +75,11 @@ module three_cards_poker::three_cards_poker {
     return highest_score_player_index
   }
 
-    fun get_card_combination_score(card_number1 : u256, card_number2 : u256 ) : u64 {
-    assert!(card_number1 < 52 && card_number2 < 52, 500);
+    fun get_card_combination_score(card_number1 : u256, card_number2 : u256, card_number3 : u256 ) : u64 {
+    assert!(card_number1 < 52 && card_number2 < 52 && card_number3 < 52, 500);
     assert!(card_number1 != card_number2 , 501);
+    assert!(card_number2 != card_number3 , 501);
+    assert!(card_number3 != card_number1 , 501);
     let mut combination_score : u64 = 0;
     let mut number_score : u64 = 0;
     let mut shape_score : u64 = 0;
