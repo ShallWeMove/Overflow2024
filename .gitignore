@@ -1,2 +1,5 @@
 .idea
 *.env
+
+two_cards_poker/build
+three_cards_poker/build

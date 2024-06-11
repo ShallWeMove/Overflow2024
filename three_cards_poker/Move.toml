@@ -1,9 +1,6 @@
 [package]
-name = "shallwemove"
+name = "three_cards_poker"
 edition = "2024.beta" # edition = "legacy" to use legacy (pre-2024) Move
-# latest version package address
-published-at = "0x40ac31cb39dfb38ca7953f62bdd430c3d1a2e671047de0b91fbaafe32275eb17"
-### upgrade capability : 0x5c6bcb30a386bb3da64a264318749914c2255eba64b7caccec95930d3a546b65
 # license = ""           # e.g., "MIT", "GPL", "Apache 2.0"
 # authors = ["..."]      # e.g., ["Joe Smith (joesmith@noemail.com)", "John Snow (johnsnow@noemail.com)"]
 
@@ -12,7 +9,8 @@ Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-fram
 
 # For remote import, use the `{ git = "...", subdir = "...", rev = "..." }`.
 # Revision can be a branch, a tag, and a commit hash.
-# MyRemotePackage = { git = "https://some.remote/host.git", subdir = "remote/path", rev = "main" }
+shallwemove = { git = "https://github.com/ShallWeMove/Overflow2024", subdir = "shallwemove", rev = "main" }
+# shallwemove = { git = "https://github.com/ShallWeMove/Overflow2024", subdir = "shallwemove", rev = "feat/move-module" }
 
 # For local dependencies use `local = path`. Path is relative to the package root
 # Local = { local = "../path/to" }
@@ -22,13 +20,12 @@ Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-fram
 # Override = { local = "../conflicting/version", override = true }
 
 [addresses]
-## original package(version 1) address
-shallwemove = "0x811a203f17389f11e08436991efa74add1abe6f4422d1edaddbd1e20d3f949ac"
-# shallwemove = "0x0"
+three_cards_poker = "0x0"
 
 # Named addresses will be accessible in Move as `@name`. They're also exported:
 # for example, `std = "0x1"` is exported by the Standard Library.
 # alice = "0xA11CE"
+shallwemove = "0xd10b25e4b34a013949d22666cf115cd01c2b0714585cd260122cb3e627893b63"
 
 [dev-dependencies]
 # The dev-dependencies section allows overriding dependencies for `--test` and

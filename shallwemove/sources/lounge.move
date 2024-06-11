@@ -41,8 +41,8 @@ module shallwemove::lounge {
     Lounge{
       id : object::new(ctx),
       casino_id : casino.id(),
-      // max_round : max_round,
-      max_round : 1,
+      max_round : max_round,
+      // max_round : 1,
       game_tables : vector[]
     }
   }

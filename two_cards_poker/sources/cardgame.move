@@ -1,10 +1,10 @@
-module poker_logic::cardgame {
+module two_cards_poker::cardgame {
   use shallwemove::cardgame::{Self};
   use shallwemove::casino::{Self, Casino};
   use shallwemove::lounge::{Self, Lounge};
   use shallwemove::game_table::{Self, GameTable};
   use shallwemove::game_status::{Self, GameStatus};
-  use poker_logic::poker_logic::{Self};
+  use two_cards_poker::two_cards_poker::{Self};
   use sui::coin::{Self, Coin};
   use sui::sui::SUI;
   use std::debug;
@@ -32,7 +32,7 @@ module poker_logic::cardgame {
     let finish_case = cardgame::exit(casino, lounge, game_table_id, ctx);
     let game_table = lounge.borrow_mut_game_table(game_table_id);
     if (finish_case == game_table::CONST_FINISH_GAME_CASE()) {
-      poker_logic::finish_game(game_table, ctx);
+      two_cards_poker::finish_game(game_table, ctx);
     };
   }
 
@@ -70,7 +70,7 @@ module poker_logic::cardgame {
     let finish_case = cardgame::action(casino, lounge, game_table_id, action_type, chip_count, ctx);
     let game_table = lounge.borrow_mut_game_table(game_table_id);
     if (finish_case == game_table::CONST_FINISH_GAME_CASE()) {
-      poker_logic::finish_game(game_table, ctx);
+      two_cards_poker::finish_game(game_table, ctx);
     };
   }
 
