@@ -23,9 +23,7 @@ Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-fram
 
 [addresses]
 ## original package(version 1) address
-# shallwemove = "0xbb82f18ff31baf24223bac5176f2c272fdf296cfef5ef32b255af200f161b3ea"
-# latest version package address
-shallwemove = "0xccf63dce749629c2b67c013ddc25d3735da4e45de9a03e9aa5b22d0fd2cc42f0"
+shallwemove = "0xbb82f18ff31baf24223bac5176f2c272fdf296cfef5ef32b255af200f161b3ea"
 # shallwemove = "0x0"
 
 # Named addresses will be accessible in Move as `@name`. They're also exported:
