@@ -1,7 +1,7 @@
 import { GamePlayButton } from "@/components/UI/GamePlayButton";
 import { action, ActionType } from "@/api/game";
 import { useAtomValue } from "jotai/index";
-import { walletAtom } from "@/lib/states";
+import {gameConfigAtom, walletAtom} from "@/lib/states";
 // import { action } from "@/api/game";
 
 interface CheckButtonProps {
@@ -12,16 +12,22 @@ interface CheckButtonProps {
 export const CheckButton = ({ value, gameTableId }: CheckButtonProps) => {
 	const disabled = false;
 	const wallet = useAtomValue(walletAtom);
+	const gameCfg = useAtomValue(gameConfigAtom);
 
 	const handleClick = async () => {
 		// action;
 		try {
+			if (!wallet || !gameCfg) {
+				console.error("Wallet or game config is not available");
+				return;
+			}
+
 			const response = await action(
 				wallet,
 				gameTableId,
 				ActionType.CHECK,
-				false,
-				0
+				0,
+				gameCfg,
 			);
 
 			if (response?.effects?.status?.status === "failure") {

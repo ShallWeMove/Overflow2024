@@ -1,12 +1,8 @@
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { WalletContextState } from "@suiet/wallet-kit";
 import { RSA } from "@/lib/rsa";
+import config, { GameConfig } from "../../config/config";
 
-
-const ORIGINAL_CARDGAME_PACKAGE_ID =
-	"0xd10b25e4b34a013949d22666cf115cd01c2b0714585cd260122cb3e627893b63";
-const LATEST_CARDGAME_PACKAGE_ID =
-	"0x811a203f17389f11e08436991efa74add1abe6f4422d1edaddbd1e20d3f949ac";
 const CASINO_ID =
 	"0x02a394910e21ce11f32891d8f33232651c5d84b126ef5a7d606476afd07a1304";
 const LOUNGE_ID =
@@ -18,15 +14,16 @@ const GAME_LOGIC_PACKAGE_ID =
 const MODULE = "cardgame";
 
 export const LOCAL_STORAGE_ONGOING_GAME_KEY = 'ongoingGameId';
+export const LOCAL_STORAGE_ONGOING_GAME_CONFIG_KEY = 'ongoingGameConfig';
 
-export const GAME_TABLE_TYPE = `${ORIGINAL_CARDGAME_PACKAGE_ID}::game_table::GameTable`;
+export const GAME_TABLE_TYPE = `${config.core.packageId}::game_table::GameTable`;
 
 // depositAmount - the amount of chips needed to enter the game
 const depositAmountInMist = 1000000;
 const gasBudgetInMist = 100000000;
 
 // enter - called when the player enters the game table
-export const enter = async (wallet: WalletContextState) => {
+export const enter = async (wallet: WalletContextState, gameConfig: GameConfig) => {
 	const publicKey = new RSA().getPublicKey();
 	const txb = new TransactionBlock();
 
@@ -34,12 +31,12 @@ export const enter = async (wallet: WalletContextState) => {
 	const [coin] = txb.splitCoins(txb.gas, [txb.pure(depositAmountInMist)]);
 
 	txb.moveCall({
-		target: `${GAME_LOGIC_PACKAGE_ID}::${MODULE}::enter`,
+		target: `${gameConfig.packageId}::cardgame::enter`,
 		arguments: [
 			// casino
-			txb.object(CASINO_ID),
+			txb.object(gameConfig.objects.casinoId),
 			// lounge
-			txb.object(LOUNGE_ID),
+			txb.object(gameConfig.objects.loungeId),
 			// public key as a string
 			txb.pure(publicKey.toString()),
 			// deposit
@@ -65,13 +62,13 @@ export const enter = async (wallet: WalletContextState) => {
 };
 
 // exit - called when the player exits the game table
-export const exit = async (wallet: WalletContextState, gameTableId: string) => {
+export const exit = async (wallet: WalletContextState, gameTableId: string, gameConfig: GameConfig) => {
 	const txb = new TransactionBlock();
 	txb.moveCall({
-		target: `${GAME_LOGIC_PACKAGE_ID}::${MODULE}::exit`,
+		target: `${gameConfig.packageId}::cardgame::exit`,
 		arguments: [
-			txb.object(CASINO_ID), // casino
-			txb.object(LOUNGE_ID), // lounge
+			txb.object(gameConfig.objects.casinoId), // casino
+			txb.object(gameConfig.objects.loungeId), // lounge
 			txb.pure(gameTableId), // game table
 		],
 	});
@@ -95,18 +92,18 @@ export const exit = async (wallet: WalletContextState, gameTableId: string) => {
 
 // ante - called when the player antes.
 // 	After all players have anted, manager player can start the game.
-export const ante = async (wallet: WalletContextState, gameTableId: string) => {
+export const ante = async (wallet: WalletContextState, gameTableId: string, gameConfig: GameConfig) => {
 	const txb = new TransactionBlock();
 
 	txb.setGasBudget(gasBudgetInMist);
 
 	txb.moveCall({
-		target: `${GAME_LOGIC_PACKAGE_ID}::${MODULE}::ante`,
+		target: `${gameConfig.packageId}::cardgame::ante`,
 		arguments: [
 			// casino
-			txb.object(CASINO_ID),
+			txb.object(gameConfig.objects.casinoId),
 			// lounge
-			txb.object(LOUNGE_ID),
+			txb.object(gameConfig.objects.loungeId),
 			// game table id as a string
 			txb.pure(gameTableId),
 		],
@@ -132,19 +129,20 @@ export const ante = async (wallet: WalletContextState, gameTableId: string) => {
 // start - called when the game starts
 export const start = async (
 	wallet: WalletContextState,
-	gameTableId: string
+	gameTableId: string,
+	gameConfig: GameConfig
 ) => {
 	const txb = new TransactionBlock();
 
 	txb.setGasBudget(gasBudgetInMist);
 
 	txb.moveCall({
-		target: `${GAME_LOGIC_PACKAGE_ID}::${MODULE}::start`,
+		target: `${gameConfig.packageId}::cardgame::start`,
 		arguments: [
 			// casino
-			txb.object(CASINO_ID),
+			txb.object(gameConfig.objects.casinoId),
 			// lounge
-			txb.object(LOUNGE_ID),
+			txb.object(gameConfig.objects.loungeId),
 			// game table as a string
 			txb.pure(gameTableId),
 		],
@@ -173,18 +171,17 @@ export const action = async (
 	wallet: WalletContextState,
 	gameTableId: string,
 	actionType: ActionType,
-	withNewCard: boolean,
-	chipCount: number
+	chipCount: number,
+	gameConfig: GameConfig
 ) => {
 	const txb = new TransactionBlock();
 	txb.moveCall({
-		target: `${GAME_LOGIC_PACKAGE_ID}::${MODULE}::action`,
+		target: `${gameConfig.packageId}::cardgame::action`,
 		arguments: [
-			txb.object(CASINO_ID), // casino
-			txb.object(LOUNGE_ID), // lounge
+			txb.object(gameConfig.objects.casinoId), // casino
+			txb.object(gameConfig.objects.loungeId), // lounge
 			txb.pure(gameTableId), // game table id
 			txb.pure(convertActionTypeToInt(actionType)), // action type
-			// txb.pure(withNewCard), // with new card
 			txb.pure(chipCount), // chip count
 		],
 	});
@@ -209,14 +206,15 @@ export const action = async (
 // settleUp - called after the game ends to calculate the winnings
 export const settleUp = async (
 	wallet: WalletContextState,
-	gameTableId: string
+	gameTableId: string,
+	gameConfig: GameConfig
 ) => {
 	const txb = new TransactionBlock();
 	txb.moveCall({
-		target: `${GAME_LOGIC_PACKAGE_ID}::${MODULE}::settle_up`,
+		target: `${gameConfig.packageId}::cardgame::settle_up`,
 		arguments: [
-			txb.object(CASINO_ID), // casino
-			txb.object(LOUNGE_ID), // lounge
+			txb.object(gameConfig.objects.casinoId), // casino
+			txb.object(gameConfig.objects.loungeId), // lounge
 			txb.pure(gameTableId), // game table
 			txb.object("0x0000000000000000000000000000000000000000000000000000000000000008") // random object
 		],

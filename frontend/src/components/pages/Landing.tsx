@@ -1,17 +1,26 @@
-import { Box, Button, Typography, styled } from "@mui/material";
-import { useRouter } from "next/router";
-import {enter, GAME_TABLE_TYPE, LOCAL_STORAGE_ONGOING_GAME_KEY} from "@/api/game";
-import { useAtomValue } from "jotai/index";
-import { walletAtom } from "@/lib/states";
+import {Box, Button, styled, Typography} from "@mui/material";
+import {useRouter} from "next/router";
+import {
+	enter,
+	GAME_TABLE_TYPE,
+	LOCAL_STORAGE_ONGOING_GAME_CONFIG_KEY,
+	LOCAL_STORAGE_ONGOING_GAME_KEY
+} from "@/api/game";
+import {useAtomValue} from "jotai/index";
+import {gameConfigAtom, walletAtom} from "@/lib/states";
 import {useEffect, useState} from "react";
-import { Loading } from "@/components/UI/Loading";
+import {Loading} from "@/components/UI/Loading";
 import OngoingGamePopUp from "@/components/pages/OngoingGamePopUp";
+import config, {GameConfig, GameType} from "../../../config/config";
+import LoginIcon from '@mui/icons-material/Login';
+import {useSetAtom} from "jotai";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const Landing = () => {
 	const router = useRouter();
 	const wallet = useAtomValue(walletAtom);
+	const setGameConfig = useSetAtom(gameConfigAtom);
 
 	const [ongoingGameExists, setOngoingGameExists] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -23,11 +32,31 @@ const Landing = () => {
 		}
 	}, []);
 
-	const enterGame = async () => {
+	const enterGame = async (gameType: GameType) => {
 		try {
 			setLoading(true);
 
-			const response = await enter(wallet);
+			let gameCfg: GameConfig | null;
+
+			switch (gameType) {
+				case GameType.TwoCardsPoker:
+					gameCfg = config.games.twoCardsPoker;
+					break;
+				case GameType.ThreeCardsPoker:
+					gameCfg = config.games.threeCardsPoker;
+					break;
+				default:
+					gameCfg = null;
+			}
+
+			if (!gameCfg) {
+				setLoading(false);
+				console.error("Failed to enter the game:", gameType);
+				alert("Invalid game type");
+				return;
+			}
+
+			const response = await enter(wallet, gameCfg);
 
 			if (response?.objectChanges) {
 				for (let i = 0; i < response.objectChanges?.length; i++) {
@@ -37,9 +66,11 @@ const Landing = () => {
 						objectChange.objectType === GAME_TABLE_TYPE
 					) {
 						const gameTableId = objectChange.objectId;
+						setGameConfig(gameCfg);
 
 						// if user enters new game successfully, save the ongoing game id to local storage
 						localStorage.setItem(LOCAL_STORAGE_ONGOING_GAME_KEY, gameTableId);
+						localStorage.setItem(LOCAL_STORAGE_ONGOING_GAME_CONFIG_KEY, JSON.stringify(gameCfg));
 						await sleep(2000);
 						setLoading(false);
 						await router.push(`/game/${gameTableId}`);
@@ -77,47 +108,76 @@ const Landing = () => {
 							<Typography color="black" fontWeight={700} fontSize={32}>
 								Welcome to Shall We Move,
 							</Typography>
-							<Typography color="black" fontWeight={700} fontSize={20}>
+							<Typography color="black" fontWeight={500} fontSize={20}
+								sx={{
+									lineHeight: "1.2",
+									marginBottom: 1,
+								}}
+							>
 								a fully on-chain multiplayer card game implemented on the Sui
-								blockchain.
-							</Typography>
-							<Typography color="black" fontWeight={700} fontSize={20}>
+								blockchain. <br />
 								This project leverages the unique features of the Sui blockchain
-								to provide secure,
-							</Typography>
-							<Typography color="black" fontWeight={700} fontSize={20}>
+								to provide secure, <br />
 								transparent, and decentralized gameplay.
 							</Typography>
+
+							<Typography
+								component="a"
+								href="https://sui.io"
+								color="blue"
+								fontWeight={500}
+								fontSize={15}
+								sx={{ textDecoration: 'underline', marginBottom: 1, }}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								Click here to learn more about SUI.
+							</Typography>
 						</Box>
-						<ButtonWrapper>
-							<Button
-								onClick={enterGame}
-								variant="contained"
-								color="secondary"
+						<Box>
+							<Typography color="black" textAlign="center" fontWeight={700} fontSize={22}
 								sx={{
-									padding: "16px 20px",
-									fontSize: "1rem",
-									borderRadius: "40px",
-									fontWeight: 700,
-									boxShadow: "none",
+									borderTop: "1px solid rgba(0, 0, 0, 0.5)",
+									paddingTop: 3,
+									marginBottom: 2,
 								}}
 							>
-								Enter Game
-							</Button>
-							<Button
-								onClick={() => router.push("https://sui.io")}
-								sx={{
-									padding: "16px 20px",
-									fontSize: "1rem",
-									color: "white",
-									fontWeight: 700,
-									borderRadius: "40px",
-									backgroundColor: "#0272E6",
-								}}
-							>
-								Learn about SUI
-							</Button>
-						</ButtonWrapper>
+								Choose a game to play
+							</Typography>
+							<ButtonWrapper>
+
+								<Button
+									onClick={() => enterGame(GameType.TwoCardsPoker)}
+									variant="contained"
+									color="secondary"
+									endIcon={<LoginIcon />}
+									sx={{
+										padding: "16px 20px",
+										fontSize: "1rem",
+										borderRadius: "40px",
+										fontWeight: 700,
+										boxShadow: "none",
+									}}
+								>
+									2 Cards Poker
+								</Button>
+								<Button
+									onClick={() => enterGame(GameType.ThreeCardsPoker)}
+									variant="contained"
+									color="info"
+									endIcon={<LoginIcon />}
+									sx={{
+										padding: "16px 20px",
+										fontSize: "1rem",
+										color: "white",
+										fontWeight: 700,
+										borderRadius: "40px",
+									}}
+								>
+									3 Cards Poker
+								</Button>
+							</ButtonWrapper>
+						</Box>
 					</Container>
 				)
 			}
@@ -143,5 +203,5 @@ const ButtonWrapper = styled(Box)({
 	alignSelf: "flex-end",
 	justifyContent: "center",
 	alignItems: "center",
-	gap: 20,
+	gap: 40,
 });

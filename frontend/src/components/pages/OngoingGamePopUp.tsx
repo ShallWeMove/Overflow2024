@@ -1,7 +1,9 @@
 import {Box, Button, styled, Typography} from "@mui/material";
 import React from "react";
 import { useRouter } from "next/router";
-import {LOCAL_STORAGE_ONGOING_GAME_KEY} from "@/api/game";
+import {LOCAL_STORAGE_ONGOING_GAME_CONFIG_KEY, LOCAL_STORAGE_ONGOING_GAME_KEY} from "@/api/game";
+import {useSetAtom} from "jotai/index";
+import {gameConfigAtom} from "@/lib/states";
 
 interface OngoingGamePopUpProps {
     onClose: () => void;
@@ -9,9 +11,19 @@ interface OngoingGamePopUpProps {
 
 const OngoingGamePopUp = ({ onClose }: OngoingGamePopUpProps) => {
     const router = useRouter();
+    const setGameConfig = useSetAtom(gameConfigAtom);
 
     const handleResumeGame = () => {
         const ongoingGameId = localStorage.getItem(LOCAL_STORAGE_ONGOING_GAME_KEY);
+        const ongoingGameConfigStr = localStorage.getItem(LOCAL_STORAGE_ONGOING_GAME_CONFIG_KEY);
+        if (!ongoingGameId || !ongoingGameConfigStr) {
+            console.error("Ongoing game id or config is not available");
+            return;
+        }
+
+        const ongoingGameConfig = JSON.parse(ongoingGameConfigStr);
+        setGameConfig(ongoingGameConfig);
+
         router.push(`/game/${ongoingGameId}`);
     }
 

@@ -1,7 +1,7 @@
 import { GamePlayButton } from "@/components/UI/GamePlayButton";
 import { start } from "@/api/game";
 import { useAtomValue } from "jotai/index";
-import { walletAtom } from "@/lib/states";
+import {gameConfigAtom, walletAtom} from "@/lib/states";
 
 interface StartButtonProps {
 	gameTableId: string;
@@ -10,10 +10,16 @@ interface StartButtonProps {
 export const StartButton = ({ gameTableId }: StartButtonProps) => {
 	const disabled = false;
 	const wallet = useAtomValue(walletAtom);
+	const gameCfg = useAtomValue(gameConfigAtom);
 
 	const handleClick = async () => {
 		try {
-			const response = await start(wallet, gameTableId);
+			if (!wallet || !gameCfg) {
+				console.error("Wallet or game config is not available");
+				return;
+			}
+
+			const response = await start(wallet, gameTableId, gameCfg);
 
 			if (response?.effects?.status?.status === "failure") {
 				alert("Failed to start");

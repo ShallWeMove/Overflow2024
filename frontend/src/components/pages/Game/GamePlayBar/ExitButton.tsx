@@ -1,7 +1,7 @@
 import { GamePlayButton } from "@/components/UI/GamePlayButton";
-import {action, ActionType, exit, LOCAL_STORAGE_ONGOING_GAME_KEY} from "@/api/game";
+import { exit, LOCAL_STORAGE_ONGOING_GAME_KEY} from "@/api/game";
 import { useAtomValue } from "jotai/index";
-import { walletAtom } from "@/lib/states";
+import { walletAtom, gameConfigAtom } from "@/lib/states";
 import { useRouter } from "next/router";
 
 interface FoldButtonProps {
@@ -12,11 +12,17 @@ export const ExitButton = ({ gameTableId }: FoldButtonProps) => {
 	const router = useRouter();
 	const disabled = false;
 	const wallet = useAtomValue(walletAtom);
+	const gameCfg = useAtomValue(gameConfigAtom);
 
 	const handleClick = async () => {
 		// action;
 		try {
-			const response = await exit(wallet, gameTableId);
+			if (!wallet || !gameCfg) {
+				console.error("Wallet or game config is not available");
+				return;
+			}
+
+			const response = await exit(wallet, gameTableId, gameCfg);
 
 			if (response?.effects?.status?.status === "failure") {
 				alert("Failed to exit");
