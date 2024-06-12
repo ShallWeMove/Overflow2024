@@ -3,7 +3,8 @@ name = "two_cards_poker"
 edition = "2024.beta" # edition = "legacy" to use legacy (pre-2024) Move
 # license = ""           # e.g., "MIT", "GPL", "Apache 2.0"
 # authors = ["..."]      # e.g., ["Joe Smith (joesmith@noemail.com)", "John Snow (johnsnow@noemail.com)"]
-# published-at = "0x83375f7ddf8e848befd0febc4d05599faeef7c161e1b2c0b52fdbbf1a3d5d39c"
+published-at = "0x083e8ded007629112d56416e28a755df224f7b6de501145217bc2a10086ac002"
+# upgrade capability : 0xc2090075e23585765ffb60249df01b8a7c5a13c1d7f6fdb7d455e3bbf5f014bb
 
 [dependencies]
 Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "framework/testnet" }
@@ -26,6 +27,7 @@ two_cards_poker = "0x0"
 # Named addresses will be accessible in Move as `@name`. They're also exported:
 # for example, `std = "0x1"` is exported by the Standard Library.
 # alice = "0xA11CE"
+#### original
 shallwemove = "0xbb82f18ff31baf24223bac5176f2c272fdf296cfef5ef32b255af200f161b3ea"
 
 [dev-dependencies]

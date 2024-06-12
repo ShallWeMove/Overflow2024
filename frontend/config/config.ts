@@ -29,7 +29,7 @@ const config: Config = {
 
     games: {
         twoCardsPoker: {
-            packageId: '0xae6c82857ae56d339ca54ac85de07900b215b9c49d293cff5eaaa74c8e33ca63',
+            packageId: '0x083e8ded007629112d56416e28a755df224f7b6de501145217bc2a10086ac002',
             objects: {
                 casinoId: '0x5b9d2b62c3a0a79341e24844e71947c5366ea3d078658485d39685e04745e1c2',
                 loungeId: '0xe88cc89eaee3d13315572b1b0679f58dbc031305776f32ffd84c33d9a5aba1d3',
