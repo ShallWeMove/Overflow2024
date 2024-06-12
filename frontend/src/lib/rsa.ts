@@ -120,7 +120,7 @@ export class RSA {
 
     
     public decrypt_card_number(card_number: number): number{
-        return this.modular_exponent(card_number, this.privateKey, this.n)
+        return this.modular_exponent(card_number, this.privateKey, this.n) - 10;
     }
 
     private encrypt(msg: number): number {
