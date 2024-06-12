@@ -183,26 +183,58 @@ In contrast to traditional poker, which utilizes 5 cards, Mini Poker is played w
 
 ## Hand Rankings
 
-### 1. Straight Flush Series
+### Two Cards Poker
+
+#### 1. Straight Flush Series
 
 - **Royal Straight Flush**: A combination of A and K cards of the same suit. It is the strongest hand.
 - **Back Straight Flush**: A combination of A and 2 cards of the same suit. Depending on the rules, it may be recognized as the second strongest hand.
 - **Straight Flush**: A combination of two consecutive numbers of the same suit. It is the third strongest hand.
 
-### 2. Pair
+#### 2. Triple
 
-- A pair consists of two cards with the same number or the same letter, such as J, Q, K.
+- A pair consists of three cards with the same number or the same letter, such as J, Q, K.
 
-### 3. Straight Series
+#### 3. Straight Series
 
 - **Royal Straight (Mountain)**: A combination of A and K cards with different suits. It is one of the strongest combinations among straight hands.
 - **Back Straight**: It consists of A and 2 cards with different suits.
 - **Straight**: A combination of two consecutive numbers with different suits. In mini poker, similar to three of a kind, this hand is considered higher than a flush.
 
-### 4. Flush
+#### 4. Flush
 
 - A flush consists of two cards of the same suit.
 
-### 5. Top
+#### 5. Pair
+
+- A pair consists of two cards with the same number or the same letter, such as J, Q, K.
+
+#### 6. Top
+
+- The highest single card in a hand, not forming any particular combination. It does not contribute to any specific hand rank. An Ace (A) is the highest top card, and a 4 is the lowest.
+
+### Three Cards Poker
+
+#### 1. Straight Flush Series
+
+- **Royal Straight Flush**: A combination of A and K cards of the same suit. It is the strongest hand.
+- **Back Straight Flush**: A combination of A and 2 cards of the same suit. Depending on the rules, it may be recognized as the second strongest hand.
+- **Straight Flush**: A combination of two consecutive numbers of the same suit. It is the third strongest hand.
+
+#### 2. Pair
+
+- A pair consists of two cards with the same number or the same letter, such as J, Q, K.
+
+#### 3. Straight Series
+
+- **Royal Straight (Mountain)**: A combination of A and K cards with different suits. It is one of the strongest combinations among straight hands.
+- **Back Straight**: It consists of A and 2 cards with different suits.
+- **Straight**: A combination of two consecutive numbers with different suits. In mini poker, similar to three of a kind, this hand is considered higher than a flush.
+
+#### 4. Flush
+
+- A flush consists of two cards of the same suit.
+
+#### 5. Top
 
 - The highest single card in a hand, not forming any particular combination. It does not contribute to any specific hand rank. An Ace (A) is the highest top card, and a 4 is the lowest.
