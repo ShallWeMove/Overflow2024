@@ -4,8 +4,8 @@ edition = "2024.beta" # edition = "legacy" to use legacy (pre-2024) Move
 # license = ""           # e.g., "MIT", "GPL", "Apache 2.0"
 # authors = ["..."]      # e.g., ["Joe Smith (joesmith@noemail.com)", "John Snow (johnsnow@noemail.com)"]
 # latest version package address
-published-at = "0x83375f7ddf8e848befd0febc4d05599faeef7c161e1b2c0b52fdbbf1a3d5d39c"
-# upgrade capability : 0xbc040e3b92a9a87f1ea420a19ad3be4b77f529d06836089efc918d3303522254
+# published-at = "0x2cddba646146b7e3964eed9b9905d15027555f583addd1e6bef4a86c275485c8"
+# upgrade capability : 0xa98c0b9c84ff81f09c0b79c5a324b72ac83b4ffb2db06a98f857b4eb8f47d31c
 
 [dependencies]
 Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "framework/testnet" }
@@ -23,13 +23,13 @@ shallwemove = { git = "https://github.com/ShallWeMove/Overflow2024", subdir = "s
 # Override = { local = "../conflicting/version", override = true }
 
 [addresses]
-# three_cards_poker = "0x3e3dc90769912624b992753928f87bc31e8e350e0ef2af255a748ff3f898742e"
+# three_cards_poker = "0x2cddba646146b7e3964eed9b9905d15027555f583addd1e6bef4a86c275485c8"
 three_cards_poker = "0x0"
 
 # Named addresses will be accessible in Move as `@name`. They're also exported:
 # for example, `std = "0x1"` is exported by the Standard Library.
 # alice = "0xA11CE"
-shallwemove = "0xd10b25e4b34a013949d22666cf115cd01c2b0714585cd260122cb3e627893b63"
+shallwemove = "0xbb82f18ff31baf24223bac5176f2c272fdf296cfef5ef32b255af200f161b3ea"
 
 [dev-dependencies]
 # The dev-dependencies section allows overriding dependencies for `--test` and
