@@ -124,11 +124,11 @@ export class RSA {
     }
 
     private encrypt(msg: number): number {
-        return this.modular_exponent(msg, this.exp, this.n);
+        return this.modular_exponent(msg + 10, this.exp, this.n);
     }
 
     private decrypt(encryptedMsg: number): number {
-        return this.modular_exponent(encryptedMsg, this.privateKey, this.n);
+        return this.modular_exponent(encryptedMsg, this.privateKey, this.n) - 10;
     }
 
     public getPublicKey(): number {

@@ -17,11 +17,11 @@ module shallwemove::encrypt {
 
   public fun encrypt_256(n: u256 , char: u256): u256{ 
     let exponent : u256 = 65537;
-    modular_exponent(char, exponent, n)
+    modular_exponent(char + 10u256, exponent, n)
   }
   public fun decrypt_256(n: u256 ,char: u256): u256{
     let priv_key : u256 = 24057;
-    modular_exponent(char, priv_key, n)
+    modular_exponent(char, priv_key, n) - 10u256
   }
 
   public fun modular_exponent(mut base : u256, mut exp : u256, mod : u256) : u256 {
@@ -124,18 +124,18 @@ module shallwemove::encrypt {
     let exp = 65537;
     let pub_key = 35263 as u256;
     let priv_key = 24057 as u256;
-    let message = vector<u8>[53, 49, 55, 53, 48, 49, 50, 101,102,103,104,105,106,107,108,109];
+    let message = vector<u8>[53, 49, 55, 53, 48, 49, 50];
 
     let cipher = encrypt_vector(pub_key, exp, message);
     let d_message = decrypt_vector(pub_key, priv_key, cipher);
     let number = convert_vec_u8_to_u256(d_message);
 
-    debug::print(&message);
     debug::print(&string::utf8(message));
+    debug::print(&string::utf8(d_message));
     debug::print(&cipher);
     debug::print(&d_message);
     debug::print(&number);
-    // assert!(d_message == vector<u256>[12u256, 33u256]);
+    assert!(d_message == message);
   }
 
 //     #[test]
