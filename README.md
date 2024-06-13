@@ -49,11 +49,11 @@ Immerse yourself in the game interface, crafted to provide a smooth and captivat
 ## Game Flow
 ![Game Flow](images/game_flow.png)
 
-## Modulization
-![Modulization](images/modulization.png)
+## Modularization
+![Modularization](images/modularization.png)
 
-## Modulization example
-![Modulization Example](images/modulization_example.png)
+## Modularization example
+![Modularization Example](images/modularization_example.png)
 
 
 # Tech Stack
