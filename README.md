@@ -81,8 +81,28 @@ As a result, the only data stored on-chain is the client's public key and the en
 
 # Get Started
 
-To run the project locally, follow these steps:
+There are two ways to run the project locally.
 
+1. Run with Docker container
+2. Run with pnpm
+
+## Run with Docker Container
+Installing [Docker](https://docs.docker.com/engine/install/) is required 
+
+### 1. Run docker containers
+```
+git clone https://github.com/ShallWeMove/Overflow2024.git && cd Overflow2023/frontend
+make # Create SSL Certficates
+docker compose up -d
+```
+### 2. Open website on browser
+`http://localhost`
+
+### 4. Play ShallWeMove!
+For more detailed settings, See **Run project with pnpm**
+
+
+# Run project with pnpm
 ## Prerequisites
 
 - Node.js (v18.17.0 or later)
