@@ -20,30 +20,12 @@ Immerse yourself in the game interface, crafted to provide a smooth and captivat
 
 # Table of Contents
 
-- [Entirely Blockchain-Powered Multiplayer Card Game: _Play, Create, Share_](#entirely-blockchain-powered-multiplayer-card-game---play--create--share-)
-  * [Homepage](#homepage)
-  * [Game Interface](#game-interface)
-  * [Demo Video](#demo-video)
-- [Table of Contents](#table-of-contents)
 - [Overview](#overview)
 - [Features](#features)
 - [Architectures](#architectures)
-  * [Game Data Structures](#game-data-structures)
-  * [Game Flow](#game-flow)
-  * [Modulization](#modulization)
-  * [Modulization example](#modulization-example)
 - [Tech Stack](#tech-stack)
 - [Get Started](#get-started)
-  * [Prerequisites](#prerequisites)
-  * [Clone the Repository](#clone-the-repository)
-  * [Smart Contracts](#smart-contracts)
-  * [Frontend](#frontend)
 - [Mini Poker: Instructions, Rules, and Hand Rankings](#mini-poker--instructions--rules--and-hand-rankings)
-  * [Overview](#overview-1)
-  * [Wallet Setup](#wallet-setup)
-  * [Starting the Game](#starting-the-game)
-  * [Betting Rules](#betting-rules)
-  * [Hand Rankings](#hand-rankings)
 
 # Overview
 
