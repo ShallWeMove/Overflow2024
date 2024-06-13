@@ -23,25 +23,42 @@ export const GamePlayBar = ({ gameTableId }: GamePlayBarProps) => {
 
 	return (
 		<Container>
-			{tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.PRE_GAME)
-			&& playerInfo?.fields.playingStatus == convertPlayingStatusTypeToInt(PlayingStatusType.ENTER)
-			&&<AnteButton gameTableId={gameTableId} />}
-			{tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.PRE_GAME)
-			&& tableInfo.managerPlayerAddress == playerInfo?.fields.playerAddress
-			&& <StartButton gameTableId={gameTableId} />}
-			{tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.IN_GAME)
-			&&<BetButton gameTableId={gameTableId} />}
-			{tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.IN_GAME)
-			&&<CheckButton gameTableId={gameTableId} />}
-			{tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.IN_GAME)
-			&&<CallButton gameTableId={gameTableId} />}
-			{tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.IN_GAME)
-			&&<RaiseButton gameTableId={gameTableId} />}
-			{tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.IN_GAME)
-			&&<FoldButton gameTableId={gameTableId} />}
+			{
+				tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.PRE_GAME) &&
+				playerInfo?.fields.playingStatus == convertPlayingStatusTypeToInt(PlayingStatusType.ENTER) &&
+				<AnteButton gameTableId={gameTableId} />
+			}
+			{
+				tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.PRE_GAME) &&
+				tableInfo.managerPlayerAddress == playerInfo?.fields.playerAddress &&
+				<StartButton gameTableId={gameTableId} />
+			}
+			{
+				tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.IN_GAME) &&
+				<BetButton gameTableId={gameTableId} />
+			}
+			{
+				tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.IN_GAME) &&
+				<CheckButton gameTableId={gameTableId} />
+			}
+			{
+				tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.IN_GAME) &&
+				<CallButton gameTableId={gameTableId} />
+			}
+			{
+				tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.IN_GAME) &&
+				<RaiseButton gameTableId={gameTableId} />
+			}
+			{
+				tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.IN_GAME) &&
+				<FoldButton gameTableId={gameTableId} />
+			}
 			<ExitButton gameTableId={gameTableId} />
-			{tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.GAME_FINISHED)
-			&&<SettleUpButton gameTableId={gameTableId} />}
+			{
+				tableInfo.gamePlayingStatus == convertGameStatusTypeToInt(GameStatusType.GAME_FINISHED) &&
+				tableInfo.winnerPlayer == playerInfo?.fields.playerAddress &&
+				<SettleUpButton gameTableId={gameTableId} />
+			}
 		</Container>
 	);
 };
