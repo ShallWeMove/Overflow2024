@@ -96,7 +96,7 @@ make # Create SSL Certficates
 docker compose up -d
 ```
 ### 2. Open website on browser
-`http://localhost`
+```http://localhost```
 
 ### 4. Play ShallWeMove!
 For more detailed settings, See **Run project with pnpm**
