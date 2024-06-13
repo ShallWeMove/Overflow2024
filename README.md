@@ -25,7 +25,7 @@ Immerse yourself in the game interface, crafted to provide a smooth and captivat
 - [Architectures](#architectures)
 - [Tech Stack](#tech-stack)
 - [Get Started](#get-started)
-- [Mini Poker: Instructions, Rules, and Hand Rankings](#mini-poker--instructions--rules--and-hand-rankings)
+- [Mini Poker: Instructions, Rules, and Hand Rankings](#mini-poker-instructions-rules-and-hand-rankings)
 
 # Overview
 
