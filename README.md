@@ -22,10 +22,10 @@ Immerse yourself in the game interface, crafted to provide a smooth and captivat
 
 - [Overview](#overview)
 - [Features](#features)
+- [Architectures](#architectures)
 - [Tech Stack](#tech-stack)
 - [Get Started](#get-started)
-- [Game Rules](#game-rules)
-  <br><br>
+- [Mini Poker: Instructions, Rules, and Hand Rankings](#mini-poker-instructions-rules-and-hand-rankings)
 
 # Overview
 
@@ -40,6 +40,21 @@ Immerse yourself in the game interface, crafted to provide a smooth and captivat
 - **Randomness**: Cards are distributed randomly to ensure fair play.
 - **Next.js + Typescript Frontend**: A modern, responsive web interface for seamless gameplay.
   <br><br>
+
+# Architectures
+
+## Game Data Structures
+![Game Data Structures](images/game_data_structures.png)
+
+## Game Flow
+![Game Flow](images/game_flow.png)
+
+## Modularization
+![Modularization](images/modularization.png)
+
+## Modularization example
+![Modularization Example](images/modularization_example.png)
+
 
 # Tech Stack
 
