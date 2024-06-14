@@ -251,7 +251,7 @@ In contrast to traditional poker, which utilizes 5 cards, Mini Poker is played w
 
 ## Hand Rankings
 
-### **Three Cards Poker**
+### _Three Cards Poker_
 
 #### 1. Straight Flush Series
 
@@ -281,7 +281,7 @@ In contrast to traditional poker, which utilizes 5 cards, Mini Poker is played w
 
 - The highest single card in a hand, not forming any particular combination. It does not contribute to any specific hand rank. An Ace (A) is the highest top card, and a 4 is the lowest.
 
-### **Two Cards Poker**
+### _Two Cards Poker_
 
 #### 1. Straight Flush Series
 
