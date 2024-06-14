@@ -138,6 +138,35 @@ module shallwemove::encrypt {
     assert!(d_message == message);
   }
 
+  #[test]
+  fun test02() {
+    let encrypted_card_number1 = 30795 as u256;
+    let encrypted_card_number2 = 12759 as u256;
+    let encrypted_card_number3 = 363 as u256;
+    let encrypted_card_number4 = 14767 as u256;
+
+    let n = 35263 as u256;
+
+
+    debug::print(&string::utf8(b"ecrypt decrypt test"));
+    // let exp = 65537 as u256;
+
+    debug::print(&string::utf8(b"encrypt 24"));
+    debug::print(&encrypt_256(n, 24));
+
+    debug::print(&string::utf8(b"decrypt 30795"));
+    debug::print(&decrypt_256(n, encrypted_card_number1));
+
+    debug::print(&string::utf8(b"decrypt 12759"));
+    debug::print(&decrypt_256(n, encrypted_card_number2));
+
+    debug::print(&string::utf8(b"decrypt 363"));
+    debug::print(&decrypt_256(n, encrypted_card_number3));
+
+    debug::print(&string::utf8(b"decrypt 14767"));
+    debug::print(&decrypt_256(n, encrypted_card_number4));
+  }
+
 //     #[test]
 //     fun test_vector_to_int(){
 //         let mut string_int = b"54235423";
