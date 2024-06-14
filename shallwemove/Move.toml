@@ -2,7 +2,7 @@
 name = "shallwemove"
 edition = "2024.beta" # edition = "legacy" to use legacy (pre-2024) Move
 # latest version package address
-published-at = "0xccf63dce749629c2b67c013ddc25d3735da4e45de9a03e9aa5b22d0fd2cc42f0"
+published-at = "0x9deb398f3824c1ac812d89dc5be5a8306c695e8bf40103065fb35b5a2baf0c77"
 ### upgrade capability : 0xbfaeb6b4695ddb978bba3f0099d54ccdb02112c47d3584ea3ba6846346d27129
 # license = ""           # e.g., "MIT", "GPL", "Apache 2.0"
 # authors = ["..."]      # e.g., ["Joe Smith (joesmith@noemail.com)", "John Snow (johnsnow@noemail.com)"]
