@@ -3,7 +3,7 @@ name = "two_cards_poker"
 edition = "2024.beta" # edition = "legacy" to use legacy (pre-2024) Move
 # license = ""           # e.g., "MIT", "GPL", "Apache 2.0"
 # authors = ["..."]      # e.g., ["Joe Smith (joesmith@noemail.com)", "John Snow (johnsnow@noemail.com)"]
-published-at = "0x083e8ded007629112d56416e28a755df224f7b6de501145217bc2a10086ac002"
+published-at = "0x9149494986fdf96ca98971313da3329dcd3a3396238bc7cf0a372e8f5747027a"
 # upgrade capability : 0xc2090075e23585765ffb60249df01b8a7c5a13c1d7f6fdb7d455e3bbf5f014bb
 
 [dependencies]
