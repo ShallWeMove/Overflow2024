@@ -17,11 +17,13 @@ module shallwemove::encrypt {
 
   public fun encrypt_256(n: u256 , char: u256): u256{ 
     let exponent : u256 = 65537;
-    modular_exponent(char + 10u256, exponent, n)
+    // modular_exponent(char + 10u256, exponent, n)
+    modular_exponent(char, exponent, n)
   }
   public fun decrypt_256(n: u256 ,char: u256): u256{
     let priv_key : u256 = 24057;
-    modular_exponent(char, priv_key, n) - 10u256
+    // modular_exponent(char, priv_key, n) - 10u256
+    modular_exponent(char, priv_key, n)
   }
 
   public fun modular_exponent(mut base : u256, mut exp : u256, mod : u256) : u256 {
