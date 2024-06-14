@@ -4,7 +4,7 @@ edition = "2024.beta" # edition = "legacy" to use legacy (pre-2024) Move
 # license = ""           # e.g., "MIT", "GPL", "Apache 2.0"
 # authors = ["..."]      # e.g., ["Joe Smith (joesmith@noemail.com)", "John Snow (johnsnow@noemail.com)"]
 # latest version package address
-# published-at = "0x2cddba646146b7e3964eed9b9905d15027555f583addd1e6bef4a86c275485c8"
+published-at = "0xce9db356441ebc9642481676f3a97ab1045ae0fe339afb42ca559401de6cf2d6"
 # upgrade capability : 0xa98c0b9c84ff81f09c0b79c5a324b72ac83b4ffb2db06a98f857b4eb8f47d31c
 
 [dependencies]

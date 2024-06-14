@@ -36,7 +36,7 @@ const config: Config = {
             }
         },
         threeCardsPoker: {
-            packageId: '0x2cddba646146b7e3964eed9b9905d15027555f583addd1e6bef4a86c275485c8',
+            packageId: '0xce9db356441ebc9642481676f3a97ab1045ae0fe339afb42ca559401de6cf2d6',
             objects: {
                 casinoId: '0x5b9d2b62c3a0a79341e24844e71947c5366ea3d078658485d39685e04745e1c2',
                 loungeId: '0x9344be522ec8dca0fad97735d9b7a27567482a95f69990745075193421fa493b',
